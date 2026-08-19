@@ -8,6 +8,7 @@ import { DoiModule } from './doi/doi.module';
 import { AuthModule } from './auth/auth.module';
 import { InstitutionsModule } from './institutions/institutions.module';
 import { PublicationsModule } from './publications/publications.module';
+import { ImportModule } from './import/import.module';
 import { AdminModule } from './admin/admin.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { AdminModule } from './admin/admin.module';
     InstitutionsModule,
     DoiModule,
     PublicationsModule,
+    ImportModule,
     AdminModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

@@ -5,6 +5,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import helmet from '@fastify/helmet';
+import multipart from '@fastify/multipart';
 import { AppModule } from './app.module';
 
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
@@ -18,6 +19,9 @@ async function bootstrap(): Promise<void> {
 
   // CSP diatur di unical-nginx agar tidak dobel dengan header dari proxy.
   await app.register(helmet, { contentSecurityPolicy: false });
+  await app.register(multipart, {
+    limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 },
+  });
 
   app.setGlobalPrefix('api');
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
