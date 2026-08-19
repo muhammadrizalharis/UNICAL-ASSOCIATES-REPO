@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.module';
 
 @Injectable()
 export class ResearchersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
 
   /** Direktori hanya memuat peneliti yang UNICAL ID-nya sudah terbit. */
   async directory(params: { q?: string; facultyId?: string; page?: number }) {
@@ -133,8 +137,48 @@ export class ResearchersService {
       publicationsByYear[pub.year] = (publicationsByYear[pub.year] ?? 0) + 1;
     }
 
+    // Tren sitasi: total snapshot bulanan seluruh karya peneliti ini.
+    const trendRows = await this.prisma.citationSnapshot.groupBy({
+      by: ['snapshotDate'],
+      where: {
+        publication: {
+          status: 'APPROVED',
+          authors: { some: { researcher: { unicalId } } },
+        },
+      },
+      _sum: { citationCount: true },
+      orderBy: { snapshotDate: 'asc' },
+    });
+    const citationTrend = trendRows.map((row) => ({
+      date: row.snapshotDate.toISOString().slice(0, 10),
+      citations: row._sum.citationCount ?? 0,
+    }));
+
+    // Kolaborator terdekat berdasarkan karya bersama.
+    const collabCount = new Map<
+      string,
+      { name: string; unicalId: string | null; count: number }
+    >();
+    for (const pub of publications) {
+      for (const c of pub.contributors) {
+        if (c.isOwner) continue;
+        const key = c.unicalId ?? c.name.toLowerCase();
+        const entry = collabCount.get(key);
+        if (entry) entry.count++;
+        else collabCount.set(key, { name: c.name, unicalId: c.unicalId, count: 1 });
+      }
+    }
+    const topCollaborators = [...collabCount.values()]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    const followerCount = await this.prisma.researcherFollow.count({
+      where: { researcher: { unicalId } },
+    });
+
     return {
       ...profile,
+      followerCount,
       metrics: {
         totalPublications: publications.length,
         totalCitations: profile.totalCitations,
@@ -142,7 +186,88 @@ export class ResearchersService {
         i10Index: profile.i10Index,
       },
       publicationsByYear,
+      citationTrend,
+      topCollaborators,
       publications,
     };
+  }
+
+  private async profileByUnicalId(unicalId: string) {
+    const profile = await this.prisma.researcherProfile.findUnique({
+      where: { unicalId },
+      select: { id: true, userId: true, fullName: true },
+    });
+    if (!profile) {
+      throw new NotFoundException({
+        code: 'RESEARCHER_NOT_FOUND',
+        message: 'Peneliti dengan UNICAL ID tersebut tidak ditemukan.',
+      });
+    }
+    return profile;
+  }
+
+  async followState(userId: string, unicalId: string) {
+    const profile = await this.profileByUnicalId(unicalId);
+    const follow = await this.prisma.researcherFollow.findUnique({
+      where: {
+        followerId_researcherId: {
+          followerId: userId,
+          researcherId: profile.id,
+        },
+      },
+      select: { createdAt: true },
+    });
+    return { following: Boolean(follow), isSelf: profile.userId === userId };
+  }
+
+  async follow(userId: string, unicalId: string) {
+    const profile = await this.profileByUnicalId(unicalId);
+    if (profile.userId === userId) {
+      return { following: false, isSelf: true };
+    }
+
+    const created = await this.prisma.researcherFollow.upsert({
+      where: {
+        followerId_researcherId: {
+          followerId: userId,
+          researcherId: profile.id,
+        },
+      },
+      create: { followerId: userId, researcherId: profile.id },
+      update: {},
+    });
+
+    // Notifikasi hanya saat follow baru, bukan pengulangan.
+    if (Date.now() - created.createdAt.getTime() < 5_000) {
+      const follower = await this.prisma.researcherProfile.findUnique({
+        where: { userId },
+        select: { fullName: true, unicalId: true },
+      });
+      void this.notifications.notify(profile.userId, {
+        type: 'social.follow',
+        title: `${follower?.fullName ?? 'Seseorang'} mulai mengikuti Anda`,
+        link: follower?.unicalId ? `/profil/${follower.unicalId}` : undefined,
+      });
+    }
+
+    return { following: true, isSelf: false };
+  }
+
+  async unfollow(userId: string, unicalId: string) {
+    const profile = await this.profileByUnicalId(unicalId);
+    await this.prisma.researcherFollow.deleteMany({
+      where: { followerId: userId, researcherId: profile.id },
+    });
+    return { following: false, isSelf: profile.userId === userId };
+  }
+
+  /** Semua userId pengikut seorang peneliti; dipakai untuk notifikasi karya baru. */
+  async followerUserIds(researcherIds: string[]): Promise<string[]> {
+    if (researcherIds.length === 0) return [];
+    const rows = await this.prisma.researcherFollow.findMany({
+      where: { researcherId: { in: researcherIds } },
+      select: { followerId: true },
+    });
+    return rows.map((r) => r.followerId);
   }
 }

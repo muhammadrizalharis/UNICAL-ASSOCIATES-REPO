@@ -69,6 +69,9 @@ model User {
   emailVerifiedAt DateTime? @map("email_verified_at")
   termsAcceptedAt DateTime? @map("terms_accepted_at")
   lastLoginAt     DateTime? @map("last_login_at")
+  /// Rahasia TOTP (base32); terisi saat setup, aktif setelah verifikasi.
+  totpSecret      String?   @map("totp_secret")
+  totpEnabledAt   DateTime? @map("totp_enabled_at")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
@@ -78,6 +81,13 @@ model User {
   reviewedClaims        ClaimRequest[]          @relation("ReviewedBy")
   auditLogs             AuditLog[]
   resetTokens           PasswordResetToken[]    @relation("ResetTarget")
+  sessions              UserSession[]
+  notifications         Notification[]
+  follows               ResearcherFollow[]
+  collections           Collection[]
+  comments              Comment[]
+  reportsFiled          Report[]                @relation("Reporter")
+  reportsResolved       Report[]                @relation("ReportResolver")
 
   @@map("users")
 }
@@ -164,6 +174,7 @@ model ResearcherProfile {
   department    Department?         @relation(fields: [departmentId], references: [id])
   authorships   PublicationAuthor[]
   claimRequests ClaimRequest[]
+  followers     ResearcherFollow[]
 
   @@index([fullName])
   @@map("researcher_profiles")
@@ -224,6 +235,9 @@ model Publication {
   categories  CategoryPublication[]
   indexations PublicationIndexation[]
   snapshots   CitationSnapshot[]
+  collectionItems CollectionItem[]
+  comments        Comment[]
+  reports         Report[]
 
   @@index([status, publishedDate(sort: Desc)])
   @@index([citationCount(sort: Desc)])
@@ -368,4 +382,130 @@ model PasswordResetToken {
 
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+/// Sesi perangkat; token JWT hanya sah bila sesinya masih hidup.
+model UserSession {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  tokenHash  String    @unique @map("token_hash")
+  userAgent  String?   @map("user_agent")
+  ipAddress  String?   @map("ip_address")
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at")
+  expiresAt  DateTime  @map("expires_at")
+  revokedAt  DateTime? @map("revoked_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_sessions")
+}
+
+model ResearcherFollow {
+  followerId   String   @map("follower_id") @db.Uuid
+  researcherId String   @map("researcher_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  follower   User              @relation(fields: [followerId], references: [id], onDelete: Cascade)
+  researcher ResearcherProfile @relation(fields: [researcherId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, researcherId])
+  @@index([researcherId])
+  @@map("researcher_follows")
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  type      String
+  title     String
+  body      String?
+  link      String?
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+model Collection {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String
+  isPublic  Boolean  @default(false) @map("is_public")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CollectionItem[]
+
+  @@unique([userId, name])
+  @@map("collections")
+}
+
+model CollectionItem {
+  collectionId  String   @map("collection_id") @db.Uuid
+  publicationId String   @map("publication_id") @db.Uuid
+  addedAt       DateTime @default(now()) @map("added_at")
+
+  collection  Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, publicationId])
+  @@map("collection_items")
+}
+
+model Comment {
+  id            String    @id @default(uuid()) @db.Uuid
+  publicationId String    @map("publication_id") @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  parentId      String?   @map("parent_id") @db.Uuid
+  body          String
+  deletedAt     DateTime? @map("deleted_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent      Comment?    @relation("Thread", fields: [parentId], references: [id])
+  replies     Comment[]   @relation("Thread")
+
+  @@index([publicationId, createdAt])
+  @@map("comments")
+}
+
+enum ReportType {
+  TAKEDOWN
+  ABUSE
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+/// Laporan takedown hak cipta atau penyalahgunaan; boleh anonim.
+model Report {
+  id             String       @id @default(uuid()) @db.Uuid
+  publicationId  String?      @map("publication_id") @db.Uuid
+  reporterId     String?      @map("reporter_id") @db.Uuid
+  reporterEmail  String?      @map("reporter_email")
+  type           ReportType   @default(OTHER)
+  status         ReportStatus @default(OPEN)
+  reason         String
+  resolutionNote String?      @map("resolution_note")
+  resolvedById   String?      @map("resolved_by") @db.Uuid
+  resolvedAt     DateTime?    @map("resolved_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  publication Publication? @relation(fields: [publicationId], references: [id], onDelete: SetNull)
+  reporter    User?        @relation("Reporter", fields: [reporterId], references: [id])
+  resolvedBy  User?        @relation("ReportResolver", fields: [resolvedById], references: [id])
+
+  @@index([status])
+  @@map("reports")
 }

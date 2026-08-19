@@ -48,6 +48,21 @@ export default function DashboardPage() {
                 title="Pengaturan Akun"
                 body="Ubah kata sandi Anda secara mandiri."
               />
+              <Card
+                href="/dashboard/keamanan"
+                title="Keamanan"
+                body="Aktifkan 2FA dan kelola perangkat yang login."
+              />
+              <Card
+                href="/dashboard/notifikasi"
+                title="Notifikasi"
+                body="Kabar klaim, komentar, pengikut, dan login baru."
+              />
+              <Card
+                href="/dashboard/koleksi"
+                title="Koleksi Saya"
+                body="Reading list publikasi yang Anda simpan."
+              />
               {user.profile?.unicalId && (
                 <Card
                   href={`/profil/${user.profile.unicalId}`}

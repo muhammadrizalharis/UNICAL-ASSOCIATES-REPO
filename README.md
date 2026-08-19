@@ -186,9 +186,11 @@ docker compose exec api npm run test:e2e    # end-to-end
 |---|---|:--:|
 | Fondasi | Stack Docker, PostgreSQL, Redis, Meilisearch, MinIO | ✅ |
 | Backend | NestJS + Fastify, skema Prisma, endpoint health | ✅ |
-| Inti | Autentikasi, UNICAL ID, upload via DOI, moderasi | 🚧 |
-| Sosial | Klaim kepenulisan, metrik, ekspor sitasi, koleksi | ⏳ |
-| Skala | Pencarian lanjutan, ORCID, API publik, PWA | ⏳ |
+| Inti | Autentikasi + 2FA, UNICAL ID, upload via DOI, moderasi | ✅ |
+| Sosial | Klaim kepenulisan, ekspor sitasi, koleksi, komentar, follow + notifikasi | ✅ |
+| Analitik | Metrik h-index/i10, tren sitasi, statistik institusi, laporan fakultas | ✅ |
+| Skala | Pencarian per-penulis, ORCID sync, API docs (Swagger), PWA, PDF open-access | ✅ |
+| Berjalan | Verifikasi email (menunggu SMTP kampus), domain resmi, multi-bahasa | 🚧 |
 
 ---
 

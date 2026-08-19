@@ -128,12 +128,18 @@ export default async function PublikasiPage({
       <main className="mx-auto max-w-5xl px-4 py-8">
         <h1 className="text-2xl font-semibold text-slate-900">Jelajahi Publikasi</h1>
 
-        <form className="mt-4 flex gap-2">
+        <form className="mt-4 flex flex-wrap gap-2">
           <input
             name="q"
             defaultValue={current.q ?? ''}
-            placeholder="Cari judul, abstrak, penulis, atau DOI…"
-            className="flex-1 rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            placeholder="Cari judul, abstrak, atau DOI…"
+            className="min-w-48 flex-1 rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+          />
+          <input
+            name="author"
+            defaultValue={current.author ?? ''}
+            placeholder="Nama penulis (opsional)"
+            className="w-56 rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
           />
           <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
             Cari

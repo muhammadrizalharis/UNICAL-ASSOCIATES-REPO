@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { PublicationActions } from '@/components/publication-actions';
+import { SaveToCollection } from '@/components/save-to-collection';
+import { CommentsSection } from '@/components/comments-section';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +32,7 @@ interface PublicationDetail {
   publishedDate: string | null;
   keywords: string[];
   url: string | null;
+  pdfUrl: string | null;
   citationCount: number;
   viewCount: number;
 }
@@ -40,6 +43,25 @@ async function loadPublication(id: string): Promise<PublicationDetail | null> {
     return body.data;
   } catch {
     return null;
+  }
+}
+
+interface RelatedHit {
+  id: string;
+  title: string;
+  journal: string | null;
+  year: number | null;
+  citationCount: number;
+}
+
+async function loadRelated(id: string): Promise<RelatedHit[]> {
+  try {
+    const body = await apiFetch<{ data: RelatedHit[] }>(
+      `/publications/${id}/related`,
+    );
+    return body.data;
+  } catch {
+    return [];
   }
 }
 
@@ -78,6 +100,8 @@ export default async function PublicationDetailPage({
   const { id } = await params;
   const pub = await loadPublication(id);
   if (!pub) notFound();
+
+  const related = await loadRelated(id);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -138,18 +162,34 @@ export default async function PublicationDetailPage({
           >
             DOI: {pub.doi} ↗
           </a>
+          {pub.pdfUrl && (
+            <a
+              href={pub.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded bg-rose-600 px-2 py-0.5 text-xs font-semibold text-white hover:bg-rose-700"
+            >
+              📄 PDF Open Access
+            </a>
+          )}
           <span className="text-slate-500">{pub.citationCount} sitasi</span>
           <span className="text-slate-500">{pub.viewCount} dilihat</span>
         </div>
 
-        <PublicationActions
-          publicationId={pub.id}
-          authors={pub.authors.map((a) => ({
-            name: a.name,
-            order: a.order,
-            claimed: a.claimed,
-          }))}
-        />
+        <div className="mt-4 flex flex-wrap items-start gap-2">
+          <PublicationActions
+            publicationId={pub.id}
+            hasPdf={Boolean(pub.pdfUrl)}
+            authors={pub.authors.map((a) => ({
+              name: a.name,
+              order: a.order,
+              claimed: a.claimed,
+            }))}
+          />
+          <div className="mt-4">
+            <SaveToCollection publicationId={pub.id} />
+          </div>
+        </div>
 
         <section className="mt-6 rounded-lg border border-slate-200 bg-white p-5">
           <h2 className="mb-2 font-medium text-slate-900">Abstrak</h2>
@@ -192,6 +232,40 @@ export default async function PublicationDetailPage({
             )}
           </section>
         )}
+
+        {related.length > 0 && (
+          <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="mb-2 font-medium text-slate-900">Artikel Terkait</h2>
+            <ul className="space-y-2 text-sm">
+              {related.map((r) => (
+                <li key={r.id}>
+                  <Link
+                    href={`/publikasi/${r.id}`}
+                    className="text-indigo-700 hover:underline"
+                  >
+                    {r.title}
+                  </Link>
+                  <span className="text-slate-500">
+                    {' '}
+                    — {[r.journal, r.year, `${r.citationCount} sitasi`]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <CommentsSection publicationId={pub.id} />
+
+        <p className="mt-6 text-center text-xs text-slate-400">
+          Menemukan pelanggaran hak cipta atau penyalahgunaan?{' '}
+          <Link href="/kebijakan" className="text-indigo-600 hover:underline">
+            Laporkan di sini
+          </Link>
+          .
+        </p>
       </main>
     </div>
   );

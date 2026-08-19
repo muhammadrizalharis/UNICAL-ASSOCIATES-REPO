@@ -4,6 +4,7 @@ import { SearchIndexService } from './search-index.service';
 
 export interface SearchParams {
   q?: string;
+  author?: string;
   categories?: string[];
   indexations?: string[];
   type?: string;
@@ -48,11 +49,18 @@ export class SearchService {
     if (params.yearFrom) filters.push(`year >= ${params.yearFrom}`);
     if (params.yearTo) filters.push(`year <= ${params.yearTo}`);
 
+    // Pencarian khusus kolom penulis; digabung bila q umum juga terisi.
+    const authorOnly = Boolean(params.author && !params.q);
+    const query = authorOnly
+      ? (params.author ?? '')
+      : [params.q, params.author].filter(Boolean).join(' ');
+
     try {
-      const result = await this.indexService.index.search(params.q ?? '', {
+      const result = await this.indexService.index.search(query, {
         filter: filters.length ? filters.join(' AND ') : undefined,
         sort: params.sort ? SORT_MAP[params.sort] : undefined,
         facets: ['year', 'type', 'categorySlugs', 'indexations'],
+        attributesToSearchOn: authorOnly ? ['authors'] : undefined,
         limit,
         offset: (page - 1) * limit,
       });
@@ -90,6 +98,18 @@ export class SearchService {
               { title: { contains: params.q, mode: 'insensitive' as const } },
               { abstract: { contains: params.q, mode: 'insensitive' as const } },
             ],
+          }
+        : {}),
+      ...(params.author
+        ? {
+            authors: {
+              some: {
+                rawAuthorName: {
+                  contains: params.author,
+                  mode: 'insensitive' as const,
+                },
+              },
+            },
           }
         : {}),
     };
@@ -143,6 +163,40 @@ export class SearchService {
         attributesToRetrieve: ['id', 'title', 'year'],
       });
       return result.hits;
+    } catch {
+      return [];
+    }
+  }
+
+  /** Artikel terkait berbasis konten: judul + kata kunci sebagai kueri. */
+  async related(publicationId: string) {
+    const publication = await this.prisma.publication.findUnique({
+      where: { id: publicationId },
+      select: { title: true, keywords: true },
+    });
+    if (!publication) return [];
+
+    const keywords = Array.isArray(publication.keywords)
+      ? (publication.keywords as string[]).slice(0, 5).join(' ')
+      : '';
+
+    try {
+      const result = await this.indexService.index.search(
+        `${publication.title} ${keywords}`.slice(0, 300),
+        {
+          limit: 6,
+          attributesToRetrieve: [
+            'id',
+            'title',
+            'journal',
+            'year',
+            'citationCount',
+          ],
+        },
+      );
+      return result.hits
+        .filter((hit) => (hit as { id: string }).id !== publicationId)
+        .slice(0, 5);
     } catch {
       return [];
     }

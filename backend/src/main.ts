@@ -6,6 +6,7 @@ import {
 } from '@nestjs/platform-fastify';
 import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
@@ -33,6 +34,24 @@ async function bootstrap(): Promise<void> {
     }),
   );
   app.enableShutdownHooks();
+
+  // Dokumentasi API publik: /api/docs (UI) dan /api/docs-json (spec).
+  const openapi = new DocumentBuilder()
+    .setTitle('UNICAL ASSOCIATES REPO API')
+    .setDescription(
+      'API publik repositori publikasi ilmiah Universitas Muhammadiyah Makassar. ' +
+        'Endpoint baca (publikasi, pencarian, peneliti, statistik) terbuka; ' +
+        'endpoint tulis membutuhkan token Bearer.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  SwaggerModule.setup(
+    'api/docs',
+    app,
+    SwaggerModule.createDocument(app, openapi),
+    { customSiteTitle: 'UNICAL API Docs' },
+  );
 
   const port = Number(process.env.PORT ?? 8000);
   await app.listen(port, '0.0.0.0');

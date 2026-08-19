@@ -1,4 +1,4 @@
-import { toApa, toBibtex, toRis } from './citation-export.util';
+import { toApa, toBibtex, toIeee, toRis } from './citation-export.util';
 
 const data = {
   doi: '10.18280/ijsdp.210613',
@@ -47,5 +47,20 @@ describe('toApa', () => {
 
   it('memakai t.t. bila tahun tidak diketahui', () => {
     expect(toApa({ ...data, year: null })).toContain('(t.t.)');
+  });
+});
+
+describe('toIeee', () => {
+  it('memakai inisial di depan dan volume/no/pp gaya IEEE', () => {
+    const out = toIeee(data);
+    expect(out).toContain('M. Faisal and M. R. Haris');
+    expect(out).toContain('"Hybrid PCA-FCM Clustering for Provincial Rice Distribution,"');
+    expect(out).toContain('vol. 21, no. 6, pp. 113-125');
+    expect(out).toContain('doi: 10.18280/ijsdp.210613.');
+  });
+
+  it('memakai "and" Oxford untuk tiga penulis atau lebih', () => {
+    const out = toIeee({ ...data, authors: ['A Satu', 'B Dua', 'C Tiga'] });
+    expect(out).toContain('A. Satu, B. Dua, and C. Tiga');
   });
 });

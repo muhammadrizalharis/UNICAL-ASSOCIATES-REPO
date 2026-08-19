@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import { TrendChart } from '@/components/trend-chart';
+import { FollowButton } from '@/components/follow-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +19,7 @@ interface Profile {
   scholarId: string | null;
   faculty: { name: string } | null;
   department: { name: string; degree: string | null } | null;
+  followerCount: number;
   metrics: {
     totalPublications: number;
     totalCitations: number;
@@ -24,6 +27,8 @@ interface Profile {
     i10Index: number;
   };
   publicationsByYear: Record<string, number>;
+  citationTrend: { date: string; citations: number }[];
+  topCollaborators: { name: string; unicalId: string | null; count: number }[];
   publications: {
     id: string;
     title: string;
@@ -109,6 +114,10 @@ export default async function ProfilPage({
                   .filter(Boolean)
                   .join(' · ')}
               </p>
+              <FollowButton
+                unicalId={profile.unicalId}
+                initialCount={profile.followerCount}
+              />
             </div>
           </div>
 
@@ -178,6 +187,44 @@ export default async function ProfilPage({
                 </div>
               ))}
             </div>
+          </section>
+        )}
+
+        {profile.citationTrend.length > 1 && (
+          <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="mb-3 font-medium text-slate-900">Tren Sitasi</h2>
+            <TrendChart points={profile.citationTrend} />
+            <p className="mt-2 text-xs text-slate-400">
+              Snapshot bulanan total sitasi seluruh karya.
+            </p>
+          </section>
+        )}
+
+        {profile.topCollaborators.length > 0 && (
+          <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
+            <h2 className="mb-3 font-medium text-slate-900">Kolaborator Terdekat</h2>
+            <ul className="grid gap-1 sm:grid-cols-2">
+              {profile.topCollaborators.map((c) => (
+                <li
+                  key={c.unicalId ?? c.name}
+                  className="flex items-center justify-between rounded px-2 py-1 text-sm hover:bg-slate-50"
+                >
+                  {c.unicalId ? (
+                    <Link
+                      href={`/profil/${c.unicalId}`}
+                      className="truncate text-indigo-600 hover:underline"
+                    >
+                      {c.name}
+                    </Link>
+                  ) : (
+                    <span className="truncate text-slate-700">{c.name}</span>
+                  )}
+                  <span className="ml-2 shrink-0 rounded bg-slate-100 px-1.5 text-xs text-slate-500">
+                    {c.count} karya
+                  </span>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 

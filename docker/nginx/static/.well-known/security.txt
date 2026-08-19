@@ -1,0 +1,5 @@
+Contact: mailto:admin@unismuh.ac.id
+Expires: 2027-08-20T00:00:00.000Z
+Preferred-Languages: id, en
+Canonical: https://unical.unismuh.ac.id/.well-known/security.txt
+Policy: https://unical.unismuh.ac.id/kebijakan

@@ -20,4 +20,10 @@ export class LoginDto {
   @IsString()
   @MaxLength(64)
   gate?: string;
+
+  /** Kode 6 digit dari aplikasi autentikator; wajib bila 2FA aktif. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  totpCode?: string;
 }

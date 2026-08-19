@@ -8,6 +8,9 @@ import { JwtService } from '@nestjs/jwt';
 import { createHash } from 'node:crypto';
 import { hash, verify } from '@node-rs/argon2';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { SessionsService, SessionMeta } from './sessions.service';
+import { TotpService } from './totp.service';
+import { NotificationsService } from '../notifications/notifications.module';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AffiliationDto } from './dto/affiliation.dto';
@@ -27,15 +30,20 @@ const ARGON_OPTIONS = {
 
 const SESSION_SHORT = '1d';
 const SESSION_REMEMBER = '30d';
+const SESSION_SHORT_MS = 24 * 60 * 60 * 1000;
+const SESSION_REMEMBER_MS = 30 * SESSION_SHORT_MS;
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly sessions: SessionsService,
+    private readonly totp: TotpService,
+    private readonly notifications: NotificationsService,
   ) {}
 
-  async register(dto: RegisterDto) {
+  async register(dto: RegisterDto, meta: SessionMeta = {}) {
     if (!dto.acceptTerms) {
       throw new BadRequestException({
         code: 'TERMS_NOT_ACCEPTED',
@@ -79,14 +87,14 @@ export class AuthService {
     });
 
     return {
-      token: await this.signToken(user.id, false),
+      token: await this.issueSession(user.id, false, meta),
       user: this.toPublicUser(user),
       homePath: '/dashboard',
       nextStep: 'affiliation',
     };
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto, meta: SessionMeta = {}) {
     const email = dto.email.trim().toLowerCase();
 
     const user = await this.prisma.user.findUnique({
@@ -119,13 +127,42 @@ export class AuthService {
       throw invalid;
     }
 
+    // 2FA: bila aktif, kode dari aplikasi autentikator wajib menyertai.
+    if (user.totpEnabledAt && user.totpSecret) {
+      if (!dto.totpCode) {
+        throw new UnauthorizedException({
+          code: 'TOTP_REQUIRED',
+          message: 'Masukkan kode 6 digit dari aplikasi autentikator Anda.',
+        });
+      }
+      if (!this.totp.verifyLoginCode(user.totpSecret, dto.totpCode)) {
+        throw new UnauthorizedException({
+          code: 'TOTP_INVALID',
+          message: 'Kode 2FA salah.',
+        });
+      }
+    }
+
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
 
+    const token = await this.issueSession(
+      user.id,
+      dto.rememberMe ?? false,
+      meta,
+    );
+
+    void this.notifications.notify(user.id, {
+      type: 'security.login',
+      title: 'Login baru ke akun Anda',
+      body: `Perangkat: ${meta.userAgent?.slice(0, 120) ?? 'tidak dikenal'} · IP: ${meta.ipAddress ?? '-'}`,
+      link: '/dashboard/keamanan',
+    });
+
     return {
-      token: await this.signToken(user.id, dto.rememberMe ?? false),
+      token,
       user: this.toPublicUser(user),
       homePath: homePathForRole(user.role),
       nextStep: this.nextStepFor(user.profile),
@@ -198,7 +235,11 @@ export class AuthService {
   }
 
   /** Ubah kata sandi mandiri; wajib membuktikan kata sandi lama. */
-  async changePassword(userId: string, dto: ChangePasswordDto) {
+  async changePassword(
+    userId: string,
+    dto: ChangePasswordDto,
+    currentToken?: string,
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, passwordHash: true },
@@ -235,6 +276,11 @@ export class AuthService {
         targetId: userId,
       },
     });
+
+    // Perangkat lain harus login ulang setelah kata sandi berganti.
+    if (currentToken) {
+      await this.sessions.revokeOthers(userId, currentToken);
+    }
 
     return { changed: true };
   }
@@ -294,11 +340,29 @@ export class AuthService {
     );
   }
 
+  /** Terbitkan JWT dan daftarkan sesinya agar bisa dicabut per perangkat. */
+  private async issueSession(
+    userId: string,
+    remember: boolean,
+    meta: SessionMeta,
+  ): Promise<string> {
+    const token = await this.signToken(userId, remember);
+    const ttl = remember ? SESSION_REMEMBER_MS : SESSION_SHORT_MS;
+    await this.sessions.createForToken(
+      userId,
+      token,
+      new Date(Date.now() + ttl),
+      meta,
+    );
+    return token;
+  }
+
   private toPublicUser(user: {
     id: string;
     email: string;
     role: string;
     emailVerifiedAt: Date | null;
+    totpEnabledAt?: Date | null;
     profile?: Record<string, any> | null;
   }) {
     return {
@@ -306,6 +370,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
       emailVerified: Boolean(user.emailVerifiedAt),
+      totpEnabled: Boolean(user.totpEnabledAt),
       profile: user.profile
         ? {
             unicalId: user.profile.unicalId,

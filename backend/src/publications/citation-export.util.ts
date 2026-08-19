@@ -85,10 +85,44 @@ export function toApa(data: CitationData): string {
   return pieces.join(' ');
 }
 
+/** "Muhammad Rizal Haris" -> "M. R. Haris" sesuai gaya IEEE. */
+function ieeeName(full: string): string {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  const initials = parts
+    .slice(0, -1)
+    .map((p) => `${p[0].toUpperCase()}.`)
+    .join(' ');
+  return `${initials} ${parts.at(-1)}`;
+}
+
+export function toIeee(data: CitationData): string {
+  const names = data.authors.map(ieeeName);
+  const authorText =
+    names.length <= 1
+      ? (names[0] ?? '')
+      : names.length === 2
+        ? `${names[0]} and ${names[1]}`
+        : `${names.slice(0, -1).join(', ')}, and ${names.at(-1)}`;
+
+  const pieces = [`${authorText}, "${data.title},"`];
+  if (data.journal) {
+    let source = `*${data.journal}*`;
+    if (data.volume) source += `, vol. ${data.volume}`;
+    if (data.issue) source += `, no. ${data.issue}`;
+    if (data.pages) source += `, pp. ${data.pages}`;
+    pieces.push(`${source},`);
+  }
+  if (data.year) pieces.push(`${data.year},`);
+  pieces.push(`doi: ${data.doi}.`);
+  return pieces.join(' ');
+}
+
 export const EXPORT_FORMATS = {
   bibtex: { fn: toBibtex, mime: 'application/x-bibtex', ext: 'bib' },
   ris: { fn: toRis, mime: 'application/x-research-info-systems', ext: 'ris' },
   apa: { fn: toApa, mime: 'text/plain', ext: 'txt' },
+  ieee: { fn: toIeee, mime: 'text/plain', ext: 'txt' },
 } as const;
 
 export type ExportFormat = keyof typeof EXPORT_FORMATS;

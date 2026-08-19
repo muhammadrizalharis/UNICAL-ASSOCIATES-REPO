@@ -1,10 +1,12 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { StorageService } from '../common/storage/storage.module';
 import { DoiResolverService } from '../doi/doi-resolver.service';
 import { normalizeDoi } from '../doi/doi.util';
 import { CreatePublicationDto } from './dto/create-publication.dto';
@@ -15,6 +17,7 @@ export class PublicationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly resolver: DoiResolverService,
+    private readonly storage: StorageService,
   ) {}
 
   async create(userId: string, dto: CreatePublicationDto) {
@@ -197,6 +200,72 @@ export class PublicationsService {
     return created.id;
   }
 
+  /** Simpan PDF open-access; hanya pengunggah publikasi atau pengelola. */
+  async attachPdf(userId: string, publicationId: string, buffer: Buffer) {
+    if (!buffer.subarray(0, 5).toString('latin1').startsWith('%PDF-')) {
+      throw new BadRequestException({
+        code: 'NOT_A_PDF',
+        message: 'Isi berkas bukan PDF yang valid.',
+      });
+    }
+
+    const publication = await this.prisma.publication.findUnique({
+      where: { id: publicationId },
+      select: { id: true, submittedById: true },
+    });
+    if (!publication) {
+      throw new NotFoundException({
+        code: 'PUBLICATION_NOT_FOUND',
+        message: 'Publikasi tidak ditemukan.',
+      });
+    }
+
+    if (publication.submittedById !== userId) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { role: true },
+      });
+      const allowed = ['MODERATOR', 'FACULTY_ADMIN', 'SUPER_ADMIN'];
+      if (!user || !allowed.includes(user.role)) {
+        throw new ForbiddenException({
+          code: 'PDF_FORBIDDEN',
+          message: 'Hanya pengunggah publikasi atau pengelola yang boleh melampirkan PDF.',
+        });
+      }
+    }
+
+    await this.storage.put(`pdf/${publicationId}.pdf`, buffer, 'application/pdf');
+    await this.prisma.publication.update({
+      where: { id: publicationId },
+      data: { pdfUrl: `/api/v1/publications/${publicationId}/pdf` },
+    });
+
+    return { pdfUrl: `/api/v1/publications/${publicationId}/pdf` };
+  }
+
+  async getPdf(publicationId: string) {
+    const publication = await this.prisma.publication.findUnique({
+      where: { id: publicationId },
+      select: { pdfUrl: true, doi: true },
+    });
+    if (!publication?.pdfUrl) {
+      throw new NotFoundException({
+        code: 'PDF_NOT_FOUND',
+        message: 'Publikasi ini belum memiliki PDF open-access.',
+      });
+    }
+
+    const object = await this.storage.stream(`pdf/${publicationId}.pdf`);
+    if (!object) {
+      throw new NotFoundException({
+        code: 'PDF_NOT_FOUND',
+        message: 'Berkas PDF tidak ditemukan di penyimpanan.',
+      });
+    }
+
+    return { ...object, filename: `${publication.doi.replace(/[^\w.-]+/g, '_')}.pdf` };
+  }
+
   private detailInclude() {
     return {
       journal: true,
@@ -247,6 +316,7 @@ export class PublicationsService {
       publishedDate: row.publishedDate,
       keywords: row.keywords,
       url: row.url,
+      pdfUrl: row.pdfUrl,
       citationCount: row.citationCount,
       viewCount: row.viewCount,
     };

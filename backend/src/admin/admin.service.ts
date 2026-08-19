@@ -7,8 +7,10 @@ import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { UnicalIdService } from '../auth/unical-id.service';
 import { MetricsService } from '../researchers/metrics.service';
+import { ResearchersService } from '../researchers/researchers.service';
 import { SearchIndexService } from '../search/search-index.service';
 import { MailService } from '../common/mail/mail.service';
+import { NotificationsService } from '../notifications/notifications.module';
 
 @Injectable()
 export class AdminService {
@@ -16,8 +18,10 @@ export class AdminService {
     private readonly prisma: PrismaService,
     private readonly unicalId: UnicalIdService,
     private readonly metrics: MetricsService,
+    private readonly researchers: ResearchersService,
     private readonly searchIndex: SearchIndexService,
     private readonly mail: MailService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async pendingPublications(page = 1, limit = 20) {
@@ -49,7 +53,12 @@ export class AdminService {
   ) {
     const publication = await this.prisma.publication.findUnique({
       where: { id: publicationId },
-      select: { id: true, status: true },
+      select: {
+        id: true,
+        status: true,
+        submittedById: true,
+        authors: { select: { researcherId: true } },
+      },
     });
 
     if (!publication) {
@@ -87,6 +96,32 @@ export class AdminService {
     await this.metrics.recalculateForPublication(publicationId);
     // Indeks publik hanya memuat publikasi ter-approve.
     await this.searchIndex.sync(publicationId, updated.status);
+
+    const link = `/publikasi/${publicationId}`;
+    void this.notifications.notify(publication.submittedById, {
+      type: approve ? 'publication.approved' : 'publication.rejected',
+      title: approve
+        ? `Publikasi "${updated.title.slice(0, 80)}" disetujui`
+        : `Publikasi "${updated.title.slice(0, 80)}" ditolak`,
+      body: approve ? undefined : reason,
+      link,
+    });
+
+    if (approve) {
+      // Pengikut penulis mendapat kabar karya baru.
+      const researcherIds = publication.authors
+        .map((a) => a.researcherId)
+        .filter((id): id is string => Boolean(id));
+      const followerIds = await this.researchers.followerUserIds(researcherIds);
+      void this.notifications.notifyMany(
+        followerIds.filter((id) => id !== publication.submittedById),
+        {
+          type: 'social.new_publication',
+          title: `Publikasi baru: ${updated.title.slice(0, 100)}`,
+          link,
+        },
+      );
+    }
 
     return updated;
   }

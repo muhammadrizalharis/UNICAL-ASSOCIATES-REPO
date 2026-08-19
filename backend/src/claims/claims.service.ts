@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { MetricsService } from '../researchers/metrics.service';
+import { NotificationsService } from '../notifications/notifications.module';
 
 const MAX_REJECTIONS = 3;
 
@@ -14,6 +15,7 @@ export class ClaimsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly metrics: MetricsService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   /** Peneliti mengklaim salah satu slot penulis pada publikasi. */
@@ -131,7 +133,13 @@ export class ClaimsService {
         status: true,
         researcherId: true,
         publicationAuthorId: true,
-        publicationAuthor: { select: { researcherId: true } },
+        researcher: { select: { userId: true } },
+        publicationAuthor: {
+          select: {
+            researcherId: true,
+            publication: { select: { id: true, title: true } },
+          },
+        },
       },
     });
 
@@ -190,6 +198,16 @@ export class ClaimsService {
 
     // Metrik pemohon berubah begitu slot tertaut.
     if (approve) await this.metrics.recalculate(claim.researcherId);
+
+    const title = claim.publicationAuthor.publication.title.slice(0, 80);
+    void this.notifications.notify(claim.researcher.userId, {
+      type: approve ? 'claim.approved' : 'claim.rejected',
+      title: approve
+        ? `Klaim kepenulisan "${title}" disetujui`
+        : `Klaim kepenulisan "${title}" ditolak`,
+      body: approve ? undefined : reason,
+      link: `/publikasi/${claim.publicationAuthor.publication.id}`,
+    });
 
     return updated;
   }

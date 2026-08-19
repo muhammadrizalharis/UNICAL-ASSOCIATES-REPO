@@ -30,6 +30,15 @@ interface PendingClaim {
   };
 }
 
+interface OpenReport {
+  id: string;
+  type: string;
+  reason: string;
+  contact: string | null;
+  publication: { id: string; title: string; doi: string } | null;
+  createdAt: string;
+}
+
 export default function AdminPage() {
   return (
     <RequireAuth staffOnly>
@@ -40,6 +49,7 @@ export default function AdminPage() {
             <h1 className="text-2xl font-semibold text-slate-900">Panel Pengelola</h1>
             <PublicationQueue />
             <ClaimQueue />
+            <ReportQueue />
             {user.role !== 'MODERATOR' && <ResearcherQueue />}
           </main>
         </div>
@@ -177,6 +187,92 @@ function ClaimQueue() {
             >
               Tolak
             </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ReportQueue() {
+  const [rows, setRows] = useState<OpenReport[]>([]);
+  const [note, setNote] = useState<string | null>(null);
+
+  const load = () =>
+    apiFetch<{ data: OpenReport[] }>('/admin/reports?status=OPEN', {
+      headers: authHeader(),
+    })
+      .then((body) => setRows(body.data))
+      .catch(() => setNote('Gagal memuat laporan.'));
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  async function close(id: string, status: 'RESOLVED' | 'DISMISSED') {
+    const resolutionNote = window.prompt(
+      status === 'RESOLVED'
+        ? 'Catatan penyelesaian (mis. tindakan yang diambil):'
+        : 'Alasan mengabaikan laporan:',
+    );
+    if (!resolutionNote || resolutionNote.trim().length < 5) return;
+
+    await apiFetch(`/admin/reports/${id}`, {
+      method: 'PATCH',
+      headers: authHeader(),
+      body: JSON.stringify({ status, resolutionNote }),
+    }).catch(() => setNote('Gagal menutup laporan.'));
+    void load();
+  }
+
+  const TYPE_LABEL: Record<string, string> = {
+    TAKEDOWN: 'Takedown',
+    ABUSE: 'Penyalahgunaan',
+    OTHER: 'Lainnya',
+  };
+
+  return (
+    <section>
+      <h2 className="mb-3 font-medium text-slate-900">
+        Laporan Masuk ({rows.length})
+      </h2>
+      {note && <p className="mb-3 text-sm text-emerald-700">{note}</p>}
+
+      <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+        {rows.length === 0 && (
+          <p className="px-4 py-4 text-sm text-slate-500">Tidak ada laporan terbuka.</p>
+        )}
+        {rows.map((row) => (
+          <div key={row.id} className="px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span className="rounded bg-rose-100 px-1.5 py-0.5 text-xs font-medium text-rose-700">
+                {TYPE_LABEL[row.type] ?? row.type}
+              </span>
+              <span className="text-xs text-slate-400">
+                {new Date(row.createdAt).toLocaleString('id-ID')} ·{' '}
+                {row.contact ?? 'anonim'}
+              </span>
+            </div>
+            {row.publication && (
+              <p className="mt-1 truncate text-xs text-slate-500">
+                Publikasi: {row.publication.title} ({row.publication.doi})
+              </p>
+            )}
+            <p className="mt-1 text-sm text-slate-700">{row.reason}</p>
+            <div className="mt-2 flex gap-2">
+              <button
+                onClick={() => void close(row.id, 'RESOLVED')}
+                className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700"
+              >
+                Selesai ditangani
+              </button>
+              <button
+                onClick={() => void close(row.id, 'DISMISSED')}
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+              >
+                Abaikan
+              </button>
+            </div>
           </div>
         ))}
       </div>

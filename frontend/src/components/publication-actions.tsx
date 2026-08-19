@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { apiBase, apiFetch, ApiRequestError } from '@/lib/api';
 import { authHeader, readUser } from '@/lib/session';
 
@@ -14,14 +14,16 @@ interface AuthorSlot {
 export function PublicationActions({
   publicationId,
   authors,
+  hasPdf = false,
 }: {
   publicationId: string;
   authors: AuthorSlot[];
+  hasPdf?: boolean;
 }) {
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2">
       <span className="text-xs font-medium text-slate-500">Ekspor sitasi:</span>
-      {(['bibtex', 'ris', 'apa'] as const).map((format) => (
+      {(['bibtex', 'ris', 'apa', 'ieee'] as const).map((format) => (
         <a
           key={format}
           href={`${apiBase()}/publications/${publicationId}/export?format=${format}`}
@@ -31,7 +33,74 @@ export function PublicationActions({
         </a>
       ))}
       <ClaimButton publicationId={publicationId} authors={authors} />
+      <PdfUploadButton publicationId={publicationId} hasPdf={hasPdf} />
     </div>
+  );
+}
+
+function PdfUploadButton({
+  publicationId,
+  hasPdf,
+}: {
+  publicationId: string;
+  hasPdf: boolean;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setLoggedIn(Boolean(readUser()));
+  }, []);
+
+  if (!loggedIn) return null;
+
+  async function upload(file: File) {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const body = new FormData();
+      body.append('file', file);
+      const res = await fetch(`${apiBase()}/publications/${publicationId}/pdf`, {
+        method: 'POST',
+        headers: authHeader(),
+        body,
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json?.message ?? 'Unggah gagal.');
+      }
+      setMessage('PDF tersimpan. Muat ulang halaman untuk melihat tautannya.');
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Unggah gagal.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="application/pdf"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) void upload(file);
+          e.target.value = '';
+        }}
+      />
+      <button
+        disabled={busy}
+        onClick={() => inputRef.current?.click()}
+        className="rounded-md border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:border-rose-400 hover:text-rose-700 disabled:opacity-60"
+      >
+        {busy ? 'Mengunggah…' : hasPdf ? 'Ganti PDF' : '📄 Unggah PDF'}
+      </button>
+      {message && <span className="text-xs text-slate-500">{message}</span>}
+    </>
   );
 }
 
