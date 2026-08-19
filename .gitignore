@@ -34,3 +34,6 @@ storage/framework/views/
 Thumbs.db
 .idea/
 *.swp
+
+# Dokumen rencana internal (khusus server, jangan dipublikasikan)
+unical-associates-repo.md
