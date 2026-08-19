@@ -7,9 +7,11 @@ import {
   HttpStatus,
   NotFoundException,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { AuthGuard } from '../auth/auth.guard';
 import { DoiNotFoundError, DoiResolverService } from './doi-resolver.service';
 import { FetchDoiDto } from './dto/fetch-doi.dto';
 import { normalizeDoi } from './doi.util';
@@ -21,9 +23,10 @@ export class DoiController {
     private readonly prisma: PrismaService,
   ) {}
 
-  // TODO: pasang guard autentikasi setelah modul auth tersedia.
+  // Hanya anggota terautentikasi; kuota ketat karena memanggil API pihak ketiga.
   @Post('fetch-doi')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   async fetchDoi(@Body() dto: FetchDoiDto) {
     const doi = normalizeDoi(dto.doi);

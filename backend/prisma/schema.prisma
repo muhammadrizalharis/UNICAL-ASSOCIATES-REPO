@@ -67,6 +67,8 @@ model User {
   passwordHash    String    @map("password_hash")
   role            Role      @default(MEMBER)
   emailVerifiedAt DateTime? @map("email_verified_at")
+  termsAcceptedAt DateTime? @map("terms_accepted_at")
+  lastLoginAt     DateTime? @map("last_login_at")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
@@ -79,19 +81,61 @@ model User {
   @@map("users")
 }
 
+/// Master fakultas. Di-seed dari data resmi Universitas Muhammadiyah Makassar.
+model Faculty {
+  id      String  @id @default(uuid()) @db.Uuid
+  code    String  @unique
+  name    String  @unique
+  website String?
+  order   Int     @default(0)
+
+  departments Department[]
+  profiles    ResearcherProfile[]
+
+  @@map("faculties")
+}
+
+/// Program studi di bawah sebuah fakultas.
+model Department {
+  id        String  @id @default(uuid()) @db.Uuid
+  facultyId String  @map("faculty_id") @db.Uuid
+  name      String
+  slug      String  @unique
+  /// S1, S2, S3, Profesi, Spesialis, atau D3.
+  degree    String?
+
+  faculty  Faculty             @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  profiles ResearcherProfile[]
+
+  @@unique([facultyId, name, degree])
+  @@index([name])
+  @@map("departments")
+}
+
 model ResearcherProfile {
   id     String @id @default(uuid()) @db.Uuid
   userId String @unique @map("user_id") @db.Uuid
 
   /// Format UNICAL-YYNNNNNN, permanen dan tidak pernah didaur ulang.
-  unicalId String @unique @map("unical_id") @db.VarChar(15)
+  /// Baru diterbitkan setelah admin memverifikasi, jadi bisa kosong dulu.
+  unicalId String? @unique @map("unical_id") @db.VarChar(15)
 
-  fullName   String  @map("full_name")
-  photoUrl   String? @map("photo_url")
-  bio        String?
-  faculty    String?
-  department String?
-  expertise  Json    @default("[]")
+  firstName String  @map("first_name")
+  lastName  String? @map("last_name")
+  fullName  String  @map("full_name")
+  country   String? @db.VarChar(2)
+
+  /// Nama institusi bebas; peneliti luar Unismuh tetap bisa mendaftar.
+  institution  String? @default("Universitas Muhammadiyah Makassar")
+  facultyId    String? @map("faculty_id") @db.Uuid
+  departmentId String? @map("department_id") @db.Uuid
+  /// Dipakai bila fakultas/prodi tidak ada di daftar master.
+  facultyOther    String? @map("faculty_other")
+  departmentOther String? @map("department_other")
+
+  photoUrl  String? @map("photo_url")
+  bio       String?
+  expertise Json    @default("[]")
 
   orcid     String?
   scopusId  String? @map("scopus_id")
@@ -103,10 +147,15 @@ model ResearcherProfile {
   totalCitations Int     @default(0) @map("total_citations")
   isVerified     Boolean @default(false) @map("is_verified")
 
+  /// Diisi saat pengguna menuntaskan langkah afiliasi pada registrasi.
+  affiliationCompletedAt DateTime? @map("affiliation_completed_at")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  faculty       Faculty?            @relation(fields: [facultyId], references: [id])
+  department    Department?         @relation(fields: [departmentId], references: [id])
   authorships   PublicationAuthor[]
   claimRequests ClaimRequest[]
 
