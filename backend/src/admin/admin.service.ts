@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../common/prisma/prisma.service';
 import { UnicalIdService } from '../auth/unical-id.service';
 import { MetricsService } from '../researchers/metrics.service';
+import { SearchIndexService } from '../search/search-index.service';
 
 @Injectable()
 export class AdminService {
@@ -13,6 +14,7 @@ export class AdminService {
     private readonly prisma: PrismaService,
     private readonly unicalId: UnicalIdService,
     private readonly metrics: MetricsService,
+    private readonly searchIndex: SearchIndexService,
   ) {}
 
   async pendingPublications(page = 1, limit = 20) {
@@ -80,6 +82,8 @@ export class AdminService {
 
     // Status publikasi ikut menentukan metrik, jadi dihitung ulang di sini.
     await this.metrics.recalculateForPublication(publicationId);
+    // Indeks publik hanya memuat publikasi ter-approve.
+    await this.searchIndex.sync(publicationId, updated.status);
 
     return updated;
   }
@@ -113,6 +117,10 @@ export class AdminService {
     }
 
     return { processed: results.length, results };
+  }
+
+  async reindexSearch() {
+    return this.searchIndex.reindexAll();
   }
 
   async pendingUsers() {

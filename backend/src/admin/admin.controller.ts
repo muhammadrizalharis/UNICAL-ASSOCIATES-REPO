@@ -86,6 +86,13 @@ export class AdminController {
     return { success: true, data: await this.admin.recalculateAllMetrics() };
   }
 
+  @Post('search/reindex')
+  @HttpCode(HttpStatus.OK)
+  @Roles('SUPER_ADMIN')
+  async reindexSearch() {
+    return { success: true, data: await this.admin.reindexSearch() };
+  }
+
   @Patch('researchers/:id/verify')
   @Roles('FACULTY_ADMIN', 'SUPER_ADMIN')
   async verifyResearcher(
