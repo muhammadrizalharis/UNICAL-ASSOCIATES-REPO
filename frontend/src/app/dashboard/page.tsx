@@ -43,6 +43,11 @@ export default function DashboardPage() {
                 title="Direktori Peneliti"
                 body="Lihat rekam jejak dan metrik riset sivitas akademika."
               />
+              <Card
+                href="/dashboard/akun"
+                title="Pengaturan Akun"
+                body="Ubah kata sandi Anda secara mandiri."
+              />
               {user.profile?.unicalId && (
                 <Card
                   href={`/profil/${user.profile.unicalId}`}

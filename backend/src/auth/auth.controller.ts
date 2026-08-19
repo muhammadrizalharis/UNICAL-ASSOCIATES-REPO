@@ -15,6 +15,7 @@ import { CurrentUserId } from './current-user.decorator';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AffiliationDto } from './dto/affiliation.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -47,6 +48,19 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async skipAffiliation(@CurrentUserId() userId: string) {
     return { success: true, data: await this.auth.skipAffiliation(userId) };
+  }
+
+  @Patch('password')
+  @UseGuards(AuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  async changePassword(
+    @CurrentUserId() userId: string,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return {
+      success: true,
+      data: await this.auth.changePassword(userId, dto),
+    };
   }
 
   @Get('me')

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { clearSession, readUser, type SessionUser } from '@/lib/session';
 
 export function RequireAuth({
@@ -57,15 +58,23 @@ export function TopBar({ user }: { user: SessionUser }) {
             {user.profile?.unicalId && ` · ${user.profile.unicalId}`}
           </p>
         </div>
-        <button
-          onClick={() => {
-            clearSession();
-            router.replace('/welcome');
-          }}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50"
-        >
-          Keluar
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/akun"
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50"
+          >
+            Akun
+          </Link>
+          <button
+            onClick={() => {
+              clearSession();
+              router.replace('/welcome');
+            }}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50"
+          >
+            Keluar
+          </button>
+        </div>
       </div>
     </header>
   );

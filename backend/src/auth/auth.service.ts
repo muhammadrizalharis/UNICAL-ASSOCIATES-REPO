@@ -10,6 +10,7 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AffiliationDto } from './dto/affiliation.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import {
   homePathForRole,
   isGateValid,
@@ -177,6 +178,48 @@ export class AuthService {
       data: { affiliationCompletedAt: new Date() },
     });
     return { skipped: true };
+  }
+
+  /** Ubah kata sandi mandiri; wajib membuktikan kata sandi lama. */
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, passwordHash: true },
+    });
+    if (!user) throw new UnauthorizedException();
+
+    const ok = await verify(user.passwordHash, dto.currentPassword).catch(
+      () => false,
+    );
+    if (!ok) {
+      throw new UnauthorizedException({
+        code: 'CURRENT_PASSWORD_WRONG',
+        message: 'Kata sandi saat ini salah.',
+      });
+    }
+
+    if (dto.newPassword === dto.currentPassword) {
+      throw new BadRequestException({
+        code: 'PASSWORD_UNCHANGED',
+        message: 'Kata sandi baru tidak boleh sama dengan yang lama.',
+      });
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: await hash(dto.newPassword, ARGON_OPTIONS) },
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        userId,
+        action: 'user.change_password',
+        targetType: 'user',
+        targetId: userId,
+      },
+    });
+
+    return { changed: true };
   }
 
   async me(userId: string) {
