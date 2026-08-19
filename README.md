@@ -1,16 +1,75 @@
 <div align="center">
 
-# 🎓 UNICAL ASSOCIATES
-### **Unismuh Ical Repository Associates**
+<img src="https://capsule-render.vercel.app/api?type=waving&height=180&color=0:1E1B4B,45:4338CA,100:A5B4FC&section=header&text=UNICAL%20ASSOCIATES&fontColor=FFFFFF&fontSize=44&fontAlignY=34&desc=Unismuh%20%C2%B7%20Ical%20%C2%B7%20Repository%20%C2%B7%20Associates&descAlignY=54&descSize=15" width="100%" alt="UNICAL ASSOCIATES" />
 
-*Platform Repositori Publikasi Ilmiah Terintegrasi — Discover, Connect, and Elevate Research*
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=21&duration=2600&pause=900&color=4F46E5&center=true&vCenter=true&width=720&lines=Tempel+DOI+%E2%86%92+Metadata+Terisi+Sendiri;Repositori+Publikasi+Ilmiah+Terintegrasi;UNICAL+ID+%C2%B7+h-index+%C2%B7+Sitasi+%C2%B7+Scopus+%26+SINTA;Semua+di+Docker%2C+di+Server+Kampus+Sendiri" alt="Discover, Connect, and Elevate Research" />
 
-[![Status](https://img.shields.io/badge/Status-In%20Development-orange.svg)]()
-[![Version](https://img.shields.io/badge/Version-0.1.0--alpha-blue.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-green.svg)]()
-[![Deploy](https://img.shields.io/badge/Deploy-Docker%20Compose-2496ED.svg)]()
-[![Host](https://img.shields.io/badge/Host-Server%20Kampus-teal.svg)]()
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)]()
+<br />
+
+<code>status: in-development</code> &nbsp;·&nbsp; <code>host: server kampus</code> &nbsp;·&nbsp; <code>license: MIT</code> &nbsp;·&nbsp; <code>UNISMUH · Informatika</code>
+
+<br /><br />
+
+[![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)](https://redis.io)
+[![Meilisearch](https://img.shields.io/badge/Meilisearch-1.10-FF5CAA?logo=meilisearch&logoColor=white)](https://www.meilisearch.com)
+[![MinIO](https://img.shields.io/badge/MinIO-S3-C72E49?logo=minio&logoColor=white)](https://min.io)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+
+[![Last Commit](https://img.shields.io/github/last-commit/muhammadrizalharis/UNICAL-ASSOCIATES-REPO?logo=git&logoColor=white&color=4338CA&label=commit%20terakhir)](https://github.com/muhammadrizalharis/UNICAL-ASSOCIATES-REPO/commits/main)
+[![Commit Activity](https://img.shields.io/github/commit-activity/m/muhammadrizalharis/UNICAL-ASSOCIATES-REPO?logo=github&color=1E1B4B&label=aktivitas%2Fbulan)](https://github.com/muhammadrizalharis/UNICAL-ASSOCIATES-REPO/graphs/commit-activity)
+[![Repo Size](https://img.shields.io/github/repo-size/muhammadrizalharis/UNICAL-ASSOCIATES-REPO?logo=github&color=6366F1&label=ukuran)](https://github.com/muhammadrizalharis/UNICAL-ASSOCIATES-REPO)
+[![Stars](https://img.shields.io/github/stars/muhammadrizalharis/UNICAL-ASSOCIATES-REPO?logo=github&color=818CF8&label=bintang)](https://github.com/muhammadrizalharis/UNICAL-ASSOCIATES-REPO/stargazers)
+
+<br />
+
+**[📥 Cara Kerja DOI](#-5-sistem-upload-berbasis-doi) · [🏗 Arsitektur](#-8-arsitektur-sistem) · [🛠 Teknologi](#-9-teknologi-tech-stack) · [🚀 Instalasi](#-21-instalasi--menjalankan-proyek) · [🔒 Keamanan](#-24-keamanan-privasi--kepatuhan) · [🗺 Roadmap](#-20-roadmap-pengembangan)**
+
+</div>
+
+---
+
+## ⚡ Sekali Tempel DOI, Semuanya Terisi
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 😩 Cara Lama
+
+```diff
+- ketik judul artikel
+- ketik 8 nama penulis satu per satu
+- cari volume, issue, halaman
+- salin abstrak dari PDF
+- hitung sitasi manual tiap semester
+```
+
+</td>
+<td width="50%" valign="top">
+
+### ⚡ Dengan UNICAL
+
+```diff
++ tempel 10.1016/j.eswa.2024.123456
++ judul · penulis · jurnal · tahun
++ volume · issue · halaman · ISSN
++ abstrak (4 sumber berlapis)
++ sitasi diperbarui terjadwal
+```
+
+</td>
+</tr>
+</table>
+
+<div align="center">
+
+| 🆔 | 📥 | 🔍 | 📊 | 🐳 |
+|:--:|:--:|:--:|:--:|:--:|
+| **UNICAL ID** | **Auto-fill DOI** | **Meilisearch** | **Metrik Riset** | **Berdaulat** |
+| identitas peneliti permanen | 4 sumber metadata | pencarian faceted | h-index & sitasi otomatis | 100% di server kampus |
 
 </div>
 
@@ -18,36 +77,58 @@
 
 ## 📑 Daftar Isi
 
-1. [Tentang UNICAL ASSOCIATES](#-1-tentang-unical-associates)
+<table>
+<tr>
+<td valign="top" width="34%">
+
+**🧭 Dasar**
+
+1. [Tentang UNICAL](#-1-tentang-unical-associates)
 2. [Visi & Misi](#-2-visi--misi)
 3. [Fitur Utama](#-3-fitur-utama)
-4. [UNICAL ID — Sistem Identitas Peneliti](#-4-unical-id--sistem-identitas-peneliti)
-5. [Sistem Upload Berbasis DOI](#-5-sistem-upload-berbasis-doi)
-6. [Klasifikasi & Kategorisasi Jurnal](#-6-klasifikasi--kategorisasi-jurnal)
-7. [Peran Pengguna (User Roles)](#-7-peran-pengguna-user-roles)
+4. [UNICAL ID](#-4-unical-id--sistem-identitas-peneliti)
+5. [Upload via DOI](#-5-sistem-upload-berbasis-doi)
+6. [Klasifikasi Jurnal](#-6-klasifikasi--kategorisasi-jurnal)
+7. [Peran Pengguna](#-7-peran-pengguna-user-roles)
 8. [Arsitektur Sistem](#-8-arsitektur-sistem)
-9. [Teknologi (Tech Stack)](#-9-teknologi-tech-stack)
+9. [Teknologi](#-9-teknologi-tech-stack)
 10. [Desain Database](#-10-desain-database)
-11. [Desain API (Endpoint)](#-11-desain-api-endpoint)
-12. [Struktur Folder Proyek](#-12-struktur-folder-proyek)
-13. [Alur Kerja Pengguna (User Flow)](#-13-alur-kerja-pengguna-user-flow)
-14. [Spesifikasi Halaman & Wireframe UI](#-14-spesifikasi-halaman--wireframe-ui)
-15. [Metrik & Rumus Perhitungan](#-15-metrik--rumus-perhitungan)
-16. [Background Jobs & Scheduler](#-16-background-jobs--scheduler)
-17. [Sistem Notifikasi](#-17-sistem-notifikasi)
-18. [SEO & Indeksasi Mesin Pencari](#-18-seo--indeksasi-mesin-pencari)
-19. [Kebutuhan Non-Fungsional (NFR)](#-19-kebutuhan-non-fungsional-nfr)
-20. [Roadmap Pengembangan](#-20-roadmap-pengembangan)
-21. [Instalasi & Menjalankan Proyek](#-21-instalasi--menjalankan-proyek)
-22. [Troubleshooting (Docker)](#-22-troubleshooting-docker)
-23. [Strategi Pengujian (Testing)](#-23-strategi-pengujian-testing)
-24. [Keamanan, Privasi & Kepatuhan](#-24-keamanan-privasi--kepatuhan)
-25. [Konvensi Kode & Git Workflow](#-25-konvensi-kode--git-workflow)
+
+</td>
+<td valign="top" width="33%">
+
+**⚙️ Rancangan**
+
+11. [Desain API](#-11-desain-api-endpoint)
+12. [Struktur Folder](#-12-struktur-folder-proyek)
+13. [Alur Pengguna](#-13-alur-kerja-pengguna-user-flow)
+14. [Wireframe UI](#-14-spesifikasi-halaman--wireframe-ui)
+15. [Metrik & Rumus](#-15-metrik--rumus-perhitungan)
+16. [Jobs & Scheduler](#-16-background-jobs--scheduler)
+17. [Notifikasi](#-17-sistem-notifikasi)
+18. [SEO & Scholar](#-18-seo--indeksasi-mesin-pencari)
+19. [Non-Fungsional](#-19-kebutuhan-non-fungsional-nfr)
+20. [Roadmap](#-20-roadmap-pengembangan)
+
+</td>
+<td valign="top" width="33%">
+
+**🚀 Operasional**
+
+21. [Instalasi](#-21-instalasi--menjalankan-proyek)
+22. [Troubleshooting](#-22-troubleshooting-docker)
+23. [Pengujian](#-23-strategi-pengujian-testing)
+24. [Keamanan & Privasi](#-24-keamanan-privasi--kepatuhan)
+25. [Konvensi & Git](#-25-konvensi-kode--git-workflow)
 26. [FAQ](#-26-faq)
 27. [Glosarium](#-27-glosarium)
 28. [Kontribusi](#-28-kontribusi)
 29. [Lisensi](#-29-lisensi)
 30. [Kontak & Tim](#-30-kontak--tim)
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -2092,20 +2173,45 @@ Proyek ini dilisensikan di bawah **MIT License** — lihat file `LICENSE` (akan 
 
 ## 📞 30. Kontak & Tim
 
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 👤 Tim
+
 | Peran | Nama |
 |---|---|
 | Project Owner / Developer | **Akram** |
 | Tim Pengembang | **Ical & Associates** |
-| Institusi | Universitas Muhammadiyah Makassar (Unismuh) |
+| Institusi | Universitas Muhammadiyah Makassar |
 
-> 💌 Untuk pertanyaan, saran, atau kolaborasi, silakan buka *Issue* di repositori ini.
+</td>
+<td width="50%" valign="top">
+
+### 📬 Hubungi
+
+| Kanal | Tautan |
+|---|---|
+| Isu & saran | [Buka Issue](https://github.com/muhammadrizalharis/UNICAL-ASSOCIATES-REPO/issues) |
+| Diskusi | [Discussions](https://github.com/muhammadrizalharis/UNICAL-ASSOCIATES-REPO/discussions) |
+| Keamanan | lihat [§24.9](#-24-keamanan-privasi--kepatuhan) |
+
+</td>
+</tr>
+</table>
 
 ---
 
 <div align="center">
 
-**UNICAL ASSOCIATES** — *Empowering Research Visibility* 🚀
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=18&duration=3000&pause=1000&color=4F46E5&center=true&vCenter=true&width=560&lines=Empowering+Research+Visibility;Menghimpun+Karya%2C+Memperluas+Dampak" alt="Empowering Research Visibility" />
 
-Made with ❤️ for Indonesian Researchers
+<br />
+
+**UNICAL ASSOCIATES** · dibangun untuk peneliti Indonesia 🇮🇩
+
+<a href="#">↑ kembali ke atas</a>
+
+<img src="https://capsule-render.vercel.app/api?type=waving&height=120&color=0:A5B4FC,55:4338CA,100:1E1B4B&section=footer" width="100%" alt="" />
 
 </div>
