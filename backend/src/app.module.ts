@@ -7,6 +7,8 @@ import { HealthModule } from './health/health.module';
 import { DoiModule } from './doi/doi.module';
 import { AuthModule } from './auth/auth.module';
 import { InstitutionsModule } from './institutions/institutions.module';
+import { PublicationsModule } from './publications/publications.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { InstitutionsModule } from './institutions/institutions.module';
     HealthModule,
     InstitutionsModule,
     DoiModule,
+    PublicationsModule,
+    AdminModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { RolesGuard } from './roles.guard';
 import { UnicalIdService } from './unical-id.service';
 
 @Global()
@@ -14,7 +15,7 @@ import { UnicalIdService } from './unical-id.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthGuard, UnicalIdService],
-  exports: [AuthGuard, UnicalIdService],
+  providers: [AuthService, AuthGuard, RolesGuard, UnicalIdService],
+  exports: [AuthGuard, RolesGuard, UnicalIdService],
 })
 export class AuthModule {}

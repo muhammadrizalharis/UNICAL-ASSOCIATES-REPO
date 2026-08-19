@@ -169,8 +169,119 @@ const INDEXATIONS = [
   { code: 'garuda', name: 'Garuda', level: null, badgeColor: '#6B7280' },
 ];
 
+// Kategori bidang ilmu mencakup seluruh fakultas, bukan hanya rumpun teknik.
+const CATEGORIES: { name: string; children: string[] }[] = [
+  {
+    name: 'Teknik dan Teknologi',
+    children: [
+      'Machine Learning dan Kecerdasan Buatan',
+      'Sains Data',
+      'Computer Vision',
+      'Pemrosesan Bahasa Alami',
+      'IoT dan Sistem Tertanam',
+      'Keamanan Siber',
+      'Rekayasa Perangkat Lunak',
+      'Teknik Elektro',
+      'Teknik Pengairan dan Sumber Daya Air',
+      'Arsitektur dan Perencanaan Wilayah',
+    ],
+  },
+  {
+    name: 'Pendidikan',
+    children: [
+      'Pendidikan Matematika',
+      'Pendidikan Bahasa dan Sastra',
+      'Pendidikan Guru Sekolah Dasar',
+      'Pendidikan Anak Usia Dini',
+      'Teknologi Pendidikan',
+      'Pendidikan Sains',
+      'Pendidikan Olahraga',
+      'Pendidikan Seni',
+      'Manajemen dan Kebijakan Pendidikan',
+    ],
+  },
+  {
+    name: 'Kedokteran dan Kesehatan',
+    children: [
+      'Ilmu Kedokteran Klinis',
+      'Kedokteran Gigi',
+      'Keperawatan',
+      'Kebidanan',
+      'Farmasi',
+      'Kesehatan Masyarakat',
+      'Ilmu Biomedis',
+      'Administrasi Rumah Sakit',
+      'Psikologi',
+    ],
+  },
+  {
+    name: 'Ekonomi dan Bisnis',
+    children: [
+      'Manajemen',
+      'Akuntansi',
+      'Ekonomi Pembangunan',
+      'Ekonomi dan Keuangan Islam',
+      'Perpajakan',
+      'Kewirausahaan',
+    ],
+  },
+  {
+    name: 'Hukum',
+    children: [
+      'Hukum Pidana',
+      'Hukum Perdata',
+      'Hukum Tata Negara',
+      'Hukum Bisnis',
+      'Hukum Islam',
+    ],
+  },
+  {
+    name: 'Agama Islam',
+    children: [
+      'Pendidikan Agama Islam',
+      'Pendidikan Bahasa Arab',
+      'Hukum Keluarga Islam',
+      'Ekonomi Syariah',
+      'Komunikasi dan Penyiaran Islam',
+      'Bimbingan dan Konseling Islam',
+    ],
+  },
+  {
+    name: 'Pertanian dan Kehutanan',
+    children: [
+      'Agribisnis',
+      'Agroteknologi',
+      'Kehutanan',
+      'Budidaya Perairan',
+      'Ketahanan Pangan',
+    ],
+  },
+  {
+    name: 'Sosial dan Politik',
+    children: [
+      'Ilmu Administrasi Publik',
+      'Ilmu Pemerintahan',
+      'Ilmu Komunikasi',
+      'Sosiologi',
+    ],
+  },
+  {
+    name: 'MIPA',
+    children: ['Matematika', 'Fisika', 'Kimia', 'Biologi', 'Statistika'],
+  },
+];
+
 function slugify(faculty: string, name: string, degree?: string): string {
   return `${faculty}-${name}-${degree ?? ''}`
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function categorySlug(name: string): string {
+  return name
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -221,8 +332,27 @@ async function main(): Promise<void> {
     });
   }
 
+  let categoryCount = 0;
+  for (const root of CATEGORIES) {
+    const parent = await prisma.category.upsert({
+      where: { slug: categorySlug(root.name) },
+      update: { name: root.name },
+      create: { slug: categorySlug(root.name), name: root.name },
+    });
+    categoryCount++;
+
+    for (const child of root.children) {
+      await prisma.category.upsert({
+        where: { slug: categorySlug(child) },
+        update: { name: child, parentId: parent.id },
+        create: { slug: categorySlug(child), name: child, parentId: parent.id },
+      });
+      categoryCount++;
+    }
+  }
+
   console.log(
-    `Seed selesai: ${FACULTIES.length} fakultas, ${departmentCount} program studi, ${INDEXATIONS.length} indeksasi.`,
+    `Seed selesai: ${FACULTIES.length} fakultas, ${departmentCount} program studi, ${INDEXATIONS.length} indeksasi, ${categoryCount} kategori.`,
   );
 
   await prisma.$disconnect();
