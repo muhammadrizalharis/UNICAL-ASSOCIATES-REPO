@@ -19,6 +19,7 @@ vendor/
 out/
 dist/
 build/
+generated/
 
 # Log & cache
 *.log

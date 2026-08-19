@@ -1,0 +1,299 @@
+// UNICAL ASSOCIATES — skema database
+// Referensi: README §10. Nama tabel & kolom snake_case agar konsisten dengan SQL.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+
+  // NestJS mengompilasi ke CommonJS, jadi client harus CJS agar tidak
+  // dimuat Node sebagai ES module.
+  moduleFormat = "cjs"
+  runtime      = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  GUEST
+  MEMBER
+  MODERATOR
+  FACULTY_ADMIN
+  SUPER_ADMIN
+}
+
+enum PublicationType {
+  JOURNAL_ARTICLE
+  PROCEEDING
+  BOOK_CHAPTER
+  BOOK
+  PREPRINT
+}
+
+enum PublicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ScopusQuartile {
+  Q1
+  Q2
+  Q3
+  Q4
+  NONE
+}
+
+enum SintaLevel {
+  S1
+  S2
+  S3
+  S4
+  S5
+  S6
+  NONE
+}
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  email           String    @unique
+  passwordHash    String    @map("password_hash")
+  role            Role      @default(MEMBER)
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  profile               ResearcherProfile?
+  submittedPublications Publication[]           @relation("SubmittedBy")
+  verifiedIndexations   PublicationIndexation[] @relation("VerifiedBy")
+  reviewedClaims        ClaimRequest[]          @relation("ReviewedBy")
+  auditLogs             AuditLog[]
+
+  @@map("users")
+}
+
+model ResearcherProfile {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @unique @map("user_id") @db.Uuid
+
+  /// Format UNICAL-YYNNNNNN, permanen dan tidak pernah didaur ulang.
+  unicalId String @unique @map("unical_id") @db.VarChar(15)
+
+  fullName   String  @map("full_name")
+  photoUrl   String? @map("photo_url")
+  bio        String?
+  faculty    String?
+  department String?
+  expertise  Json    @default("[]")
+
+  orcid     String?
+  scopusId  String? @map("scopus_id")
+  sintaId   String? @map("sinta_id")
+  scholarId String? @map("scholar_id")
+
+  hIndex         Int     @default(0) @map("h_index")
+  i10Index       Int     @default(0) @map("i10_index")
+  totalCitations Int     @default(0) @map("total_citations")
+  isVerified     Boolean @default(false) @map("is_verified")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authorships   PublicationAuthor[]
+  claimRequests ClaimRequest[]
+
+  @@index([fullName])
+  @@map("researcher_profiles")
+}
+
+model Journal {
+  id        String  @id @default(uuid()) @db.Uuid
+  name      String
+  publisher String?
+  issn      String? @unique @db.VarChar(9)
+  eissn     String? @db.VarChar(9)
+  country   String?
+  website   String?
+
+  scopusQuartile ScopusQuartile @default(NONE) @map("scopus_quartile")
+  sintaLevel     SintaLevel     @default(NONE) @map("sinta_level")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  publications Publication[]
+
+  @@index([name])
+  @@map("journals")
+}
+
+model Publication {
+  id String @id @default(uuid()) @db.Uuid
+
+  /// Kunci deduplikasi, disimpan dalam bentuk kanonik huruf kecil.
+  doi String @unique
+
+  title         String
+  abstract      String?
+  type          PublicationType   @default(JOURNAL_ARTICLE)
+  journalId     String?           @map("journal_id") @db.Uuid
+  volume        String?
+  issue         String?
+  pages         String?
+  publishedDate DateTime?         @map("published_date") @db.Date
+  keywords      Json              @default("[]")
+  url           String?
+  pdfUrl        String?           @map("pdf_url")
+  citationCount Int               @default(0) @map("citation_count")
+  viewCount     Int               @default(0) @map("view_count")
+  status        PublicationStatus @default(PENDING)
+  submittedById String            @map("submitted_by") @db.Uuid
+
+  /// Respons mentah CrossRef/OpenAlex untuk audit dan parse ulang.
+  metadataRaw Json? @map("metadata_raw")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  journal     Journal?               @relation(fields: [journalId], references: [id])
+  submittedBy User                   @relation("SubmittedBy", fields: [submittedById], references: [id])
+  authors     PublicationAuthor[]
+  categories  CategoryPublication[]
+  indexations PublicationIndexation[]
+  snapshots   CitationSnapshot[]
+
+  @@index([status, publishedDate(sort: Desc)])
+  @@index([citationCount(sort: Desc)])
+  @@map("publications")
+}
+
+model PublicationAuthor {
+  id            String @id @default(uuid()) @db.Uuid
+  publicationId String @map("publication_id") @db.Uuid
+
+  /// NULL berarti penulis eksternal yang belum memiliki akun.
+  researcherId String? @map("researcher_id") @db.Uuid
+
+  rawAuthorName   String  @map("raw_author_name")
+  authorOrder     Int     @map("author_order") @db.SmallInt
+  isCorresponding Boolean @default(false) @map("is_corresponding")
+  affiliationRaw  String? @map("affiliation_raw")
+
+  publication   Publication        @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  researcher    ResearcherProfile? @relation(fields: [researcherId], references: [id])
+  claimRequests ClaimRequest[]
+
+  @@unique([publicationId, authorOrder])
+  @@index([researcherId])
+  @@map("publication_authors")
+}
+
+model Category {
+  id          String  @id @default(uuid()) @db.Uuid
+  parentId    String? @map("parent_id") @db.Uuid
+  name        String
+  slug        String  @unique
+  description String?
+  icon        String?
+
+  parent       Category?            @relation("CategoryTree", fields: [parentId], references: [id])
+  children     Category[]           @relation("CategoryTree")
+  publications CategoryPublication[]
+
+  @@map("categories")
+}
+
+model CategoryPublication {
+  publicationId String @map("publication_id") @db.Uuid
+  categoryId    String @map("category_id") @db.Uuid
+
+  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([publicationId, categoryId])
+  @@index([categoryId, publicationId])
+  @@map("category_publication")
+}
+
+model Indexation {
+  id         String  @id @default(uuid()) @db.Uuid
+  code       String  @unique
+  name       String
+  level      String?
+  badgeColor String? @map("badge_color")
+
+  publications PublicationIndexation[]
+
+  @@map("indexations")
+}
+
+model PublicationIndexation {
+  publicationId String    @map("publication_id") @db.Uuid
+  indexationId  String    @map("indexation_id") @db.Uuid
+  verifiedById  String?   @map("verified_by") @db.Uuid
+  verifiedAt    DateTime? @map("verified_at")
+
+  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+  indexation  Indexation  @relation(fields: [indexationId], references: [id], onDelete: Cascade)
+  verifiedBy  User?       @relation("VerifiedBy", fields: [verifiedById], references: [id])
+
+  @@id([publicationId, indexationId])
+  @@map("publication_indexations")
+}
+
+model CitationSnapshot {
+  id            String   @id @default(uuid()) @db.Uuid
+  publicationId String   @map("publication_id") @db.Uuid
+  citationCount Int      @map("citation_count")
+  snapshotDate  DateTime @map("snapshot_date") @db.Date
+
+  publication Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+
+  @@unique([publicationId, snapshotDate])
+  @@map("citation_snapshots")
+}
+
+model ClaimRequest {
+  id                  String      @id @default(uuid()) @db.Uuid
+  publicationAuthorId String      @map("publication_author_id") @db.Uuid
+  researcherId        String      @map("researcher_id") @db.Uuid
+  status              ClaimStatus @default(PENDING)
+  reviewedById        String?     @map("reviewed_by") @db.Uuid
+  reviewedAt          DateTime?   @map("reviewed_at")
+  rejectionReason     String?     @map("rejection_reason")
+  createdAt           DateTime    @default(now()) @map("created_at")
+
+  publicationAuthor PublicationAuthor @relation(fields: [publicationAuthorId], references: [id], onDelete: Cascade)
+  researcher        ResearcherProfile @relation(fields: [researcherId], references: [id], onDelete: Cascade)
+  reviewedBy        User?             @relation("ReviewedBy", fields: [reviewedById], references: [id])
+
+  @@index([status])
+  @@map("claim_requests")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  action     String
+  targetType String   @map("target_type")
+  targetId   String?  @map("target_id")
+  oldValues  Json?    @map("old_values")
+  newValues  Json?    @map("new_values")
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
