@@ -201,6 +201,12 @@ services:
       S3_ACCESS_KEY: ${MINIO_ROOT_USER:-unical}
       S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_SECURE: ${MAIL_SECURE:-false}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASS: ${MAIL_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-UNICAL <no-reply@unical.assoc.id>}
       ADMIN_GATE: ${ADMIN_GATE:-assoc=-01}
       SUPER_ADMIN_GATE: ${SUPER_ADMIN_GATE:-assoc=-000}
       CROSSREF_MAILTO: ${CROSSREF_MAILTO:-admin@unismuh.ac.id}
@@ -237,6 +243,38 @@ services:
           memory: 2G
         reservations:
           memory: 512M
+
+  worker:
+    <<: *base
+    image: unical-api:local
+    container_name: unical-worker
+    command: ["node", "dist/src/worker.js"]
+    # Worker tidak membuka HTTP; healthcheck bawaan image harus dimatikan.
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      TZ: ${TZ:-Asia/Makassar}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-unical}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-unical}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MEILI_HOST: http://meili:7700
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      CROSSREF_MAILTO: ${CROSSREF_MAILTO:-admin@unismuh.ac.id}
+      JWT_SECRET: ${JWT_SECRET}
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+        reservations:
+          memory: 256M
 
   nginx:
     <<: *base

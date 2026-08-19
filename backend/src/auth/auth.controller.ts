@@ -16,6 +16,17 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AffiliationDto } from './dto/affiliation.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { IsString, MinLength, MaxLength } from 'class-validator';
+
+class ResetPasswordDto {
+  @IsString()
+  token!: string;
+
+  @IsString()
+  @MinLength(12, { message: 'Kata sandi baru minimal 12 karakter' })
+  @MaxLength(128)
+  newPassword!: string;
+}
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -48,6 +59,16 @@ export class AuthController {
   @UseGuards(AuthGuard)
   async skipAffiliation(@CurrentUserId() userId: string) {
     return { success: true, data: await this.auth.skipAffiliation(userId) };
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return {
+      success: true,
+      data: await this.auth.resetPasswordWithToken(dto.token, dto.newPassword),
+    };
   }
 
   @Patch('password')

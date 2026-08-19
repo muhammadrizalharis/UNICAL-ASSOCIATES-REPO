@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { createHash } from 'node:crypto';
 import { hash, verify } from '@node-rs/argon2';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
@@ -236,6 +237,44 @@ export class AuthService {
     });
 
     return { changed: true };
+  }
+
+  /** Memakai token reset yang diterbitkan super admin. */
+  async resetPasswordWithToken(token: string, newPassword: string) {
+    const tokenHash = createHash('sha256').update(token).digest('hex');
+
+    const record = await this.prisma.passwordResetToken.findUnique({
+      where: { tokenHash },
+      select: { id: true, userId: true, expiresAt: true, usedAt: true },
+    });
+
+    if (!record || record.usedAt || record.expiresAt < new Date()) {
+      throw new BadRequestException({
+        code: 'RESET_TOKEN_INVALID',
+        message: 'Tautan reset tidak sah atau sudah kedaluwarsa.',
+      });
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: record.userId },
+        data: { passwordHash: await hash(newPassword, ARGON_OPTIONS) },
+      }),
+      this.prisma.passwordResetToken.update({
+        where: { id: record.id },
+        data: { usedAt: new Date() },
+      }),
+      this.prisma.auditLog.create({
+        data: {
+          userId: record.userId,
+          action: 'user.password_reset_used',
+          targetType: 'user',
+          targetId: record.userId,
+        },
+      }),
+    ]);
+
+    return { reset: true };
   }
 
   async me(userId: string) {

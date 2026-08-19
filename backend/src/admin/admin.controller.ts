@@ -17,6 +17,11 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { CurrentUserId } from '../auth/current-user.decorator';
 import { AdminService } from './admin.service';
+import {
+  JobsQueueService,
+  JOB_REFRESH_CITATIONS,
+  JOB_TAKE_SNAPSHOT,
+} from '../jobs/jobs-queue.service';
 
 class RejectDto {
   @IsOptional()
@@ -28,7 +33,10 @@ class RejectDto {
 @Controller({ path: 'admin', version: '1' })
 @UseGuards(AuthGuard, RolesGuard)
 export class AdminController {
-  constructor(private readonly admin: AdminService) {}
+  constructor(
+    private readonly admin: AdminService,
+    private readonly jobs: JobsQueueService,
+  ) {}
 
   @Get('publications')
   @Roles('MODERATOR', 'FACULTY_ADMIN', 'SUPER_ADMIN')
@@ -91,6 +99,35 @@ export class AdminController {
   @Roles('SUPER_ADMIN')
   async reindexSearch() {
     return { success: true, data: await this.admin.reindexSearch() };
+  }
+
+  @Post('users/:id/password-reset')
+  @HttpCode(HttpStatus.OK)
+  @Roles('SUPER_ADMIN')
+  async issuePasswordReset(
+    @CurrentUserId() adminId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return {
+      success: true,
+      data: await this.admin.issuePasswordReset(adminId, id),
+    };
+  }
+
+  @Post('citations/refresh')
+  @HttpCode(HttpStatus.OK)
+  @Roles('SUPER_ADMIN')
+  async refreshCitations() {
+    const jobId = await this.jobs.enqueue(JOB_REFRESH_CITATIONS);
+    return { success: true, data: { queued: true, jobId } };
+  }
+
+  @Post('citations/snapshot')
+  @HttpCode(HttpStatus.OK)
+  @Roles('SUPER_ADMIN')
+  async takeSnapshot() {
+    const jobId = await this.jobs.enqueue(JOB_TAKE_SNAPSHOT);
+    return { success: true, data: { queued: true, jobId } };
   }
 
   @Patch('researchers/:id/verify')

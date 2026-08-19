@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { CacheService } from '../common/cache/cache.module';
 import {
   ResolvedAuthor,
   ResolvedPublication,
@@ -12,6 +13,7 @@ import {
 } from './doi.util';
 
 const REQUEST_TIMEOUT_MS = 15_000;
+const CACHE_TTL_SECONDS = 86_400;
 
 interface CrossrefAuthor {
   given?: string;
@@ -57,12 +59,18 @@ export class DoiResolverService {
   private readonly mailto =
     process.env.CROSSREF_MAILTO ?? 'admin@unismuh.ac.id';
 
+  constructor(private readonly cache: CacheService) {}
+
   /**
-   * Mengambil metadata sebuah DOI. Metadata utama berasal dari CrossRef dengan
-   * cadangan DataCite. Abstrak sering kosong di CrossRef sehingga dilengkapi
-   * berurutan dari OpenAlex lalu Semantic Scholar.
+   * Mengambil metadata sebuah DOI. Respons di-cache 24 jam sehingga DOI yang
+   * sama tidak memukul API eksternal berulang. Metadata utama dari CrossRef
+   * dengan cadangan DataCite; abstrak dilengkapi OpenAlex lalu Semantic Scholar.
    */
   async resolve(doi: string): Promise<ResolvedPublication> {
+    const cacheKey = `doi:${doi}`;
+    const cached = await this.cache.get<ResolvedPublication>(cacheKey);
+    if (cached) return cached;
+
     const work = await this.fetchCrossref(doi);
 
     const resolved = work
@@ -73,6 +81,7 @@ export class DoiResolverService {
       await this.enrichAbstract(resolved);
     }
 
+    await this.cache.set(cacheKey, resolved, CACHE_TTL_SECONDS);
     return resolved;
   }
 

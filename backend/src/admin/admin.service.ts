@@ -3,10 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { UnicalIdService } from '../auth/unical-id.service';
 import { MetricsService } from '../researchers/metrics.service';
 import { SearchIndexService } from '../search/search-index.service';
+import { MailService } from '../common/mail/mail.service';
 
 @Injectable()
 export class AdminService {
@@ -15,6 +17,7 @@ export class AdminService {
     private readonly unicalId: UnicalIdService,
     private readonly metrics: MetricsService,
     private readonly searchIndex: SearchIndexService,
+    private readonly mail: MailService,
   ) {}
 
   async pendingPublications(page = 1, limit = 20) {
@@ -121,6 +124,55 @@ export class AdminService {
 
   async reindexSearch() {
     return this.searchIndex.reindexAll();
+  }
+
+  /**
+   * Super admin menerbitkan tautan reset kata sandi untuk sebuah akun.
+   * Token acak berumur 1 jam; hanya hash-nya yang disimpan. Bila SMTP
+   * terkonfigurasi tautan dikirim ke email akun; tautan juga dikembalikan
+   * ke super admin untuk disampaikan manual bila email belum berjalan.
+   */
+  async issuePasswordReset(adminId: string, targetUserId: string) {
+    const target = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: { id: true, email: true },
+    });
+    if (!target) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'Akun tidak ditemukan.',
+      });
+    }
+
+    // Token lama yang belum terpakai digugurkan agar hanya satu yang sah.
+    await this.prisma.passwordResetToken.updateMany({
+      where: { userId: target.id, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+
+    const token = randomBytes(32).toString('base64url');
+    const tokenHash = createHash('sha256').update(token).digest('hex');
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    await this.prisma.passwordResetToken.create({
+      data: { userId: target.id, tokenHash, expiresAt, createdBy: adminId },
+    });
+
+    const base = process.env.APP_URL ?? 'http://127.0.0.1:48080';
+    const resetUrl = `${base}/reset-sandi?token=${token}`;
+    const emailSent = await this.mail.sendPasswordReset(target.email, resetUrl);
+
+    await this.prisma.auditLog.create({
+      data: {
+        userId: adminId,
+        action: 'user.password_reset_issued',
+        targetType: 'user',
+        targetId: target.id,
+        newValues: { emailSent, expiresAt },
+      },
+    });
+
+    return { email: target.email, resetUrl, emailSent, expiresAt };
   }
 
   async pendingUsers() {
