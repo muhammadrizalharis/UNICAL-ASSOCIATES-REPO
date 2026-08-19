@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { UnicalIdService } from '../auth/unical-id.service';
+import { MetricsService } from '../researchers/metrics.service';
 
 @Injectable()
 export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly unicalId: UnicalIdService,
+    private readonly metrics: MetricsService,
   ) {}
 
   async pendingPublications(page = 1, limit = 20) {
@@ -76,7 +78,41 @@ export class AdminService {
       },
     });
 
+    // Status publikasi ikut menentukan metrik, jadi dihitung ulang di sini.
+    await this.metrics.recalculateForPublication(publicationId);
+
     return updated;
+  }
+
+  /**
+   * Menghitung ulang metrik seluruh peneliti. Diperlukan untuk data yang
+   * disetujui sebelum fitur metrik ada, atau setelah pembaruan sitasi massal.
+   */
+  async recalculateAllMetrics() {
+    const profiles = await this.prisma.researcherProfile.findMany({
+      where: { unicalId: { not: null } },
+      select: { id: true, unicalId: true, fullName: true },
+    });
+
+    const results: {
+      unicalId: string | null;
+      fullName: string;
+      hIndex: number;
+      i10Index: number;
+      totalCitations: number;
+      totalPublications: number;
+    }[] = [];
+
+    for (const profile of profiles) {
+      const metrics = await this.metrics.recalculate(profile.id);
+      results.push({
+        unicalId: profile.unicalId,
+        fullName: profile.fullName,
+        ...metrics,
+      });
+    }
+
+    return { processed: results.length, results };
   }
 
   async pendingUsers() {

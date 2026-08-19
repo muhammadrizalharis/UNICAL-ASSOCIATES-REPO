@@ -2,9 +2,12 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -74,6 +77,13 @@ export class AdminController {
   @Roles('FACULTY_ADMIN', 'SUPER_ADMIN')
   async pendingResearchers() {
     return { success: true, data: await this.admin.pendingUsers() };
+  }
+
+  @Post('metrics/recalculate')
+  @HttpCode(HttpStatus.OK)
+  @Roles('SUPER_ADMIN')
+  async recalculateMetrics() {
+    return { success: true, data: await this.admin.recalculateAllMetrics() };
   }
 
   @Patch('researchers/:id/verify')

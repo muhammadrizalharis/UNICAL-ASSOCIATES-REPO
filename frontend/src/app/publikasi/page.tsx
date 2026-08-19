@@ -46,12 +46,17 @@ export default async function PublikasiPage({
           <Link href="/" className="font-bold text-indigo-700">
             UNICAL ASSOCIATES REPO
           </Link>
-          <Link
-            href="/welcome"
-            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-          >
-            Masuk
-          </Link>
+          <nav className="flex gap-4 text-sm">
+            <Link href="/peneliti" className="text-slate-600 hover:text-indigo-700">
+              Peneliti
+            </Link>
+            <Link
+              href="/welcome"
+              className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50"
+            >
+              Masuk
+            </Link>
+          </nav>
         </div>
       </header>
 

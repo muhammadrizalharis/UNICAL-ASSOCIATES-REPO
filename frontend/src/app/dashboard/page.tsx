@@ -38,6 +38,18 @@ export default function DashboardPage() {
                 title="Jelajahi Repositori"
                 body="Telusuri publikasi yang sudah terverifikasi."
               />
+              <Card
+                href="/peneliti"
+                title="Direktori Peneliti"
+                body="Lihat rekam jejak dan metrik riset sivitas akademika."
+              />
+              {user.profile?.unicalId && (
+                <Card
+                  href={`/profil/${user.profile.unicalId}`}
+                  title="Profil Publik Saya"
+                  body="Tampilan profil Anda sebagaimana dilihat pengunjung."
+                />
+              )}
             </div>
           </main>
         </div>
