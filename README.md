@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&height=180&color=0:1E1B4B,45:4338CA,100:A5B4FC&section=header&text=UNICAL%20ASSOCIATES&fontColor=FFFFFF&fontSize=44&fontAlignY=34&desc=Unismuh%20%C2%B7%20Ical%20%C2%B7%20Repository%20%C2%B7%20Associates&descAlignY=54&descSize=15" width="100%" alt="UNICAL ASSOCIATES" />
+<img src="https://capsule-render.vercel.app/api?type=waving&height=180&color=0:1E1B4B,45:4338CA,100:A5B4FC&section=header&text=UNICAL%20ASSOCIATES&fontColor=FFFFFF&fontSize=44&fontAlignY=34&desc=Unismuh%20Catalog%20of%20Academic%20Literature&descAlignY=54&descSize=15" width="100%" alt="UNICAL ASSOCIATES" />
 
 <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=21&duration=2600&pause=900&color=4F46E5&center=true&vCenter=true&width=720&lines=Tempel+DOI+%E2%86%92+Metadata+Terisi+Sendiri;Repositori+Publikasi+Ilmiah+Terintegrasi;UNICAL+ID+%C2%B7+h-index+%C2%B7+Sitasi+%C2%B7+Scopus+%26+SINTA;Semua+di+Docker%2C+di+Server+Kampus+Sendiri" alt="Discover, Connect, and Elevate Research" />
 
@@ -134,7 +134,9 @@
 
 ## 🌟 1. Tentang UNICAL ASSOCIATES
 
-**UNICAL ASSOCIATES (Unismuh Ical Repository Associates)** adalah platform web repositori publikasi ilmiah yang terinspirasi dari **ScienceDirect** dan **ResearchGate**. UNICAL dirancang sebagai pusat agregasi seluruh jurnal/artikel yang telah dipublikasikan oleh sivitas akademika, dengan sistem identitas peneliti unik (**UNICAL ID**) yang berfungsi seperti **Scopus Author ID**.
+**UNICAL ASSOCIATES** adalah platform web repositori publikasi ilmiah milik **Universitas Muhammadiyah Makassar**, terinspirasi dari **ScienceDirect** dan **ResearchGate**. UNICAL dirancang sebagai pusat agregasi seluruh jurnal/artikel yang telah dipublikasikan oleh sivitas akademika, dengan sistem identitas peneliti unik (**UNICAL ID**) yang berfungsi seperti **Scopus Author ID**.
+
+> **UNICAL** = **UNI**smuh **C**atalog of **A**cademic **L**iterature · **ASSOCIATES** = jejaring peneliti yang berkontribusi di dalamnya.
 
 Keunggulan utama UNICAL adalah **upload berbasis DOI** — pengguna cukup memasukkan DOI artikel, dan sistem akan otomatis mengambil seluruh metadata (judul, penulis, abstrak, jurnal, tahun, volume, halaman, sitasi) — persis seperti cara kerja **Mendeley**.
 
@@ -2182,7 +2184,7 @@ Proyek ini dilisensikan di bawah **MIT License** — lihat file `LICENSE` (akan 
 | Peran | Nama |
 |---|---|
 | Project Owner / Developer | **Akram** |
-| Tim Pengembang | **Ical & Associates** |
+| Tim Pengembang | Program Studi Informatika |
 | Institusi | Universitas Muhammadiyah Makassar |
 
 </td>
