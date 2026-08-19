@@ -10,6 +10,7 @@ import { InstitutionsModule } from './institutions/institutions.module';
 import { TaxonomyModule } from './taxonomy/taxonomy.module';
 import { ResearchersModule } from './researchers/researchers.module';
 import { SearchModule } from './search/search.module';
+import { OrcidModule } from './orcid/orcid.module';
 import { PublicationsModule } from './publications/publications.module';
 import { ImportModule } from './import/import.module';
 import { AdminModule } from './admin/admin.module';
@@ -26,6 +27,7 @@ import { AdminModule } from './admin/admin.module';
     TaxonomyModule,
     ResearchersModule,
     SearchModule,
+    OrcidModule,
     DoiModule,
     PublicationsModule,
     ImportModule,

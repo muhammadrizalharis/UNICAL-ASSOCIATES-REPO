@@ -10,6 +10,8 @@ export interface ResolvedAuthor {
   order: number;
   isCorresponding: boolean;
   affiliation: string | null;
+  /// Diisi bila CrossRef menyertakan ORCID penulis; kunci pencocokan akun.
+  orcid: string | null;
 }
 
 export interface ResolvedJournal {

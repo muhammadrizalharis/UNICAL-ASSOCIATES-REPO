@@ -18,6 +18,7 @@ interface CrossrefAuthor {
   family?: string;
   name?: string;
   sequence?: string;
+  ORCID?: string;
   affiliation?: { name?: string }[];
 }
 
@@ -179,6 +180,9 @@ export class DoiResolverService {
         order: index + 1,
         isCorresponding: author.sequence === 'first',
         affiliation: author.affiliation?.[0]?.name ?? null,
+        orcid: author.ORCID
+          ? author.ORCID.replace(/^https?:\/\/orcid\.org\//i, '')
+          : null,
       };
     });
   }
@@ -201,6 +205,10 @@ export class DoiResolverService {
         order: index + 1,
         isCorresponding: index === 0,
         affiliation: creator.affiliation?.[0]?.name ?? null,
+        orcid:
+          creator.nameIdentifiers?.find(
+            (n: Record<string, any>) => n.nameIdentifierScheme === 'ORCID',
+          )?.nameIdentifier?.replace(/^https?:\/\/orcid\.org\//i, '') ?? null,
       }),
     );
 
