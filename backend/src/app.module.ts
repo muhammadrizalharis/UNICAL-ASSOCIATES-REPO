@@ -7,6 +7,7 @@ import { HealthModule } from './health/health.module';
 import { DoiModule } from './doi/doi.module';
 import { AuthModule } from './auth/auth.module';
 import { InstitutionsModule } from './institutions/institutions.module';
+import { TaxonomyModule } from './taxonomy/taxonomy.module';
 import { PublicationsModule } from './publications/publications.module';
 import { ImportModule } from './import/import.module';
 import { AdminModule } from './admin/admin.module';
@@ -20,6 +21,7 @@ import { AdminModule } from './admin/admin.module';
     AuthModule,
     HealthModule,
     InstitutionsModule,
+    TaxonomyModule,
     DoiModule,
     PublicationsModule,
     ImportModule,
