@@ -42,7 +42,9 @@ export function LoginForm({ gate }: { gate?: string }) {
       router.push(
         body.data.nextStep === 'affiliation'
           ? '/daftar/afiliasi'
-          : body.data.homePath,
+          : body.data.nextStep === 'orcid'
+            ? '/daftar/orcid'
+            : body.data.homePath,
       );
     } catch (err) {
       setError(

@@ -79,14 +79,17 @@ export default function AfiliasiPage() {
       // Sesi tersimpan masih versi saat login, jadi disegarkan agar dashboard
       // langsung menampilkan afiliasi yang baru saja diisi.
       const token = readToken();
+      let hasOrcid = false;
       if (token) {
         const me = await apiFetch<{ data: SessionUser }>('/auth/me', {
           headers: authHeader(),
         });
         saveSession(token, me.data);
+        hasOrcid = Boolean(me.data.profile?.orcid);
       }
 
-      router.push('/dashboard');
+      // Lanjut ke penautan ORCID bila belum tertaut, agar profil langsung terisi.
+      router.push(hasOrcid ? '/dashboard' : '/daftar/orcid');
     } catch (err) {
       setError(
         err instanceof ApiRequestError ? err.message : 'Gagal menyimpan afiliasi.',

@@ -34,16 +34,28 @@ export class OrcidController {
     private readonly prisma: PrismaService,
   ) {}
 
-  /** Peneliti menautkan ORCID iD ke profilnya sendiri. */
+  /**
+   * Peneliti menautkan ORCID iD ke profilnya sendiri; afiliasi dan seluruh
+   * karyanya langsung disinkronkan sehingga profil terisi sekali jalan.
+   */
   @Patch('researchers/me/orcid')
+  @Throttle({ default: { ttl: 300_000, limit: 3 } })
   async linkSelf(@CurrentUserId() userId: string, @Body() dto: LinkOrcidDto) {
-    const profile = await this.prisma.researcherProfile.update({
-      where: { userId },
-      data: { orcid: dto.orcid },
-      select: { unicalId: true, fullName: true, orcid: true },
-    });
+    return {
+      success: true,
+      data: await this.orcid.linkAndSync(userId, dto.orcid),
+    };
+  }
 
-    return { success: true, data: profile };
+  /** Pengguna memilih menunda penautan ORCID; ajakan tidak muncul lagi. */
+  @Post('researchers/me/orcid/dismiss')
+  @HttpCode(HttpStatus.OK)
+  async dismissPrompt(@CurrentUserId() userId: string) {
+    await this.prisma.researcherProfile.update({
+      where: { userId },
+      data: { orcidPromptDismissedAt: new Date() },
+    });
+    return { success: true, data: { dismissed: true } };
   }
 
   /** Peneliti mengimpor karya dari ORCID miliknya sendiri. */

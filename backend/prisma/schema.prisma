@@ -142,6 +142,11 @@ model ResearcherProfile {
   sintaId   String? @map("sinta_id")
   scholarId String? @map("scholar_id")
 
+  /// Waktu sinkronisasi ORCID terakhir (tautan + impor karya).
+  orcidSyncedAt DateTime? @map("orcid_synced_at")
+  /// Terisi bila pengguna memilih melewati ajakan menautkan ORCID.
+  orcidPromptDismissedAt DateTime? @map("orcid_prompt_dismissed_at")
+
   hIndex         Int     @default(0) @map("h_index")
   i10Index       Int     @default(0) @map("i10_index")
   totalCitations Int     @default(0) @map("total_citations")

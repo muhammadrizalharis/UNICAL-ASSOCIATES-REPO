@@ -82,6 +82,22 @@ export class OrcidService {
   }
 
   /**
+   * Menautkan ORCID ke profil lalu langsung mengimpor seluruh karyanya —
+   * dipakai saat login pertama admin agar sekali klik tuntas tersinkron.
+   */
+  async linkAndSync(userId: string, orcid: string) {
+    const profile = await this.prisma.researcherProfile.update({
+      where: { userId },
+      data: { orcid, orcidSyncedAt: new Date() },
+      select: { id: true },
+    });
+
+    const works = await this.importWorks(profile.id);
+
+    return { orcid, works };
+  }
+
+  /**
    * Mengimpor seluruh karya ber-DOI milik peneliti dari ORCID tertautnya.
    * Karya diverifikasi lewat rantai CrossRef sehingga metadatanya resmi,
    * lalu slot penulis ditautkan berdasarkan ORCID atau kecocokan nama.

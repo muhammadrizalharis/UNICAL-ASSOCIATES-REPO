@@ -127,8 +127,24 @@ export class AuthService {
       token: await this.signToken(user.id, dto.rememberMe ?? false),
       user: this.toPublicUser(user),
       homePath: homePathForRole(user.role),
-      nextStep: user.profile?.affiliationCompletedAt ? null : 'affiliation',
+      nextStep: this.nextStepFor(user.profile),
     };
+  }
+
+  /** Urutan pelengkapan profil: afiliasi dulu, lalu tautan ORCID. */
+  private nextStepFor(
+    profile:
+      | {
+          affiliationCompletedAt: Date | null;
+          orcid: string | null;
+          orcidPromptDismissedAt: Date | null;
+        }
+      | null
+      | undefined,
+  ): 'affiliation' | 'orcid' | null {
+    if (!profile?.affiliationCompletedAt) return 'affiliation';
+    if (!profile.orcid && !profile.orcidPromptDismissedAt) return 'orcid';
+    return null;
   }
 
   async saveAffiliation(userId: string, dto: AffiliationDto) {
@@ -262,6 +278,7 @@ export class AuthService {
             faculty: user.profile.faculty?.name ?? user.profile.facultyOther,
             department:
               user.profile.department?.name ?? user.profile.departmentOther,
+            orcid: user.profile.orcid ?? null,
             isVerified: user.profile.isVerified,
             affiliationCompleted: Boolean(user.profile.affiliationCompletedAt),
           }

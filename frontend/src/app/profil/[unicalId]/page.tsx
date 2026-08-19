@@ -31,6 +31,7 @@ interface Profile {
     year: number | null;
     citationCount: number;
     isCorresponding: boolean;
+    contributors: { name: string; unicalId: string | null; isOwner: boolean }[];
     badges: { code: string; name: string; level: string | null; badgeColor: string | null }[];
   }[];
 }
@@ -215,6 +216,30 @@ export default async function ProfilPage({
                 >
                   {pub.title}
                 </Link>
+
+                {pub.contributors.length > 0 && (
+                  <p className="mt-1 text-sm text-slate-600">
+                    {pub.contributors.map((c, i) => (
+                      <span key={`${c.name}-${i}`}>
+                        {c.unicalId ? (
+                          <Link
+                            href={`/profil/${c.unicalId}`}
+                            className={
+                              c.isOwner
+                                ? 'font-semibold text-indigo-700'
+                                : 'text-indigo-600 hover:underline'
+                            }
+                          >
+                            {c.name}
+                          </Link>
+                        ) : (
+                          c.name
+                        )}
+                        {i < pub.contributors.length - 1 && '; '}
+                      </span>
+                    ))}
+                  </p>
+                )}
 
                 <p className="mt-1 text-xs text-slate-500">
                   {[

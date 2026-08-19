@@ -90,6 +90,14 @@ export class ResearchersService {
             publishedDate: true,
             citationCount: true,
             journal: { select: { name: true } },
+            authors: {
+              orderBy: { authorOrder: 'asc' },
+              select: {
+                rawAuthorName: true,
+                authorOrder: true,
+                researcher: { select: { unicalId: true } },
+              },
+            },
             indexations: {
               select: {
                 indexation: {
@@ -110,6 +118,12 @@ export class ResearchersService {
       citationCount: a.publication.citationCount,
       authorOrder: a.authorOrder,
       isCorresponding: a.isCorresponding,
+      // Daftar kontributor lengkap seperti tampilan karya di ORCID.
+      contributors: a.publication.authors.map((author) => ({
+        name: author.rawAuthorName,
+        unicalId: author.researcher?.unicalId ?? null,
+        isOwner: author.researcher?.unicalId === unicalId,
+      })),
       badges: a.publication.indexations.map((i) => i.indexation),
     }));
 
