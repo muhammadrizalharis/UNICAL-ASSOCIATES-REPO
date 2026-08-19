@@ -1160,7 +1160,7 @@ GET    /admin/audit-logs
       "suggested_quartile": "Q1"
     },
     "authors": [
-      { "name": "Akram", "order": 1, "affiliation": "Universitas Muhammadiyah Makassar",
+      { "name": "Muhammad Rizal Haris", "order": 1, "affiliation": "Universitas Muhammadiyah Makassar",
         "matched_researcher": { "unical_id": "UNICAL-26000001", "confidence": 0.92 } },
       { "name": "John Doe", "order": 2, "affiliation": "MIT", "matched_researcher": null }
     ],
@@ -1231,8 +1231,8 @@ GET /search?q=machine+learning&index=scopus_q1,sinta_1&year_from=2020&sort=citat
   "success": true,
   "data": {
     "unical_id": "UNICAL-26000001",
-    "full_name": "Akram",
-    "photo_url": "https://unical.unismuh.ac.id/storage/photos/akram.jpg",
+    "full_name": "Muhammad Rizal Haris",
+    "photo_url": "https://unical.unismuh.ac.id/storage/photos/rizal-haris.jpg",
     "faculty": "Fakultas Teknik", "department": "Informatika",
     "expertise": ["Machine Learning", "Computer Vision"],
     "external_ids": { "orcid": "0000-0002-XXXX", "scopus_id": "57xxxxxxx", "sinta_id": "66xxxxx" },
@@ -1434,7 +1434,7 @@ stateDiagram-v2
 │ 📅 Tahun      │ ┌────────────────────────────────────────┐   │
 │ [2020▬●▬2026]│ │ [Q1][S1] Deep Learning Approach for Student │   │
 │ 🌍 Indeksasi  │ │ Performance Prediction                       │   │
-│ ☑ Scopus Q1  │ │ Akram, J. Doe · Expert Systems w/ App · 2024 │   │
+│ ☑ Scopus Q1  │ │ Haris, J. Doe · Expert Systems w/ App · 2024 │   │
 │ ☐ Scopus Q2  │ │ 📈 17 sitasi · 👁 230 · DOI: 10.1016/...     │   │
 │ ☑ SINTA 1    │ │ [Abstrak ▾] [📎 Sitasi] [⭐ Simpan]           │   │
 │ 📁 Bidang     │ └────────────────────────────────────────┘   │
@@ -1450,7 +1450,7 @@ stateDiagram-v2
 ┌────────────────────────────────────────────────────────┐
 │ [Scopus Q1] [SINTA 1] [DOAJ]              Artikel Jurnal · 2024    │
 │ Deep Learning Approach for Student Performance Prediction         │
-│ 👤 Akram¹✱ · John Doe²   (✱ corresponding · ¹klik → profil UNICAL) │
+│ 👤 Haris¹✱ · John Doe²   (✱ corresponding · ¹klik → profil UNICAL) │
 │ 📰 Expert Systems with Applications · Elsevier · Vol 244 (1)      │
 │ 🔗 DOI: 10.1016/j.eswa.2024.123456  [Buka di Penerbit ↗]           │
 ├──────────────────────────────────────────┬─────────────┤
@@ -1471,7 +1471,7 @@ stateDiagram-v2
 
 ```
 ┌───────────────────────────────────────────────────────┐
-│  ┌────┐  Akram                          [+ Ikuti]  [✉ Kontak]    │
+│  ┌────┐  Haris                          [+ Ikuti]  [✉ Kontak]    │
 │  │ 📷 │  🆔 UNICAL-26000001                                       │
 │  └────┘  🏛️ Fakultas Teknik · Informatika · Unismuh Makassar     │
 │          🏷️ Machine Learning · Computer Vision                    │
@@ -1495,7 +1495,7 @@ stateDiagram-v2
 ┌─────────────────────┐    ┌────────────────────────────┐
 │ Tempel DOI:         │    │ ✅ Metadata ditemukan!         │
 │ ┌───────────────┐ │    │ Judul  : [Deep Learning...]   │
-│ │10.1016/j.eswa..│ │ →  │ Penulis: Akram (→ Anda? ☑)    │
+│ │10.1016/j.eswa..│ │ →  │ Penulis: Haris (→ Anda? ☑)    │
 │ └───────────────┘ │    │ Jurnal : ESWA · Q1 (auto)     │
 │ [🔍 Ambil Metadata] │    │ Kategori*: [ML & AI ▾]        │
 │ atau                │    │ Indeksasi: ☑Scopus Q1 ☑SINTA1 │
@@ -1615,7 +1615,7 @@ Agar publikasi ditemukan Google & **Google Scholar** (seperti ScienceDirect):
 2. **Meta tags Highwire Press** (dibaca Google Scholar) di halaman detail publikasi:
 ```html
 <meta name="citation_title" content="Deep Learning Approach for..." />
-<meta name="citation_author" content="Akram" />
+<meta name="citation_author" content="Muhammad Rizal Haris" />
 <meta name="citation_publication_date" content="2024/06/15" />
 <meta name="citation_journal_title" content="Expert Systems with Applications" />
 <meta name="citation_volume" content="244" />
@@ -2139,7 +2139,7 @@ SINTA adalah pemeringkat nasional milik Kemdikbudristek. UNICAL adalah repositor
 | **Metadata** | Data deskriptif artikel (judul, penulis, jurnal, tahun, dll.) — bukan isi artikelnya |
 | **Open Access (OA)** | Artikel yang bebas diakses publik secara legal |
 | **Corresponding author** | Penulis penanggung jawab korespondensi artikel |
-| **Fuzzy matching** | Pencocokan teks toleran-beda (mis. "M. Akram" ≈ "Muh. Akram") untuk mengaitkan nama penulis ke akun |
+| **Fuzzy matching** | Pencocokan teks toleran-beda (mis. "M. Rizal Haris" ≈ "Muh. Rizal Haris") untuk mengaitkan nama penulis ke akun |
 | **Sanctum** | Paket autentikasi token API resmi Laravel |
 | **Docker Compose** | Alat menjalankan banyak container sebagai satu stack dari berkas `docker-compose.yml` |
 | **Reverse proxy** | Server di depan aplikasi yang menangani TLS, domain, dan penerusan request ke container |
@@ -2183,8 +2183,7 @@ Proyek ini dilisensikan di bawah **MIT License** — lihat file `LICENSE` (akan 
 
 | Peran | Nama |
 |---|---|
-| Project Owner / Developer | **Akram** |
-| Tim Pengembang | Program Studi Informatika |
+| Owner & Pengembang | **Muhammad Rizal Haris** |
 | Institusi | Universitas Muhammadiyah Makassar |
 
 </td>
