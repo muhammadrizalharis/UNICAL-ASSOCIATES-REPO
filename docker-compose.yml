@@ -1,0 +1,193 @@
+# UNICAL ASSOCIATES — lapisan data (Milestone 1)
+#
+# Seluruh sumber daya di sini milik UNICAL sendiri: tidak menumpang
+# Postgres/Redis/MinIO milik stack lain di server kampus.
+# Port host memakai blok 48000–48999 yang direservasi untuk proyek ini.
+#
+# Jalankan: cp .env.example .env && docker compose up -d
+#
+# Service aplikasi (web, api, worker, scheduler, nginx) ditambahkan pada
+# Milestone 2 setelah kode backend/frontend ada.
+
+name: unical
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-base: &base
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  networks: [unical-net]
+  logging: *logging
+
+services:
+  postgres:
+    <<: *base
+    image: postgres:16-alpine
+    container_name: unical-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-unical}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?wajib diisi di .env}
+      POSTGRES_DB: ${POSTGRES_DB:-unical}
+      TZ: ${TZ:-Asia/Makassar}
+    command:
+      - postgres
+      - -c
+      - shared_buffers=4GB
+      - -c
+      - effective_cache_size=12GB
+      - -c
+      - work_mem=32MB
+      - -c
+      - maintenance_work_mem=1GB
+      - -c
+      - max_connections=200
+      - -c
+      - random_page_cost=1.1
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-48432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-unical} -d ${POSTGRES_DB:-unical}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "8"
+          memory: 16G
+        reservations:
+          memory: 4G
+
+  redis:
+    <<: *base
+    image: redis:7-alpine
+    container_name: unical-redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?wajib diisi di .env}
+    # noeviction dipakai karena Redis juga menampung antrean job — kebijakan
+    # LRU berisiko membuang job yang belum diproses.
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - "3gb"
+      - --maxmemory-policy
+      - noeviction
+      - --requirepass
+      - ${REDIS_PASSWORD}
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-48379}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4G
+        reservations:
+          memory: 512M
+
+  meili:
+    <<: *base
+    image: getmeili/meilisearch:v1.10
+    container_name: unical-meili
+    environment:
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?wajib diisi di .env}
+      MEILI_ENV: production
+      MEILI_NO_ANALYTICS: "true"
+    ports:
+      - "127.0.0.1:${MEILI_PORT:-48700}:7700"
+    volumes:
+      - meilidata:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:7700/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 8G
+        reservations:
+          memory: 1G
+
+  minio:
+    <<: *base
+    image: minio/minio:latest
+    container_name: unical-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-unical}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?wajib diisi di .env}
+    ports:
+      - "127.0.0.1:${MINIO_PORT:-48900}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-48901}:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          memory: 512M
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: unical-minio-init
+    restart: "no"
+    networks: [unical-net]
+    logging: *logging
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 '${MINIO_ROOT_USER:-unical}' '${MINIO_ROOT_PASSWORD}' &&
+      mc mb --ignore-existing local/${MINIO_BUCKET:-unical-assets} &&
+      mc anonymous set none local/${MINIO_BUCKET:-unical-assets} &&
+      echo 'bucket siap' "
+
+volumes:
+  pgdata:
+    name: unical-pgdata
+  redisdata:
+    name: unical-redisdata
+  meilidata:
+    name: unical-meilidata
+  miniodata:
+    name: unical-miniodata
+
+networks:
+  unical-net:
+    name: unical-net
+    driver: bridge
+    ipam:
+      config:
+        # 172.17-172.30 sudah dipakai stack lain di server ini, dan 172.31 masih
+        # bisa direbut kolam alamat default Docker. 10.48.x aman dan selaras
+        # dengan blok port 48xxx milik UNICAL.
+        - subnet: 10.48.0.0/16
