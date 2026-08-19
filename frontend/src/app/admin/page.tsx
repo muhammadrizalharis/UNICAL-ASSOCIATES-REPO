@@ -1,0 +1,162 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { apiFetch } from '@/lib/api';
+import { authHeader } from '@/lib/session';
+import { RequireAuth, TopBar } from '@/components/require-auth';
+
+interface PendingPublication {
+  id: string;
+  doi: string;
+  title: string;
+  submittedBy: { email: string };
+}
+
+interface PendingResearcher {
+  id: string;
+  fullName: string;
+  user: { email: string };
+  faculty: { name: string } | null;
+  department: { name: string } | null;
+}
+
+export default function AdminPage() {
+  return (
+    <RequireAuth staffOnly>
+      {(user) => (
+        <div className="min-h-screen bg-slate-50">
+          <TopBar user={user} />
+          <main className="mx-auto max-w-5xl space-y-8 px-4 py-8">
+            <h1 className="text-2xl font-semibold text-slate-900">Panel Pengelola</h1>
+            <PublicationQueue />
+            {user.role !== 'MODERATOR' && <ResearcherQueue />}
+          </main>
+        </div>
+      )}
+    </RequireAuth>
+  );
+}
+
+function PublicationQueue() {
+  const [rows, setRows] = useState<PendingPublication[]>([]);
+  const [note, setNote] = useState<string | null>(null);
+
+  const load = () =>
+    apiFetch<{ data: PendingPublication[] }>('/admin/publications', {
+      headers: authHeader(),
+    })
+      .then((body) => setRows(body.data))
+      .catch(() => setNote('Gagal memuat antrean publikasi.'));
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  async function decide(id: string, approve: boolean) {
+    const path = `/admin/publications/${id}/${approve ? 'approve' : 'reject'}`;
+    await apiFetch(path, {
+      method: 'PATCH',
+      headers: authHeader(),
+      body: approve ? undefined : JSON.stringify({ reason: 'Tidak sesuai kriteria.' }),
+    });
+    setNote(approve ? 'Publikasi disetujui.' : 'Publikasi ditolak.');
+    void load();
+  }
+
+  return (
+    <section>
+      <h2 className="mb-3 font-medium text-slate-900">
+        Antrean Verifikasi Publikasi ({rows.length})
+      </h2>
+      {note && <p className="mb-3 text-sm text-emerald-700">{note}</p>}
+
+      <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+        {rows.length === 0 && (
+          <p className="px-4 py-4 text-sm text-slate-500">Tidak ada antrean.</p>
+        )}
+        {rows.map((row) => (
+          <div key={row.id} className="flex items-center gap-4 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-slate-900">{row.title}</p>
+              <p className="truncate text-xs text-slate-500">
+                {row.doi} · {row.submittedBy.email}
+              </p>
+            </div>
+            <button
+              onClick={() => decide(row.id, true)}
+              className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700"
+            >
+              Setujui
+            </button>
+            <button
+              onClick={() => decide(row.id, false)}
+              className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
+            >
+              Tolak
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ResearcherQueue() {
+  const [rows, setRows] = useState<PendingResearcher[]>([]);
+  const [note, setNote] = useState<string | null>(null);
+
+  const load = () =>
+    apiFetch<{ data: PendingResearcher[] }>('/admin/researchers/pending', {
+      headers: authHeader(),
+    })
+      .then((body) => setRows(body.data))
+      .catch(() => setNote('Gagal memuat daftar peneliti.'));
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  async function verify(id: string) {
+    const body = await apiFetch<{ data: { unicalId: string } }>(
+      `/admin/researchers/${id}/verify`,
+      { method: 'PATCH', headers: authHeader() },
+    );
+    setNote(`UNICAL ID diterbitkan: ${body.data.unicalId}`);
+    void load();
+  }
+
+  return (
+    <section>
+      <h2 className="mb-3 font-medium text-slate-900">
+        Peneliti Menunggu Verifikasi ({rows.length})
+      </h2>
+      {note && <p className="mb-3 text-sm text-emerald-700">{note}</p>}
+
+      <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+        {rows.length === 0 && (
+          <p className="px-4 py-4 text-sm text-slate-500">Tidak ada antrean.</p>
+        )}
+        {rows.map((row) => (
+          <div key={row.id} className="flex items-center gap-4 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-slate-900">
+                {row.fullName}
+              </p>
+              <p className="truncate text-xs text-slate-500">
+                {row.user.email}
+                {row.department && ` · ${row.department.name}`}
+                {row.faculty && ` · ${row.faculty.name}`}
+              </p>
+            </div>
+            <button
+              onClick={() => verify(row.id)}
+              className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700"
+            >
+              Terbitkan UNICAL ID
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
