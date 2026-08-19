@@ -1,4 +1,4 @@
-# UNICAL ASSOCIATES — image backend (api / worker / scheduler)
+# UNICAL ASSOCIATES REPO — image backend (api / worker / scheduler)
 # Multi-stage: toolchain build tidak ikut ke image akhir.
 
 # ── Tahap 1: dependensi lengkap ──

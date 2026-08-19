@@ -1,4 +1,4 @@
-# UNICAL ASSOCIATES — perintah operasional
+# UNICAL ASSOCIATES REPO — perintah operasional
 # Catatan: resep Makefile wajib diawali TAB, bukan spasi.
 
 SHELL := /bin/bash

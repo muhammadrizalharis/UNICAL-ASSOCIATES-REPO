@@ -1,4 +1,4 @@
--- Ekstensi wajib UNICAL ASSOCIATES.
+-- Ekstensi wajib UNICAL ASSOCIATES REPO.
 -- Dijalankan otomatis hanya saat volume database masih kosong.
 
 -- Pencocokan nama penulis yang toleran perbedaan ejaan ("M. Akram" ~ "Muh. Akram").

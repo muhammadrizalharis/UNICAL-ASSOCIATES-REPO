@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&height=180&color=0:1E1B4B,45:4338CA,100:A5B4FC&section=header&text=UNICAL%20ASSOCIATES&fontColor=FFFFFF&fontSize=44&fontAlignY=34&desc=Unismuh%20Catalog%20of%20Academic%20Literature&descAlignY=54&descSize=15" width="100%" alt="UNICAL ASSOCIATES" />
+<img src="https://capsule-render.vercel.app/api?type=waving&height=180&color=0:1E1B4B,45:4338CA,100:A5B4FC&section=header&text=UNICAL%20ASSOCIATES%20REPO&fontColor=FFFFFF&fontSize=38&fontAlignY=34&desc=Unismuh%20Catalog%20of%20Academic%20Literature%20Repository&descAlignY=54&descSize=15" width="100%" alt="UNICAL ASSOCIATES REPO" />
 
 <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=21&duration=2600&pause=900&color=4F46E5&center=true&vCenter=true&width=720&lines=Tempel+DOI+%E2%86%92+Metadata+Terisi+Sendiri;Repositori+Publikasi+Ilmiah+Terintegrasi;UNICAL+ID+%C2%B7+h-index+%C2%B7+Sitasi+%C2%B7+Scopus+%26+SINTA;Berjalan+Penuh+di+Docker" alt="Discover, Connect, and Elevate Research" />
 
@@ -33,11 +33,11 @@
 
 ## 🌟 Tentang
 
-**UNICAL ASSOCIATES** adalah platform repositori publikasi ilmiah milik **Universitas Muhammadiyah Makassar**, terinspirasi dari ScienceDirect dan ResearchGate.
+**UNICAL ASSOCIATES REPO** adalah platform repositori publikasi ilmiah milik **Universitas Muhammadiyah Makassar**, terinspirasi dari ScienceDirect dan ResearchGate.
 
 Platform ini menghimpun jurnal dan artikel yang **sudah terbit**, lalu menyusunnya dalam satu katalog yang mudah dicari, dilengkapi identitas peneliti permanen dan metrik riset otomatis.
 
-> **UNICAL** = **UNI**smuh **C**atalog of **A**cademic **L**iterature · **ASSOCIATES** = jejaring peneliti yang berkontribusi di dalamnya.
+> **UNICAL** = **UNI**smuh **C**atalog of **A**cademic **L**iterature · **ASSOCIATES** = jejaring peneliti yang berkontribusi · **REPO** = repositori tempat seluruh karya dihimpun.
 
 UNICAL **tidak menerbitkan** jurnal. Yang disimpan hanya metadata beserta tautan DOI resmi, sebagaimana cara kerja Google Scholar dan Mendeley.
 
@@ -232,7 +232,7 @@ Pertanyaan dan saran silakan disampaikan lewat [Issues](https://github.com/muham
 
 <br />
 
-**UNICAL ASSOCIATES** · dibangun untuk peneliti Indonesia 🇮🇩
+**UNICAL ASSOCIATES REPO** · dibangun untuk peneliti Indonesia 🇮🇩
 
 <img src="https://capsule-render.vercel.app/api?type=waving&height=120&color=0:A5B4FC,55:4338CA,100:1E1B4B&section=footer" width="100%" alt="" />
 
