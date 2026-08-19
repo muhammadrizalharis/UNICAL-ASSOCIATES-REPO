@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class LoginDto {
   @IsEmail({}, { message: 'Format email tidak valid' })
@@ -11,4 +11,13 @@ export class LoginDto {
   @IsOptional()
   @IsBoolean()
   rememberMe?: boolean;
+
+  /**
+   * Segmen URL pintu masuk, diisi otomatis oleh halaman /welcome/[gate].
+   * Anggota biasa mengosongkannya.
+   */
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  gate?: string;
 }

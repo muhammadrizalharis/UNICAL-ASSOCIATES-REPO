@@ -10,6 +10,11 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AffiliationDto } from './dto/affiliation.dto';
+import {
+  homePathForRole,
+  isGateValid,
+  readGateConfig,
+} from './gate.util';
 
 // Parameter Argon2id sesuai kebijakan keamanan: memori 64 MB.
 const ARGON_OPTIONS = {
@@ -74,6 +79,7 @@ export class AuthService {
     return {
       token: await this.signToken(user.id, false),
       user: this.toPublicUser(user),
+      homePath: '/dashboard',
       nextStep: 'affiliation',
     };
   }
@@ -104,6 +110,13 @@ export class AuthService {
     const ok = await verify(user.passwordHash, dto.password).catch(() => false);
     if (!ok) throw invalid;
 
+    // Pintu masuk harus cocok dengan peran: anggota lewat /welcome/,
+    // admin dan super admin lewat URL masing-masing. Galatnya disamakan
+    // agar tidak terbaca akun mana yang berperan admin.
+    if (!isGateValid(user.role, dto.gate, readGateConfig())) {
+      throw invalid;
+    }
+
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
@@ -112,6 +125,7 @@ export class AuthService {
     return {
       token: await this.signToken(user.id, dto.rememberMe ?? false),
       user: this.toPublicUser(user),
+      homePath: homePathForRole(user.role),
       nextStep: user.profile?.affiliationCompletedAt ? null : 'affiliation',
     };
   }
