@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import { PublicationActions } from '@/components/publication-actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +20,7 @@ interface PublicationDetail {
     order: number;
     isCorresponding: boolean;
     affiliation: string | null;
+    claimed: boolean;
   }[];
   categories: { id: string; name: string }[];
   badges: { code: string; name: string; level: string | null; color: string | null }[];
@@ -139,6 +141,15 @@ export default async function PublicationDetailPage({
           <span className="text-slate-500">{pub.citationCount} sitasi</span>
           <span className="text-slate-500">{pub.viewCount} dilihat</span>
         </div>
+
+        <PublicationActions
+          publicationId={pub.id}
+          authors={pub.authors.map((a) => ({
+            name: a.name,
+            order: a.order,
+            claimed: a.claimed,
+          }))}
+        />
 
         <section className="mt-6 rounded-lg border border-slate-200 bg-white p-5">
           <h2 className="mb-2 font-medium text-slate-900">Abstrak</h2>

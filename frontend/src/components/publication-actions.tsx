@@ -1,0 +1,109 @@
+'use client';
+
+import { useState } from 'react';
+import { apiBase, apiFetch, ApiRequestError } from '@/lib/api';
+import { authHeader, readUser } from '@/lib/session';
+
+interface AuthorSlot {
+  name: string;
+  order: number;
+  claimed: boolean;
+}
+
+/** Tombol ekspor sitasi + klaim kepenulisan pada halaman detail publikasi. */
+export function PublicationActions({
+  publicationId,
+  authors,
+}: {
+  publicationId: string;
+  authors: AuthorSlot[];
+}) {
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-2">
+      <span className="text-xs font-medium text-slate-500">Ekspor sitasi:</span>
+      {(['bibtex', 'ris', 'apa'] as const).map((format) => (
+        <a
+          key={format}
+          href={`${apiBase()}/publications/${publicationId}/export?format=${format}`}
+          className="rounded-md border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-700 uppercase transition hover:border-indigo-400 hover:text-indigo-700"
+        >
+          {format}
+        </a>
+      ))}
+      <ClaimButton publicationId={publicationId} authors={authors} />
+    </div>
+  );
+}
+
+function ClaimButton({
+  publicationId,
+  authors,
+}: {
+  publicationId: string;
+  authors: AuthorSlot[];
+}) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const unclaimed = authors.filter((a) => !a.claimed);
+  if (unclaimed.length === 0) return null;
+
+  async function claim(order: number) {
+    if (!readUser()) {
+      window.location.href = '/welcome';
+      return;
+    }
+
+    setBusy(true);
+    setError(null);
+    try {
+      await apiFetch(`/publications/${publicationId}/claim`, {
+        method: 'POST',
+        headers: authHeader(),
+        body: JSON.stringify({ authorOrder: order }),
+      });
+      setNote('Klaim terkirim. Moderator akan meninjau kecocokan nama Anda.');
+      setOpen(false);
+    } catch (err) {
+      setError(
+        err instanceof ApiRequestError ? err.message : 'Klaim gagal terkirim.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="rounded-md border border-indigo-300 bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 transition hover:bg-indigo-100"
+      >
+        ✋ Ini publikasi saya
+      </button>
+
+      {open && (
+        <div className="absolute z-10 mt-1 w-64 rounded-md border border-slate-200 bg-white p-2 shadow-lg">
+          <p className="mb-1 px-1 text-xs text-slate-500">
+            Pilih nama Anda pada daftar penulis:
+          </p>
+          {unclaimed.map((author) => (
+            <button
+              key={author.order}
+              disabled={busy}
+              onClick={() => claim(author.order)}
+              className="block w-full rounded px-2 py-1.5 text-left text-sm text-slate-700 hover:bg-indigo-50 disabled:opacity-60"
+            >
+              {author.order}. {author.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {note && <p className="mt-2 text-xs text-emerald-700">{note}</p>}
+      {error && <p className="mt-2 text-xs text-red-700">{error}</p>}
+    </div>
+  );
+}

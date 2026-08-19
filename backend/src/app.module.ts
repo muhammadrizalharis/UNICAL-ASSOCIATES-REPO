@@ -13,6 +13,7 @@ import { ResearchersModule } from './researchers/researchers.module';
 import { SearchModule } from './search/search.module';
 import { OrcidModule } from './orcid/orcid.module';
 import { JobsModule } from './jobs/jobs.module';
+import { ClaimsModule } from './claims/claims.module';
 import { PublicationsModule } from './publications/publications.module';
 import { ImportModule } from './import/import.module';
 import { AdminModule } from './admin/admin.module';
@@ -32,6 +33,7 @@ import { AdminModule } from './admin/admin.module';
     SearchModule,
     OrcidModule,
     JobsModule,
+    ClaimsModule,
     DoiModule,
     PublicationsModule,
     ImportModule,

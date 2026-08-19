@@ -20,6 +20,16 @@ interface PendingResearcher {
   department: { name: string } | null;
 }
 
+interface PendingClaim {
+  id: string;
+  researcher: { unicalId: string | null; fullName: string };
+  publicationAuthor: {
+    rawAuthorName: string;
+    authorOrder: number;
+    publication: { id: string; title: string; doi: string };
+  };
+}
+
 export default function AdminPage() {
   return (
     <RequireAuth staffOnly>
@@ -29,6 +39,7 @@ export default function AdminPage() {
           <main className="mx-auto max-w-5xl space-y-8 px-4 py-8">
             <h1 className="text-2xl font-semibold text-slate-900">Panel Pengelola</h1>
             <PublicationQueue />
+            <ClaimQueue />
             {user.role !== 'MODERATOR' && <ResearcherQueue />}
           </main>
         </div>
@@ -80,6 +91,78 @@ function PublicationQueue() {
               <p className="truncate text-sm font-medium text-slate-900">{row.title}</p>
               <p className="truncate text-xs text-slate-500">
                 {row.doi} · {row.submittedBy.email}
+              </p>
+            </div>
+            <button
+              onClick={() => decide(row.id, true)}
+              className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700"
+            >
+              Setujui
+            </button>
+            <button
+              onClick={() => decide(row.id, false)}
+              className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
+            >
+              Tolak
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ClaimQueue() {
+  const [rows, setRows] = useState<PendingClaim[]>([]);
+  const [note, setNote] = useState<string | null>(null);
+
+  const load = () =>
+    apiFetch<{ data: PendingClaim[] }>('/admin/claims', { headers: authHeader() })
+      .then((body) => setRows(body.data))
+      .catch(() => setNote('Gagal memuat antrean klaim.'));
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  async function decide(id: string, approve: boolean) {
+    await apiFetch(`/admin/claims/${id}/${approve ? 'approve' : 'reject'}`, {
+      method: 'PATCH',
+      headers: authHeader(),
+      body: approve
+        ? undefined
+        : JSON.stringify({ reason: 'Nama tidak cocok dengan slot penulis.' }),
+    });
+    setNote(approve ? 'Klaim disetujui; metrik pemohon dihitung ulang.' : 'Klaim ditolak.');
+    void load();
+  }
+
+  return (
+    <section>
+      <h2 className="mb-3 font-medium text-slate-900">
+        Klaim Kepenulisan ({rows.length})
+      </h2>
+      {note && <p className="mb-3 text-sm text-emerald-700">{note}</p>}
+
+      <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+        {rows.length === 0 && (
+          <p className="px-4 py-4 text-sm text-slate-500">Tidak ada antrean.</p>
+        )}
+        {rows.map((row) => (
+          <div key={row.id} className="flex items-center gap-4 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-slate-900">
+                {row.researcher.fullName}
+                {row.researcher.unicalId && (
+                  <span className="ml-1 text-xs text-slate-500">
+                    ({row.researcher.unicalId})
+                  </span>
+                )}
+              </p>
+              <p className="truncate text-xs text-slate-500">
+                mengklaim slot #{row.publicationAuthor.authorOrder} “
+                {row.publicationAuthor.rawAuthorName}” pada{' '}
+                {row.publicationAuthor.publication.title}
               </p>
             </div>
             <button

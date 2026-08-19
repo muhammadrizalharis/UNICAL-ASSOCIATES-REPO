@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../common/prisma/prisma.service';
 import { DoiResolverService } from '../doi/doi-resolver.service';
 import { normalizeDoi } from '../doi/doi.util';
+import { namesLooselyMatch } from './name-match.util';
 import { SearchIndexService } from '../search/search-index.service';
 import { MetricsService } from '../researchers/metrics.service';
 
@@ -227,19 +228,7 @@ export class OrcidService {
     if (author.orcid && profile.orcid) {
       return author.orcid.toUpperCase() === profile.orcid.toUpperCase();
     }
-    return this.nameLoose(author.name) === this.nameLoose(profile.fullName);
-  }
-
-  private nameLoose(name: string): string {
-    return name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z ]/g, '')
-      .split(/\s+/)
-      .filter(Boolean)
-      .sort()
-      .join(' ');
+    return namesLooselyMatch(author.name, profile.fullName);
   }
 
   private async linkAuthorship(
@@ -256,8 +245,7 @@ export class OrcidService {
 
     const bySlotName = slots.find(
       (s) =>
-        !s.researcherId &&
-        this.nameLoose(s.rawAuthorName) === this.nameLoose(profile.fullName),
+        !s.researcherId && namesLooselyMatch(s.rawAuthorName, profile.fullName),
     );
 
     if (bySlotName) {
