@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
+import { dict, getLang } from '@/lib/i18n';
+import { LanguageToggle } from '@/components/language-toggle';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Jelajahi Publikasi · UNICAL ASSOCIATES REPO' };
@@ -54,12 +56,7 @@ const TYPE_LABEL: Record<string, string> = {
   PREPRINT: 'Preprint',
 };
 
-const SORTS = [
-  { id: '', label: 'Relevansi' },
-  { id: 'newest', label: 'Terbaru' },
-  { id: 'citations', label: 'Paling disitasi' },
-  { id: 'views', label: 'Paling dilihat' },
-];
+const SORT_IDS = ['', 'newest', 'citations', 'views'] as const;
 
 type Query = Record<string, string | undefined>;
 
@@ -87,6 +84,8 @@ export default async function PublikasiPage({
   searchParams: Promise<Query>;
 }) {
   const current = await searchParams;
+  const lang = await getLang();
+  const t = dict(lang);
 
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(current)) {
@@ -113,42 +112,46 @@ export default async function PublikasiPage({
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Link href="/peneliti" className="text-slate-600 hover:text-indigo-700">
-              Peneliti
+              {t.common.researchers}
             </Link>
+            <Link href="/statistik" className="text-slate-600 hover:text-indigo-700">
+              Statistik
+            </Link>
+            <LanguageToggle lang={lang} />
             <Link
               href="/welcome"
               className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50"
             >
-              Masuk
+              {t.common.login}
             </Link>
           </nav>
         </div>
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <h1 className="text-2xl font-semibold text-slate-900">Jelajahi Publikasi</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">{t.publikasi.title}</h1>
 
         <form className="mt-4 flex flex-wrap gap-2">
           <input
             name="q"
             defaultValue={current.q ?? ''}
-            placeholder="Cari judul, abstrak, atau DOI…"
+            placeholder={t.publikasi.searchPlaceholder}
             className="min-w-48 flex-1 rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
           />
           <input
             name="author"
             defaultValue={current.author ?? ''}
-            placeholder="Nama penulis (opsional)"
+            placeholder={t.publikasi.authorPlaceholder}
             className="w-56 rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
           />
           <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
-            Cari
+            {t.common.search}
           </button>
         </form>
 
         {!result && (
           <p className="mt-6 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-            Tidak dapat memuat hasil pencarian.
+            {t.publikasi.loadFailed}
           </p>
         )}
 
@@ -156,7 +159,7 @@ export default async function PublikasiPage({
           <div className="mt-6 grid gap-6 md:grid-cols-[220px_1fr]">
             <aside className="space-y-5">
               <FacetGroup
-                title="Indeksasi"
+                title={t.publikasi.facetIndexation}
                 entries={facets.indexations}
                 labels={INDEX_LABEL}
                 active={activeIndex}
@@ -168,7 +171,7 @@ export default async function PublikasiPage({
                 }
               />
               <FacetGroup
-                title="Jenis"
+                title={t.publikasi.facetType}
                 entries={facets.type}
                 labels={TYPE_LABEL}
                 active={activeType ? [activeType] : []}
@@ -180,7 +183,7 @@ export default async function PublikasiPage({
                 }
               />
               <FacetGroup
-                title="Tahun"
+                title={t.publikasi.facetYear}
                 entries={facets.year}
                 labels={{}}
                 active={
@@ -202,7 +205,7 @@ export default async function PublikasiPage({
                   href={buildHref({}, { q: current.q })}
                   className="block text-sm text-indigo-600 hover:underline"
                 >
-                  Hapus semua filter
+                  {t.publikasi.clearFilters}
                 </Link>
               )}
             </aside>
@@ -210,7 +213,7 @@ export default async function PublikasiPage({
             <section>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm text-slate-600">
-                  {result.meta.total} hasil
+                  {result.meta.total} {t.publikasi.results}
                   {result.meta.took !== null && ` · ${result.meta.took} ms`}
                   <span className="ml-2 rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-600">
                     {result.meta.engine}
@@ -218,26 +221,34 @@ export default async function PublikasiPage({
                 </p>
 
                 <div className="flex gap-1 text-xs">
-                  {SORTS.map((s) => (
-                    <Link
-                      key={s.id || 'relevance'}
-                      href={buildHref(current, { sort: s.id || undefined })}
-                      className={`rounded px-2 py-1 transition ${
-                        (current.sort ?? '') === s.id
-                          ? 'bg-indigo-600 text-white'
-                          : 'text-slate-600 hover:bg-slate-200'
-                      }`}
-                    >
-                      {s.label}
-                    </Link>
-                  ))}
+                  {SORT_IDS.map((id) => {
+                    const label = {
+                      '': t.publikasi.sortRelevance,
+                      newest: t.publikasi.sortNewest,
+                      citations: t.publikasi.sortMostCited,
+                      views: t.publikasi.sortMostViewed,
+                    }[id];
+                    return (
+                      <Link
+                        key={id || 'relevance'}
+                        href={buildHref(current, { sort: id || undefined })}
+                        className={`rounded px-2 py-1 transition ${
+                          (current.sort ?? '') === id
+                            ? 'bg-indigo-600 text-white'
+                            : 'text-slate-600 hover:bg-slate-200'
+                        }`}
+                      >
+                        {label}
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="space-y-3">
                 {result.data.length === 0 && (
                   <p className="rounded-lg border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-500">
-                    Tidak ada publikasi yang cocok.
+                    {t.publikasi.noMatch}
                   </p>
                 )}
 
@@ -266,7 +277,8 @@ export default async function PublikasiPage({
 
                     <p className="mt-1 text-sm text-slate-600">
                       {hit.authors.slice(0, 4).join(', ')}
-                      {hit.authors.length > 4 && ` +${hit.authors.length - 4} lainnya`}
+                      {hit.authors.length > 4 &&
+                        ` +${hit.authors.length - 4} ${t.publikasi.others}`}
                     </p>
 
                     {hit.abstract && (
@@ -279,8 +291,8 @@ export default async function PublikasiPage({
                       {[
                         hit.journal,
                         hit.year,
-                        `${hit.citationCount} sitasi`,
-                        `${hit.viewCount} dilihat`,
+                        `${hit.citationCount} ${t.common.citations}`,
+                        `${hit.viewCount} ${t.common.views}`,
                       ]
                         .filter(Boolean)
                         .join(' · ')}

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { clearSession, readUser, type SessionUser } from '@/lib/session';
+import { apiFetch } from '@/lib/api';
+import { authHeader, clearSession, readUser, type SessionUser } from '@/lib/session';
 
 export function RequireAuth({
   staffOnly = false,
@@ -47,6 +48,15 @@ export function RequireAuth({
 
 export function TopBar({ user }: { user: SessionUser }) {
   const router = useRouter();
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    apiFetch<{ meta: { unread: number } }>('/notifications', {
+      headers: authHeader(),
+    })
+      .then((res) => setUnread(res.meta.unread))
+      .catch(() => undefined);
+  }, []);
 
   return (
     <header className="border-b border-slate-200 bg-white">
@@ -59,6 +69,18 @@ export function TopBar({ user }: { user: SessionUser }) {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/notifikasi"
+            title="Notifikasi"
+            className="relative rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50"
+          >
+            🔔
+            {unread > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold text-white">
+                {unread > 99 ? '99+' : unread}
+              </span>
+            )}
+          </Link>
           <Link
             href="/dashboard/akun"
             className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50"

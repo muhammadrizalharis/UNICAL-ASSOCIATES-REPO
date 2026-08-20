@@ -78,7 +78,7 @@ export function CommentsSection({ publicationId }: { publicationId: string }) {
     }
   }
 
-  const me = readUser();
+  const canModerate = loggedIn;
 
   function CommentCard({ c, isReply }: { c: CommentView; isReply?: boolean }) {
     return (
@@ -116,7 +116,7 @@ export function CommentsSection({ publicationId }: { publicationId: string }) {
                 {replyTo === c.id ? 'Batal balas' : 'Balas'}
               </button>
             )}
-            {me && (
+            {canModerate && (
               <button
                 onClick={() => void remove(c.id)}
                 className="text-slate-400 hover:text-red-600"

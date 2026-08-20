@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
+import { dict, getLang } from '@/lib/i18n';
+import { LanguageToggle } from '@/components/language-toggle';
 import { TrendChart } from '@/components/trend-chart';
 
-export const revalidate = 600;
+// Dinamis karena cookie bahasa; data berat sudah di-cache Redis di API (10 mnt).
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'Statistik Institusi · UNICAL ASSOCIATES REPO',
@@ -46,6 +49,9 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export default async function StatistikPage() {
+  const lang = await getLang();
+  const t = dict(lang);
+
   let stats: Stats | null = null;
   try {
     const body = await apiFetch<{ data: Stats }>('/stats');
@@ -57,7 +63,7 @@ export default async function StatistikPage() {
   if (!stats) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-16 text-center text-slate-500">
-        Statistik sedang tidak tersedia. Coba lagi sebentar lagi.
+        {t.statistik.unavailable}
       </main>
     );
   }
@@ -67,32 +73,32 @@ export default async function StatistikPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-4xl px-4 py-3">
-          <Link href="/" className="text-sm text-indigo-600 hover:underline">
-            ← Beranda
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
+          <Link href="/publikasi" className="text-sm text-indigo-600 hover:underline">
+            {t.common.backToPublications}
           </Link>
+          <LanguageToggle lang={lang} />
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8">
         <h1 className="text-2xl font-semibold text-slate-900">
-          Statistik Institusi
+          {t.statistik.title}
         </h1>
         <p className="mt-1 text-sm text-slate-600">
-          Kinerja riset Universitas Muhammadiyah Makassar di UNICAL ASSOCIATES
-          REPO.
+          {t.statistik.subtitle}
         </p>
 
         <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Big label="Publikasi" value={stats.totals.publications} />
-          <Big label="Sitasi" value={stats.totals.citations} />
-          <Big label="Peneliti" value={stats.totals.researchers} />
-          <Big label="Jurnal" value={stats.totals.journals} />
+          <Big label={t.common.publications} value={stats.totals.publications} />
+          <Big label={t.profil.metricCitations} value={stats.totals.citations} />
+          <Big label={t.common.researchers} value={stats.totals.researchers} />
+          <Big label={t.statistik.journals} value={stats.totals.journals} />
         </section>
 
         {stats.publicationsByYear.length > 0 && (
           <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="mb-3 font-medium text-slate-900">Publikasi per Tahun</h2>
+            <h2 className="mb-3 font-medium text-slate-900">{t.statistik.perYear}</h2>
             <div className="flex items-end gap-1 overflow-x-auto">
               {stats.publicationsByYear.map((row) => (
                 <div
@@ -113,21 +119,21 @@ export default async function StatistikPage() {
 
         {stats.citationTrend.length > 1 && (
           <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="mb-3 font-medium text-slate-900">Tren Sitasi Institusi</h2>
+            <h2 className="mb-3 font-medium text-slate-900">{t.statistik.trend}</h2>
             <TrendChart points={stats.citationTrend} />
           </section>
         )}
 
         <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="mb-3 font-medium text-slate-900">Per Fakultas</h2>
+          <h2 className="mb-3 font-medium text-slate-900">{t.statistik.perFaculty}</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
-                  <th className="py-2 pr-3">Fakultas</th>
-                  <th className="py-2 pr-3 text-right">Peneliti</th>
-                  <th className="py-2 pr-3 text-right">Publikasi</th>
-                  <th className="py-2 text-right">Sitasi</th>
+                  <th className="py-2 pr-3">{t.statistik.faculty}</th>
+                  <th className="py-2 pr-3 text-right">{t.common.researchers}</th>
+                  <th className="py-2 pr-3 text-right">{t.common.publications}</th>
+                  <th className="py-2 text-right">{t.profil.metricCitations}</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,7 +164,7 @@ export default async function StatistikPage() {
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <section className="rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="mb-3 font-medium text-slate-900">Jenis Publikasi</h2>
+            <h2 className="mb-3 font-medium text-slate-900">{t.statistik.types}</h2>
             <ul className="space-y-1 text-sm">
               {stats.byType.map((row) => (
                 <li key={row.type} className="flex justify-between">
@@ -172,12 +178,12 @@ export default async function StatistikPage() {
           </section>
 
           <section className="rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="mb-3 font-medium text-slate-900">Kuartil Scopus</h2>
+            <h2 className="mb-3 font-medium text-slate-900">{t.statistik.quartile}</h2>
             <ul className="space-y-1 text-sm">
               {stats.byQuartile.map((row) => (
                 <li key={row.quartile} className="flex justify-between">
                   <span className="text-slate-700">
-                    {row.quartile === 'NONE' ? 'Belum terklasifikasi' : row.quartile}
+                    {row.quartile === 'NONE' ? t.statistik.unclassified : row.quartile}
                   </span>
                   <span className="text-slate-500">{row.total}</span>
                 </li>
@@ -187,7 +193,7 @@ export default async function StatistikPage() {
         </div>
 
         <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="mb-3 font-medium text-slate-900">Paling Banyak Disitasi</h2>
+          <h2 className="mb-3 font-medium text-slate-900">{t.statistik.topCited}</h2>
           <ol className="list-decimal space-y-2 pl-5 text-sm">
             {stats.topCited.map((pub) => (
               <li key={pub.id}>
@@ -199,7 +205,7 @@ export default async function StatistikPage() {
                 </Link>
                 <span className="text-slate-500">
                   {' '}
-                  — {[pub.journal, pub.year, `${pub.citationCount} sitasi`]
+                  — {[pub.journal, pub.year, `${pub.citationCount} ${t.common.citations}`]
                     .filter(Boolean)
                     .join(' · ')}
                 </span>

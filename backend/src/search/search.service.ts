@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { CacheService } from '../common/cache/cache.module';
 import { SearchIndexService } from './search-index.service';
 
 export interface SearchParams {
@@ -27,6 +28,7 @@ export class SearchService {
 
   constructor(
     private readonly prisma: PrismaService,
+    private readonly cache: CacheService,
     private readonly indexService: SearchIndexService,
   ) {}
 
@@ -170,6 +172,10 @@ export class SearchService {
 
   /** Artikel terkait berbasis konten: judul + kata kunci sebagai kueri. */
   async related(publicationId: string) {
+    const cacheKey = `related:${publicationId}`;
+    const cached = await this.cache.get<unknown[]>(cacheKey);
+    if (cached) return cached;
+
     const publication = await this.prisma.publication.findUnique({
       where: { id: publicationId },
       select: { title: true, keywords: true },
@@ -194,9 +200,11 @@ export class SearchService {
           ],
         },
       );
-      return result.hits
+      const hits = result.hits
         .filter((hit) => (hit as { id: string }).id !== publicationId)
         .slice(0, 5);
+      await this.cache.set(cacheKey, hits, 600);
+      return hits;
     } catch {
       return [];
     }

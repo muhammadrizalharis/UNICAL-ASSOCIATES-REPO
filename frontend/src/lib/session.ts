@@ -28,10 +28,12 @@ export function saveSession(token: string, user: SessionUser): void {
 }
 
 export function readToken(): string | null {
+  if (typeof window === 'undefined') return null;
   return localStorage.getItem(TOKEN_KEY);
 }
 
 export function readUser(): SessionUser | null {
+  if (typeof window === 'undefined') return null;
   const raw = localStorage.getItem(USER_KEY);
   if (!raw) return null;
 

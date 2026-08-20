@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { CacheService } from '../common/cache/cache.module';
 import { NotificationsService } from '../notifications/notifications.module';
+
+const PROFILE_CACHE_TTL_S = 120;
 
 @Injectable()
 export class ResearchersService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly cache: CacheService,
     private readonly notifications: NotificationsService,
   ) {}
 
@@ -49,6 +53,10 @@ export class ResearchersService {
   }
 
   async publicProfile(unicalId: string) {
+    const cacheKey = `profile:${unicalId}`;
+    const cached = await this.cache.get<object>(cacheKey);
+    if (cached) return cached;
+
     const profile = await this.prisma.researcherProfile.findUnique({
       where: { unicalId },
       select: {
@@ -176,7 +184,7 @@ export class ResearchersService {
       where: { researcher: { unicalId } },
     });
 
-    return {
+    const result = {
       ...profile,
       followerCount,
       metrics: {
@@ -190,6 +198,9 @@ export class ResearchersService {
       topCollaborators,
       publications,
     };
+
+    await this.cache.set(cacheKey, result, PROFILE_CACHE_TTL_S);
+    return result;
   }
 
   private async profileByUnicalId(unicalId: string) {

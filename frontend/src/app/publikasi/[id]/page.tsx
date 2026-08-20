@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import { dict, getLang } from '@/lib/i18n';
+import { LanguageToggle } from '@/components/language-toggle';
 import { PublicationActions } from '@/components/publication-actions';
 import { SaveToCollection } from '@/components/save-to-collection';
 import { CommentsSection } from '@/components/comments-section';
@@ -102,14 +104,17 @@ export default async function PublicationDetailPage({
   if (!pub) notFound();
 
   const related = await loadRelated(id);
+  const lang = await getLang();
+  const t = dict(lang);
 
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-3xl px-4 py-3">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <Link href="/publikasi" className="text-sm text-indigo-600 hover:underline">
-            ← Jelajahi Publikasi
+            {t.common.backToPublications}
           </Link>
+          <LanguageToggle lang={lang} />
         </div>
       </header>
 
@@ -172,8 +177,8 @@ export default async function PublicationDetailPage({
               📄 PDF Open Access
             </a>
           )}
-          <span className="text-slate-500">{pub.citationCount} sitasi</span>
-          <span className="text-slate-500">{pub.viewCount} dilihat</span>
+          <span className="text-slate-500">{pub.citationCount} {t.common.citations}</span>
+          <span className="text-slate-500">{pub.viewCount} {t.common.views}</span>
         </div>
 
         <div className="mt-4 flex flex-wrap items-start gap-2">
@@ -192,9 +197,9 @@ export default async function PublicationDetailPage({
         </div>
 
         <section className="mt-6 rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="mb-2 font-medium text-slate-900">Abstrak</h2>
+          <h2 className="mb-2 font-medium text-slate-900">{t.publikasi.abstract}</h2>
           <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">
-            {pub.abstract ?? 'Abstrak tidak tersedia untuk publikasi ini.'}
+            {pub.abstract ?? t.publikasi.abstractMissing}
           </p>
         </section>
 
@@ -202,7 +207,7 @@ export default async function PublicationDetailPage({
           <section className="mt-4 space-y-3 rounded-lg border border-slate-200 bg-white p-5">
             {pub.categories.length > 0 && (
               <div>
-                <p className="mb-1 text-xs font-medium text-slate-500">Bidang ilmu</p>
+                <p className="mb-1 text-xs font-medium text-slate-500">{t.publikasi.fields}</p>
                 <div className="flex flex-wrap gap-1">
                   {pub.categories.map((c) => (
                     <span
@@ -235,7 +240,7 @@ export default async function PublicationDetailPage({
 
         {related.length > 0 && (
           <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="mb-2 font-medium text-slate-900">Artikel Terkait</h2>
+            <h2 className="mb-2 font-medium text-slate-900">{t.publikasi.related}</h2>
             <ul className="space-y-2 text-sm">
               {related.map((r) => (
                 <li key={r.id}>
@@ -247,7 +252,7 @@ export default async function PublicationDetailPage({
                   </Link>
                   <span className="text-slate-500">
                     {' '}
-                    — {[r.journal, r.year, `${r.citationCount} sitasi`]
+                    — {[r.journal, r.year, `${r.citationCount} ${t.common.citations}`]
                       .filter(Boolean)
                       .join(' · ')}
                   </span>
@@ -260,9 +265,9 @@ export default async function PublicationDetailPage({
         <CommentsSection publicationId={pub.id} />
 
         <p className="mt-6 text-center text-xs text-slate-400">
-          Menemukan pelanggaran hak cipta atau penyalahgunaan?{' '}
+          {t.publikasi.reportPrompt}{' '}
           <Link href="/kebijakan" className="text-indigo-600 hover:underline">
-            Laporkan di sini
+            {t.publikasi.reportLink}
           </Link>
           .
         </p>

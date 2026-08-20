@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
+import { dict, getLang } from '@/lib/i18n';
+import { LanguageToggle } from '@/components/language-toggle';
 import { TrendChart } from '@/components/trend-chart';
 import { FollowButton } from '@/components/follow-button';
 
@@ -74,6 +76,9 @@ export default async function ProfilPage({
   const profile = await loadProfile(unicalId);
   if (!profile) notFound();
 
+  const lang = await getLang();
+  const t = dict(lang);
+
   const years = Object.keys(profile.publicationsByYear).sort();
   const maxPerYear = Math.max(1, ...Object.values(profile.publicationsByYear));
 
@@ -87,10 +92,11 @@ export default async function ProfilPage({
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-3xl px-4 py-3">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <Link href="/peneliti" className="text-sm text-indigo-600 hover:underline">
-            ← Direktori Peneliti
+            {t.common.backToResearchers}
           </Link>
+          <LanguageToggle lang={lang} />
         </div>
       </header>
 
@@ -162,15 +168,15 @@ export default async function ProfilPage({
         </section>
 
         <section className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Metric label="Publikasi" value={profile.metrics.totalPublications} />
-          <Metric label="Sitasi" value={profile.metrics.totalCitations} />
+          <Metric label={t.common.publications} value={profile.metrics.totalPublications} />
+          <Metric label={t.profil.metricCitations} value={profile.metrics.totalCitations} />
           <Metric label="h-index" value={profile.metrics.hIndex} />
           <Metric label="i10-index" value={profile.metrics.i10Index} />
         </section>
 
         {years.length > 0 && (
           <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="mb-3 font-medium text-slate-900">Publikasi per Tahun</h2>
+            <h2 className="mb-3 font-medium text-slate-900">{t.profil.perYear}</h2>
             <div className="flex items-end gap-2">
               {years.map((year) => (
                 <div key={year} className="flex flex-1 flex-col items-center gap-1">
@@ -192,17 +198,17 @@ export default async function ProfilPage({
 
         {profile.citationTrend.length > 1 && (
           <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="mb-3 font-medium text-slate-900">Tren Sitasi</h2>
+            <h2 className="mb-3 font-medium text-slate-900">{t.profil.citationTrend}</h2>
             <TrendChart points={profile.citationTrend} />
             <p className="mt-2 text-xs text-slate-400">
-              Snapshot bulanan total sitasi seluruh karya.
+              {t.profil.trendCaption}
             </p>
           </section>
         )}
 
         {profile.topCollaborators.length > 0 && (
           <section className="mt-4 rounded-lg border border-slate-200 bg-white p-5">
-            <h2 className="mb-3 font-medium text-slate-900">Kolaborator Terdekat</h2>
+            <h2 className="mb-3 font-medium text-slate-900">{t.profil.collaborators}</h2>
             <ul className="grid gap-1 sm:grid-cols-2">
               {profile.topCollaborators.map((c) => (
                 <li
@@ -220,7 +226,7 @@ export default async function ProfilPage({
                     <span className="truncate text-slate-700">{c.name}</span>
                   )}
                   <span className="ml-2 shrink-0 rounded bg-slate-100 px-1.5 text-xs text-slate-500">
-                    {c.count} karya
+                    {c.count} {t.common.works}
                   </span>
                 </li>
               ))}
@@ -230,13 +236,13 @@ export default async function ProfilPage({
 
         <section className="mt-4">
           <h2 className="mb-3 font-medium text-slate-900">
-            Daftar Publikasi ({profile.publications.length})
+            {t.profil.publicationList} ({profile.publications.length})
           </h2>
 
           <div className="space-y-3">
             {profile.publications.length === 0 && (
               <p className="rounded-lg border border-slate-200 bg-white px-4 py-6 text-center text-sm text-slate-500">
-                Belum ada publikasi terverifikasi.
+                {t.profil.noPublications}
               </p>
             )}
 
@@ -292,8 +298,8 @@ export default async function ProfilPage({
                   {[
                     pub.journal,
                     pub.year,
-                    `${pub.citationCount} sitasi`,
-                    pub.isCorresponding ? 'corresponding author' : null,
+                    `${pub.citationCount} ${t.common.citations}`,
+                    pub.isCorresponding ? t.profil.corresponding : null,
                   ]
                     .filter(Boolean)
                     .join(' · ')}

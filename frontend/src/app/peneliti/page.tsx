@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
+import { dict, getLang } from '@/lib/i18n';
+import { LanguageToggle } from '@/components/language-toggle';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Direktori Peneliti · UNICAL ASSOCIATES REPO' };
@@ -26,6 +28,8 @@ export default async function PenelitiPage({
   searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const { q, page } = await searchParams;
+  const lang = await getLang();
+  const t = dict(lang);
 
   const params = new URLSearchParams();
   if (q) params.set('q', q);
@@ -45,28 +49,31 @@ export default async function PenelitiPage({
           <Link href="/" className="font-bold text-indigo-700">
             UNICAL ASSOCIATES REPO
           </Link>
-          <nav className="flex gap-4 text-sm">
+          <nav className="flex items-center gap-4 text-sm">
             <Link href="/publikasi" className="text-slate-600 hover:text-indigo-700">
-              Publikasi
+              {t.common.publications}
             </Link>
+            <LanguageToggle lang={lang} />
             <Link href="/welcome" className="text-slate-600 hover:text-indigo-700">
-              Masuk
+              {t.common.login}
             </Link>
           </nav>
         </div>
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="text-2xl font-semibold text-slate-900">Direktori Peneliti</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">{t.peneliti.title}</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Peneliti yang UNICAL ID-nya sudah diterbitkan.
+          {lang === 'id'
+            ? 'Peneliti yang UNICAL ID-nya sudah diterbitkan.'
+            : 'Researchers whose UNICAL ID has been issued.'}
         </p>
 
         <form className="mt-4 flex gap-2">
           <input
             name="q"
             defaultValue={q ?? ''}
-            placeholder="Cari nama peneliti…"
+            placeholder={t.peneliti.searchPlaceholder}
             className="flex-1 rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
           />
           <button className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
