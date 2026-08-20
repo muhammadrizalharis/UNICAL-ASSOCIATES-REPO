@@ -103,7 +103,7 @@ export default async function ProfilPage({
       <main className="mx-auto max-w-3xl px-4 py-8">
         <section className="rounded-lg border border-slate-200 bg-white p-6">
           <div className="flex gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-2xl font-semibold text-indigo-700">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-bold text-white shadow-lg shadow-indigo-200">
               {profile.fullName.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">

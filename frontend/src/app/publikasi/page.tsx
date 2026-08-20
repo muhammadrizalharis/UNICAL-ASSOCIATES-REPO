@@ -255,7 +255,7 @@ export default async function PublikasiPage({
                 {result.data.map((hit) => (
                   <article
                     key={hit.id}
-                    className="rounded-lg border border-slate-200 bg-white p-4 transition hover:border-indigo-300"
+                    className="rounded-lg border border-slate-200 bg-white p-4 transition duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
                   >
                     <div className="mb-1 flex flex-wrap gap-1">
                       {hit.indexations.map((code) => (
