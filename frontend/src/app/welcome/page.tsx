@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { CountUp } from '@/components/count-up';
 
 export const dynamic = 'force-dynamic';
@@ -67,37 +68,38 @@ export default async function WelcomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-20 border-b border-white/10 bg-slate-950/80 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-[#f8fafc]/10 bg-slate-950/80 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div>
-            <p className="font-extrabold tracking-tight text-white">
+            <p className="font-extrabold tracking-tight text-[#f8fafc]">
               UNICAL <span className="text-indigo-400">ASSOCIATES</span> REPO
             </p>
-            <p className="text-[11px] tracking-wide text-slate-400">{t.landing.tagline}</p>
+            <p className="text-[11px] tracking-wide text-[#94a3b8]">{t.landing.tagline}</p>
           </div>
           <nav className="flex items-center gap-3 text-sm">
             <Link
               href="/publikasi"
-              className="hidden text-slate-300 hover:text-white sm:block"
+              className="hidden text-[#cbd5e1] hover:text-[#f8fafc] sm:block"
             >
               {t.common.publications}
             </Link>
             <Link
               href="/peneliti"
-              className="hidden text-slate-300 hover:text-white sm:block"
+              className="hidden text-[#cbd5e1] hover:text-[#f8fafc] sm:block"
             >
               {t.common.researchers}
             </Link>
             <Link
               href="/statistik"
-              className="hidden text-slate-300 hover:text-white sm:block"
+              className="hidden text-[#cbd5e1] hover:text-[#f8fafc] sm:block"
             >
               Statistik
             </Link>
+            <ThemeToggle />
             <LanguageToggle lang={lang} />
             <Link
               href="/masuk"
-              className="rounded-md bg-indigo-500 px-3 py-1.5 font-medium text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-400"
+              className="rounded-md bg-indigo-500 px-3 py-1.5 font-medium text-[#f8fafc] shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-400"
             >
               {t.landing.ctaLogin}
             </Link>
@@ -124,7 +126,7 @@ export default async function WelcomePage() {
               {t.landing.badge}
             </p>
 
-            <h1 className="animate-fade-up delay-100 mt-6 text-3xl font-extrabold tracking-tight text-white sm:text-5xl sm:leading-[1.15]">
+            <h1 className="animate-fade-up delay-100 mt-6 text-3xl font-extrabold tracking-tight text-[#f8fafc] sm:text-5xl sm:leading-[1.15]">
               {lang === 'id' ? (
                 <>
                   Repositori Publikasi Ilmiah{' '}
@@ -142,31 +144,31 @@ export default async function WelcomePage() {
               )}
             </h1>
 
-            <p className="animate-fade-up delay-200 mx-auto mt-5 max-w-2xl text-slate-400">
+            <p className="animate-fade-up delay-200 mx-auto mt-5 max-w-2xl text-[#94a3b8]">
               {t.landing.heroSubtitle}
             </p>
 
             <form
               action="/publikasi"
-              className="animate-fade-up delay-300 mx-auto mt-9 flex max-w-xl gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-indigo-950/50 backdrop-blur"
+              className="animate-fade-up delay-300 mx-auto mt-9 flex max-w-xl gap-2 rounded-2xl border border-[#f8fafc]/10 bg-[#f8fafc]/5 p-2 shadow-2xl shadow-indigo-950/50 backdrop-blur"
             >
               <input
                 name="q"
                 placeholder={t.landing.searchPlaceholder}
-                className="min-w-0 flex-1 rounded-xl bg-transparent px-4 py-3 text-white placeholder-slate-500 outline-none"
+                className="min-w-0 flex-1 rounded-xl bg-transparent px-4 py-3 text-[#f8fafc] placeholder-[#64748b] outline-none"
               />
-              <button className="rounded-xl bg-indigo-500 px-5 py-3 font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:bg-indigo-400">
+              <button className="rounded-xl bg-indigo-500 px-5 py-3 font-semibold text-[#f8fafc] shadow-lg shadow-indigo-500/30 transition hover:bg-indigo-400">
                 {t.landing.searchButton}
               </button>
             </form>
 
-            <p className="animate-fade-up delay-300 mt-4 text-xs text-slate-500">
+            <p className="animate-fade-up delay-300 mt-4 text-xs text-[#64748b]">
               {t.landing.popular}{' '}
               {POPULAR_KEYWORDS.map((k) => (
                 <Link
                   key={k}
                   href={`/publikasi?q=${encodeURIComponent(k)}`}
-                  className="mx-1 inline-block rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-slate-300 transition hover:border-indigo-400/50 hover:text-white"
+                  className="mx-1 inline-block rounded-full border border-[#f8fafc]/10 bg-[#f8fafc]/5 px-2.5 py-0.5 text-[#cbd5e1] transition hover:border-indigo-400/50 hover:text-[#f8fafc]"
                 >
                   {k}
                 </Link>
@@ -262,7 +264,7 @@ export default async function WelcomePage() {
                     href={`/profil/${r.unicalId}`}
                     className="group rounded-xl border border-slate-200 p-5 text-center transition duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100"
                   >
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xl font-bold text-white shadow-lg shadow-indigo-200 transition group-hover:scale-110">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xl font-bold text-[#f8fafc] shadow-lg shadow-indigo-200 transition group-hover:scale-110">
                       {r.fullName.charAt(0).toUpperCase()}
                     </div>
                     <p className="mt-3 line-clamp-1 font-semibold text-slate-900">
@@ -302,18 +304,18 @@ export default async function WelcomePage() {
             aria-hidden
           />
           <div className="relative mx-auto max-w-3xl px-4 py-16 text-center">
-            <h2 className="text-3xl font-bold text-white">{t.landing.ctaTitle}</h2>
-            <p className="mx-auto mt-3 max-w-xl text-slate-400">{t.landing.ctaBody}</p>
+            <h2 className="text-3xl font-bold text-[#f8fafc]">{t.landing.ctaTitle}</h2>
+            <p className="mx-auto mt-3 max-w-xl text-[#94a3b8]">{t.landing.ctaBody}</p>
             <div className="mt-8 flex justify-center gap-3">
               <Link
                 href="/daftar"
-                className="rounded-xl bg-indigo-500 px-7 py-3.5 font-semibold text-white shadow-xl shadow-indigo-500/30 transition hover:-translate-y-0.5 hover:bg-indigo-400"
+                className="rounded-xl bg-indigo-500 px-7 py-3.5 font-semibold text-[#f8fafc] shadow-xl shadow-indigo-500/30 transition hover:-translate-y-0.5 hover:bg-indigo-400"
               >
                 {t.landing.ctaRegister}
               </Link>
               <Link
                 href="/masuk"
-                className="rounded-xl border border-white/15 bg-white/5 px-7 py-3.5 font-semibold text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/10"
+                className="rounded-xl border border-[#f8fafc]/15 bg-[#f8fafc]/5 px-7 py-3.5 font-semibold text-[#f8fafc] backdrop-blur transition hover:-translate-y-0.5 hover:bg-[#f8fafc]/10"
               >
                 {t.landing.ctaLogin}
               </Link>
@@ -362,8 +364,8 @@ export default async function WelcomePage() {
 
 function Stat({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-5 text-center backdrop-blur transition hover:border-indigo-400/40">
-      <p className="text-3xl font-extrabold text-white">
+    <div className="rounded-xl border border-[#f8fafc]/10 bg-[#f8fafc]/5 p-5 text-center backdrop-blur transition hover:border-indigo-400/40">
+      <p className="text-3xl font-extrabold text-[#f8fafc]">
         <CountUp end={value} />
       </p>
       <p className="mt-1 text-xs text-slate-400">{label}</p>
@@ -374,7 +376,7 @@ function Stat({ value, label }: { value: number; label: string }) {
 function Step({ no, title, body }: { no: string; title: string; body: string }) {
   return (
     <div className="relative rounded-xl border border-slate-200 bg-slate-50 p-6 transition duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg">
-      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 font-bold text-white shadow-md">
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 font-bold text-[#f8fafc] shadow-md">
         {no}
       </span>
       <p className="mt-3 font-semibold text-slate-900">{title}</p>

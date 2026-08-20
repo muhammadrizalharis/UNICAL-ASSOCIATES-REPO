@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Jelajahi Publikasi · UNICAL ASSOCIATES REPO' };
@@ -117,6 +118,7 @@ export default async function PublikasiPage({
             <Link href="/statistik" className="text-slate-600 hover:text-indigo-700">
               Statistik
             </Link>
+            <ThemeToggle />
             <LanguageToggle lang={lang} />
             <Link
               href="/masuk"

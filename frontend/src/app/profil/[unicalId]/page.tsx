@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { TrendChart } from '@/components/trend-chart';
 import { FollowButton } from '@/components/follow-button';
 
@@ -96,6 +97,7 @@ export default async function ProfilPage({
           <Link href="/peneliti" className="text-sm text-indigo-600 hover:underline">
             {t.common.backToResearchers}
           </Link>
+          <ThemeToggle />
           <LanguageToggle lang={lang} />
         </div>
       </header>

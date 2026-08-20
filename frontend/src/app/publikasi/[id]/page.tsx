@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { PublicationActions } from '@/components/publication-actions';
 import { SaveToCollection } from '@/components/save-to-collection';
 import { CommentsSection } from '@/components/comments-section';
@@ -114,6 +115,7 @@ export default async function PublicationDetailPage({
           <Link href="/publikasi" className="text-sm text-indigo-600 hover:underline">
             {t.common.backToPublications}
           </Link>
+          <ThemeToggle />
           <LanguageToggle lang={lang} />
         </div>
       </header>

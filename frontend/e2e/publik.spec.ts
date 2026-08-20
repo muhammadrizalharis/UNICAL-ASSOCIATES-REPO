@@ -99,6 +99,24 @@ test.describe('Halaman publik', () => {
     await page.screenshot({ path: `${SHOT.dir}/05-laporan-fakultas.png`, fullPage: true });
   });
 
+  test('mode gelap: toggle, persisten setelah reload, dan berlaku lintas halaman', async ({ page }) => {
+    await page.goto('/publikasi');
+    await expect(page.locator('html')).not.toHaveClass(/dark/);
+
+    await page.getByRole('button', { name: 'Aktifkan mode gelap' }).click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await page.screenshot({ path: `${SHOT.dir}/14-mode-gelap.png`, fullPage: true });
+
+    // Preferensi menempel lewat localStorage saat reload dan pindah halaman.
+    await page.reload();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await page.goto('/statistik');
+    await expect(page.locator('html')).toHaveClass(/dark/);
+
+    await page.getByRole('button', { name: 'Aktifkan mode terang' }).click();
+    await expect(page.locator('html')).not.toHaveClass(/dark/);
+  });
+
   test('sakelar bahasa ID → EN menerjemahkan antarmuka', async ({ page }) => {
     await page.goto('/publikasi');
     await expect(page.getByRole('heading', { name: 'Jelajahi Publikasi' })).toBeVisible();

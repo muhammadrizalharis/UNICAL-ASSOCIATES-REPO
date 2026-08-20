@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Direktori Peneliti · UNICAL ASSOCIATES REPO' };
@@ -53,6 +54,7 @@ export default async function PenelitiPage({
             <Link href="/publikasi" className="text-slate-600 hover:text-indigo-700">
               {t.common.publications}
             </Link>
+            <ThemeToggle />
             <LanguageToggle lang={lang} />
             <Link href="/masuk" className="text-slate-600 hover:text-indigo-700">
               {t.common.login}

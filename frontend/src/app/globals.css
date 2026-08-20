@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Varian dark berbasis kelas .dark di <html> (toggle manual + preferensi OS). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -10,6 +13,51 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-jakarta);
   --font-mono: var(--font-geist-mono);
+}
+
+/*
+ * Mode gelap: alihkan variabel palet Tailwind v4 sehingga seluruh halaman
+ * ikut gelap tanpa menyunting tiap kelas. Bagian yang selalu gelap
+ * (hero landing) memakai warna literal agar tidak ikut terbalik.
+ */
+.dark {
+  color-scheme: dark;
+  --background: #0b1220;
+  --foreground: #f2f5fb;
+
+  --color-white: #111a2e;
+  --color-slate-50: #0b1220;
+  --color-slate-100: #1c2740;
+  --color-slate-200: #2a3655;
+  --color-slate-300: #3b4a6b;
+  --color-slate-400: #8fa0bd;
+  --color-slate-500: #a9b7d0;
+  --color-slate-600: #c3cde0;
+  --color-slate-700: #d7deec;
+  --color-slate-800: #e8edf6;
+  --color-slate-900: #f2f5fb;
+
+  --color-indigo-50: #1d2145;
+  --color-indigo-100: #2a2f63;
+  --color-indigo-200: #3d448c;
+  --color-indigo-700: #a5b4fc;
+
+  --color-emerald-50: #06281f;
+  --color-emerald-100: #0a3d2d;
+  --color-emerald-700: #34d399;
+
+  --color-red-50: #3b0d0d;
+  --color-red-300: #7f1d1d;
+  --color-red-600: #f87171;
+  --color-red-700: #fca5a5;
+
+  --color-amber-50: #3a2405;
+  --color-amber-200: #92600a;
+  --color-amber-700: #fbbf24;
+  --color-amber-800: #fcd34d;
+
+  --color-rose-100: #4c1225;
+  --color-rose-700: #fb7185;
 }
 
 body {

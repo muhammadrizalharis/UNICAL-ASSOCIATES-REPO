@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { authHeader, clearSession, readUser, type SessionUser } from '@/lib/session';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function RequireAuth({
   staffOnly = false,
@@ -69,6 +70,7 @@ export function TopBar({ user }: { user: SessionUser }) {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link
             href="/dashboard/notifikasi"
             title="Notifikasi"

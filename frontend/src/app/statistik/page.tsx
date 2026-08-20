@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { TrendChart } from '@/components/trend-chart';
 
 // Dinamis karena cookie bahasa; data berat sudah di-cache Redis di API (10 mnt).
@@ -77,6 +78,7 @@ export default async function StatistikPage() {
           <Link href="/publikasi" className="text-sm text-indigo-600 hover:underline">
             {t.common.backToPublications}
           </Link>
+          <ThemeToggle />
           <LanguageToggle lang={lang} />
         </div>
       </header>
