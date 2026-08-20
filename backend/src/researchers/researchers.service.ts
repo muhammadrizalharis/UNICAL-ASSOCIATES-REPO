@@ -30,7 +30,12 @@ export class ResearchersService {
       this.prisma.researcherProfile.count({ where }),
       this.prisma.researcherProfile.findMany({
         where,
-        orderBy: [{ totalCitations: 'desc' }, { fullName: 'asc' }],
+        // Peringkat: jumlah karya dulu, lalu sitasi, lalu nama.
+        orderBy: [
+          { authorships: { _count: 'desc' } },
+          { totalCitations: 'desc' },
+          { fullName: 'asc' },
+        ],
         skip: (page - 1) * limit,
         take: limit,
         select: {

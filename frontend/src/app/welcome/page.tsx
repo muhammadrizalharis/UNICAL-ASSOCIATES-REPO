@@ -273,7 +273,10 @@ export default async function WelcomePage() {
                     <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
                       {r.department?.name ?? r.unicalId}
                     </p>
-                    <p className="mt-2 text-xs font-medium text-indigo-700">
+                    <p className="mt-2 text-sm font-bold text-indigo-700">
+                      {r._count.authorships} {t.common.publications.toLowerCase()}
+                    </p>
+                    <p className="mt-0.5 text-xs font-medium text-slate-500">
                       h-index {r.hIndex} · {r.totalCitations} {t.common.citations}
                     </p>
                   </Link>
