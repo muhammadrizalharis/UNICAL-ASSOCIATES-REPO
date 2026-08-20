@@ -3,10 +3,14 @@
 import Link from 'next/link';
 import { RequireAuth, TopBar } from '@/components/require-auth';
 
+const STAFF_ROLES = ['MODERATOR', 'FACULTY_ADMIN', 'SUPER_ADMIN'];
+
 export default function DashboardPage() {
   return (
     <RequireAuth>
-      {(user) => (
+      {(user) => {
+        const isStaff = STAFF_ROLES.includes(user.role);
+        return (
         <div className="min-h-screen bg-slate-50">
           <TopBar user={user} />
 
@@ -15,12 +19,15 @@ export default function DashboardPage() {
               Halo, {user.profile?.firstName}
             </h1>
             <p className="mt-1 text-sm text-slate-600">
-              {user.profile?.department
-                ? `${user.profile.department} · ${user.profile.faculty}`
-                : 'Afiliasi belum dilengkapi.'}
+              {isStaff
+                ? 'Akun pengelola — moderasi publikasi, klaim, dan verifikasi peneliti.'
+                : user.profile?.department
+                  ? `${user.profile.department} · ${user.profile.faculty}`
+                  : 'Afiliasi belum dilengkapi.'}
             </p>
 
-            {!user.profile?.unicalId && (
+            {/* UNICAL ID hanya untuk peneliti; akun pengelola memang tanpa ID. */}
+            {!isStaff && !user.profile?.unicalId && (
               <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                 UNICAL ID Anda belum terbit. Admin fakultas akan memverifikasi
                 data Anda terlebih dahulu.
@@ -28,6 +35,13 @@ export default function DashboardPage() {
             )}
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {isStaff && (
+                <Card
+                  href="/admin"
+                  title="⚙️ Panel Pengelola"
+                  body="Antrean moderasi publikasi, klaim kepenulisan, verifikasi peneliti, dan laporan."
+                />
+              )}
               <Card
                 href="/dashboard/unggah"
                 title="Unggah Publikasi"
@@ -73,7 +87,8 @@ export default function DashboardPage() {
             </div>
           </main>
         </div>
-      )}
+        );
+      }}
     </RequireAuth>
   );
 }
