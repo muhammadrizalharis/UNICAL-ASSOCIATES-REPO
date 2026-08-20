@@ -149,9 +149,18 @@ html {
   animation: gradient-x 8s ease infinite;
 }
 
-/* Pola titik halus untuk hero gelap */
+/* Pola titik halus — adaptif dua mode */
+.bg-dots {
+  background-image: radial-gradient(rgba(79, 70, 229, 0.14) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.dark .bg-dots {
+  background-image: radial-gradient(rgba(165, 180, 252, 0.12) 1px, transparent 1px);
+}
+
+/* Pola titik terang untuk latar yang selalu gelap/berwarna */
 .bg-dots-dark {
-  background-image: radial-gradient(rgba(165, 180, 252, 0.14) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(248, 250, 252, 0.12) 1px, transparent 1px);
   background-size: 26px 26px;
 }
 
