@@ -5,7 +5,7 @@ Docker yang berjalan di server kampus (nginx `127.0.0.1:48080`).
 
 - **Kerangka**: [Playwright](https://playwright.dev) 1.55.0 (Chromium)
 - **Lokasi suite**: `frontend/e2e/`
-- **Hasil terakhir**: **16/16 lulus** — 20 Agustus 2026
+- **Hasil terakhir**: **17/17 lulus** — 20 Agustus 2026
 - **Tangkapan layar**: `frontend/e2e/dokumentasi/`
 
 ## Cara Menjalankan
@@ -35,10 +35,11 @@ sehingga suite tetap bisa dijalankan siapa pun terhadap halaman publik.
 
 ## Cakupan & Hasil
 
-### `publik.spec.ts` — tanpa login (10 uji)
+### `publik.spec.ts` — tanpa login (11 uji)
 
 | # | Uji | Verifikasi | Bukti |
 |---|---|---|---|
+| 0 | Landing `/welcome` | Hero + pencarian, statistik hidup, karya tersitasi teratas, CTA masuk/daftar | [00](../frontend/e2e/dokumentasi/00-landing.png) |
 | 1 | Daftar publikasi | Pencarian kata kunci, faset Tahun/Jenis, kartu hasil | [01](../frontend/e2e/dokumentasi/01-publikasi-pencarian.png) |
 | 2 | Pencarian per-penulis | Kolom `author` menyaring hasil | — |
 | 3 | Detail publikasi | 4 tombol ekspor (BibTeX/RIS/APA/IEEE), abstrak, diskusi, meta `citation_doi` Google Scholar | [02](../frontend/e2e/dokumentasi/02-publikasi-detail.png) |

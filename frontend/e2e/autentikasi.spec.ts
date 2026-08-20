@@ -13,7 +13,7 @@ test.beforeAll(async ({ browser }) => {
   test.skip(!PASSWORD, 'E2E_QA_PASSWORD belum di-set');
   page = await browser.newPage();
 
-  await page.goto('/welcome');
+  await page.goto('/masuk');
   await page.getByLabel(/Email/i).fill(EMAIL);
   await page.getByLabel(/sandi/i).fill(PASSWORD);
   await page.getByRole('button', { name: /Masuk/i }).click();

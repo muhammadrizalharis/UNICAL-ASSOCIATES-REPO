@@ -119,7 +119,7 @@ export default async function PublikasiPage({
             </Link>
             <LanguageToggle lang={lang} />
             <Link
-              href="/welcome"
+              href="/masuk"
               className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50"
             >
               {t.common.login}

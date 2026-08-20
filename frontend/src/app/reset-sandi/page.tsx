@@ -31,7 +31,7 @@ function ResetForm() {
         body: JSON.stringify({ token, newPassword: next }),
       });
       setDone(true);
-      setTimeout(() => router.push('/welcome'), 2200);
+      setTimeout(() => router.push('/masuk'), 2200);
     } catch (err) {
       setError(
         err instanceof ApiRequestError ? err.message : 'Reset gagal diproses.',

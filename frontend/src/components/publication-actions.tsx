@@ -121,7 +121,7 @@ function ClaimButton({
 
   async function claim(order: number) {
     if (!readUser()) {
-      window.location.href = '/welcome';
+      window.location.href = '/masuk';
       return;
     }
 

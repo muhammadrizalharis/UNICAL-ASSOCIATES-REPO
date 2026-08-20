@@ -171,7 +171,7 @@ export function CommentsSection({ publicationId }: { publicationId: string }) {
 
       {!loggedIn && (
         <p className="mt-3 text-xs text-slate-500">
-          <a href="/welcome" className="text-indigo-600 hover:underline">
+          <a href="/masuk" className="text-indigo-600 hover:underline">
             Masuk
           </a>{' '}
           untuk ikut berdiskusi.

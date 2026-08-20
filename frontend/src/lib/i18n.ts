@@ -87,6 +87,41 @@ const id = {
     searchPlaceholder: 'Cari nama peneliti…',
     empty: 'Belum ada peneliti yang cocok.',
   },
+  landing: {
+    tagline: 'UNIsmuh Catalog of Academic Literature',
+    heroTitle: 'Repositori Publikasi Ilmiah Universitas Muhammadiyah Makassar',
+    heroSubtitle:
+      'Telusuri karya ilmiah sivitas akademika: artikel jurnal, prosiding, dan buku — lengkap dengan metrik sitasi yang diperbarui otomatis.',
+    searchPlaceholder: 'Cari judul, kata kunci, penulis, atau DOI…',
+    searchButton: 'Telusuri',
+    statPublications: 'Publikasi Terverifikasi',
+    statCitations: 'Total Sitasi',
+    statResearchers: 'Peneliti Ber-UNICAL ID',
+    statJournals: 'Jurnal',
+    topCited: 'Paling Banyak Disitasi',
+    seeAll: 'Lihat semua →',
+    featureTitle: 'Kenapa UNICAL ASSOCIATES REPO?',
+    featureDoi: 'Tempel DOI, Semua Terisi',
+    featureDoiBody:
+      'Metadata lengkap diambil otomatis dari CrossRef, DataCite, dan OpenAlex — tanpa mengetik manual.',
+    featureId: 'UNICAL ID & Metrik Riset',
+    featureIdBody:
+      'Identitas peneliti permanen dengan h-index, i10-index, dan tren sitasi yang dihitung otomatis.',
+    featureExport: 'Ekspor Sitasi 4 Format',
+    featureExportBody:
+      'BibTeX, RIS, APA, dan IEEE siap unduh dari setiap halaman publikasi.',
+    featureOpen: 'Akses Terbuka',
+    featureOpenBody:
+      'PDF open-access, API publik terdokumentasi, dan pencarian dwibahasa untuk semua orang.',
+    ctaTitle: 'Sivitas akademika Unismuh Makassar?',
+    ctaBody:
+      'Daftarkan diri, klaim karya Anda, dan bangun rekam jejak riset yang terverifikasi.',
+    ctaRegister: 'Daftar Sekarang',
+    ctaLogin: 'Masuk',
+    footerPolicy: 'Kebijakan & Pelaporan',
+    footerStats: 'Statistik Institusi',
+    footerApi: 'Dokumentasi API',
+  },
 };
 
 // Struktur EN wajib identik dengan ID agar tidak ada kunci yang lolos.
@@ -166,6 +201,41 @@ const en: typeof id = {
     title: 'Researcher Directory',
     searchPlaceholder: 'Search researcher name…',
     empty: 'No matching researchers yet.',
+  },
+  landing: {
+    tagline: 'UNIsmuh Catalog of Academic Literature',
+    heroTitle: 'Scientific Publication Repository of Universitas Muhammadiyah Makassar',
+    heroSubtitle:
+      'Explore the academic output of our community: journal articles, proceedings, and books — with automatically updated citation metrics.',
+    searchPlaceholder: 'Search title, keywords, author, or DOI…',
+    searchButton: 'Explore',
+    statPublications: 'Verified Publications',
+    statCitations: 'Total Citations',
+    statResearchers: 'Researchers with UNICAL ID',
+    statJournals: 'Journals',
+    topCited: 'Most Cited',
+    seeAll: 'See all →',
+    featureTitle: 'Why UNICAL ASSOCIATES REPO?',
+    featureDoi: 'Paste a DOI, Everything Fills In',
+    featureDoiBody:
+      'Complete metadata is fetched automatically from CrossRef, DataCite, and OpenAlex — no manual typing.',
+    featureId: 'UNICAL ID & Research Metrics',
+    featureIdBody:
+      'A permanent researcher identity with automatically computed h-index, i10-index, and citation trends.',
+    featureExport: 'Citation Export in 4 Formats',
+    featureExportBody:
+      'BibTeX, RIS, APA, and IEEE ready to download from every publication page.',
+    featureOpen: 'Open Access',
+    featureOpenBody:
+      'Open-access PDFs, a documented public API, and bilingual search for everyone.',
+    ctaTitle: 'Part of Unismuh Makassar academic community?',
+    ctaBody:
+      'Register, claim your works, and build a verified research track record.',
+    ctaRegister: 'Register Now',
+    ctaLogin: 'Sign in',
+    footerPolicy: 'Policy & Reporting',
+    footerStats: 'Institution Statistics',
+    footerApi: 'API Documentation',
   },
 };
 

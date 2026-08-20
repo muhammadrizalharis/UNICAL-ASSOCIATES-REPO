@@ -157,7 +157,7 @@ export default function DaftarPage() {
 
         <p className="text-center text-sm text-slate-600">
           Sudah punya akun?{' '}
-          <Link href="/welcome" className="font-medium text-indigo-600 hover:underline">
+          <Link href="/masuk" className="font-medium text-indigo-600 hover:underline">
             Masuk
           </Link>
         </p>

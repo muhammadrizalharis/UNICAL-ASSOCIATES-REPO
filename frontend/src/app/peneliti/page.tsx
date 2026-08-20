@@ -54,7 +54,7 @@ export default async function PenelitiPage({
               {t.common.publications}
             </Link>
             <LanguageToggle lang={lang} />
-            <Link href="/welcome" className="text-slate-600 hover:text-indigo-700">
+            <Link href="/masuk" className="text-slate-600 hover:text-indigo-700">
               {t.common.login}
             </Link>
           </nav>

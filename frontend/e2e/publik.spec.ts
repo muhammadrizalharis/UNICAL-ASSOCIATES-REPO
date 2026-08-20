@@ -3,6 +3,22 @@ import { test, expect } from '@playwright/test';
 const SHOT = { dir: 'e2e/dokumentasi' };
 
 test.describe('Halaman publik', () => {
+  test('landing /welcome: hero, statistik hidup, karya teratas, CTA', async ({ page }) => {
+    await page.goto('/welcome');
+    await expect(
+      page.getByRole('heading', { name: /Repositori Publikasi Ilmiah/ }),
+    ).toBeVisible();
+    await expect(page.getByText('Publikasi Terverifikasi')).toBeVisible();
+    await expect(page.getByText('Paling Banyak Disitasi')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Daftar Sekarang' })).toBeVisible();
+    await page.screenshot({ path: `${SHOT.dir}/00-landing.png`, fullPage: true });
+
+    // Pencarian hero mengarah ke halaman jelajah.
+    await page.getByPlaceholder(/Cari judul, kata kunci/).fill('clustering');
+    await page.getByRole('button', { name: 'Telusuri' }).click();
+    await page.waitForURL(/\/publikasi\?q=clustering/);
+  });
+
   test('daftar publikasi: pencarian, faset, dan hasil', async ({ page }) => {
     await page.goto('/publikasi');
     await expect(page.getByRole('heading', { name: 'Jelajahi Publikasi' })).toBeVisible();

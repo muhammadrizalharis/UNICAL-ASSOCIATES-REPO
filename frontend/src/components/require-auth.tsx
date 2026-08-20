@@ -21,7 +21,7 @@ export function RequireAuth({
     const current = readUser();
 
     if (!current) {
-      router.replace('/welcome');
+      router.replace('/masuk');
       return;
     }
 
@@ -90,7 +90,7 @@ export function TopBar({ user }: { user: SessionUser }) {
           <button
             onClick={() => {
               clearSession();
-              router.replace('/welcome');
+              router.replace('/masuk');
             }}
             className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50"
           >
