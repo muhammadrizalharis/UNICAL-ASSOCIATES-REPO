@@ -70,22 +70,39 @@ const compose = (args, t) =>
 const psql = (sql) =>
   run('docker', ['exec', 'unical-postgres', 'psql', '-U', 'unical', '-d', 'unical', '-P', 'border=0', '-c', sql]);
 
-// ── Token super admin (dipakai perintah aksi API) ──
+// ── Token super admin: diterbitkan sendiri (JWT HS256 + sesi di DB),
+//    tidak bergantung sandi yang bisa diganti pemiliknya kapan saja. ──
 let adminToken = null;
+
+const b64url = (buf) =>
+  Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
 async function adminLogin() {
-  const res = await fetch(`${API}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'User-Agent': 'unical-ops-bot' },
-    body: JSON.stringify({
-      email: 'usrsuperadmin@unical.assoc.id',
-      password: env.SEED_PWD_SUPERADMIN,
-      gate: env.SUPER_ADMIN_GATE,
-      rememberMe: true,
-    }),
-  });
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body?.message ?? `login ${res.status}`);
-  adminToken = body.data.token;
+  const { createHmac } = await import('node:crypto');
+  const userId = (
+    await run('docker', [
+      'exec', 'unical-postgres', 'psql', '-U', 'unical', '-d', 'unical', '-tAc',
+      "SELECT id FROM users WHERE role='SUPER_ADMIN' ORDER BY created_at LIMIT 1;",
+    ])
+  ).trim();
+  if (!/^[0-9a-f-]{36}$/.test(userId)) throw new Error('super admin tidak ditemukan');
+
+  const now = Math.floor(Date.now() / 1000);
+  const header = b64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const payload = b64url(JSON.stringify({ sub: userId, iat: now, exp: now + 30 * 86400 }));
+  const sig = b64url(
+    createHmac('sha256', env.JWT_SECRET).update(`${header}.${payload}`).digest(),
+  );
+  const token = `${header}.${payload}.${sig}`;
+
+  const tokenHash = createHash('sha256').update(token).digest('hex');
+  await run('docker', [
+    'exec', 'unical-postgres', 'psql', '-U', 'unical', '-d', 'unical', '-c',
+    `INSERT INTO user_sessions (id, user_id, token_hash, user_agent, expires_at)
+     VALUES (gen_random_uuid(), '${userId}', '${tokenHash}', 'unical-ops-bot', now() + interval '30 days')
+     ON CONFLICT (token_hash) DO NOTHING;`,
+  ]);
+  adminToken = token;
 }
 
 async function adminPost(path) {
