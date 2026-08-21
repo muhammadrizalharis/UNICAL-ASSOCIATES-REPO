@@ -11,6 +11,7 @@
  * (cron @reboot + watchdog pgrep sudah dipasang otomatis.)
  */
 import { execFile } from 'node:child_process';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
@@ -33,11 +34,23 @@ function readEnv() {
 const env = readEnv();
 const TOKEN = env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID = String(env.TELEGRAM_CHAT_ID ?? '');
+const BOT_SECRET = env.UNICAL_BOT_SECRET ?? '';
 const TG = `https://api.telegram.org/bot${TOKEN}`;
 
 if (!TOKEN || !CHAT_ID) {
   console.error('TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID belum diisi di .env');
   process.exit(1);
+}
+if (!BOT_SECRET) {
+  console.error('UNICAL_BOT_SECRET belum diisi di .env — perintah aksi butuh ini');
+  process.exit(1);
+}
+
+/** Bandingkan secret tanpa membocorkan panjang/isi lewat timing. */
+function secretValid(candidate) {
+  const a = createHash('sha256').update(String(candidate ?? '')).digest();
+  const b = createHash('sha256').update(BOT_SECRET).digest();
+  return timingSafeEqual(a, b);
 }
 
 // ── Util eksekusi aman (execFile, tanpa shell) ──
@@ -111,7 +124,7 @@ const SERVICES = ['api', 'web', 'worker', 'nginx', 'postgres', 'redis', 'meili',
 
 const HELP = `🤖 Bot Ops UNICAL ASSOCIATES REPO
 
-📊 INFO
+📊 INFO (tanpa secret)
 /status — kesehatan container + situs
 /statistik — angka repositori (publikasi, sitasi, dst)
 /pengguna — daftar akun & login terakhir
@@ -119,15 +132,18 @@ const HELP = `🤖 Bot Ops UNICAL ASSOCIATES REPO
 /publikasi — 5 publikasi terbaru
 /aktivitas — 10 aksi audit terakhir
 /disk — pemakaian disk & ukuran backup
-
-⚙️ AKSI
-/backup — jalankan backup sekarang
 /backupinfo — riwayat & berkas backup
-/restart <api|web|worker|nginx|semua>
 /log <api|web|worker|nginx> — 15 baris log terakhir
-/sitasi — perbarui sitasi semua publikasi (OpenAlex)
-/reindex — bangun ulang indeks pencarian
-/metrik — hitung ulang metrik semua peneliti`;
+
+⚙️ AKSI (wajib secret di akhir perintah)
+/backup {SECRET}
+/restart <api|web|worker|nginx|semua> {SECRET}
+/sitasi {SECRET} — perbarui sitasi semua publikasi
+/reindex {SECRET} — bangun ulang indeks pencarian
+/metrik {SECRET} — hitung ulang metrik peneliti
+
+🔐 {SECRET} = nilai UNICAL_BOT_SECRET di .env server.
+Pesan yang memuat secret otomatis DIHAPUS dari chat setelah diproses.`;
 
 async function cmdStatus() {
   const ps = await compose(['ps', '--format', '{{.Name}}\t{{.Status}}']);
@@ -221,8 +237,23 @@ async function cmdLog(arg) {
 let offset = 0;
 console.log(`[${new Date().toISOString()}] bot ops UNICAL mulai`);
 
+// Perintah yang mengubah keadaan sistem: wajib menyertakan secret di akhir.
+const NEED_SECRET = new Set(['/backup', '/restart', '/sitasi', '/reindex', '/metrik']);
+
 async function handle(text) {
-  const [cmd, arg = ''] = text.trim().split(/\s+/, 2);
+  const tokens = text.trim().split(/\s+/);
+  const cmd = tokens[0];
+
+  let args = tokens.slice(1);
+  if (NEED_SECRET.has(cmd)) {
+    const candidate = args.at(-1);
+    if (!candidate || !secretValid(candidate)) {
+      return `🔐 Perintah ini butuh secret di akhir:\n${cmd}${cmd === '/restart' ? ' <layanan>' : ''} {UNICAL_BOT_SECRET}`;
+    }
+    args = args.slice(0, -1);
+  }
+  const arg = args[0] ?? '';
+
   try {
     switch (cmd) {
       case '/start':
@@ -250,7 +281,7 @@ async function handle(text) {
       case '/backupinfo':
         return await cmdBackupInfo();
       case '/restart':
-        return arg ? await cmdRestart(arg) : 'Pakai: /restart <api|web|worker|nginx|semua>';
+        return arg ? await cmdRestart(arg) : 'Pakai: /restart <api|web|worker|nginx|semua> {SECRET}';
       case '/log':
         return arg ? await cmdLog(arg) : 'Pakai: /log <api|web|worker|nginx>';
       case '/sitasi': {
@@ -291,6 +322,14 @@ async function poll() {
         continue;
       }
       const reply = await handle(msg.text);
+      // Pesan yang memuat secret dihapus agar tidak tersimpan di riwayat chat.
+      if (NEED_SECRET.has(msg.text.trim().split(/\s+/)[0])) {
+        await fetch(`${TG}/deleteMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: CHAT_ID, message_id: msg.message_id }),
+        }).catch(() => {});
+      }
       await send(reply);
     }
   } catch (error) {
