@@ -3,7 +3,6 @@ import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { MobileMenu } from '@/components/mobile-menu';
 import { SiteFooter } from '@/components/site-footer';
 
 export const dynamic = 'force-dynamic';
@@ -122,13 +121,6 @@ export default async function PublikasiPage({
             </Link>
             <ThemeToggle />
             <LanguageToggle lang={lang} />
-            <MobileMenu
-              items={[
-                { href: '/welcome', label: 'Beranda' },
-                { href: '/peneliti', label: t.common.researchers },
-                { href: '/statistik', label: 'Statistik' },
-              ]}
-            />
             <Link
               href="/masuk"
               className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50"
@@ -137,6 +129,18 @@ export default async function PublikasiPage({
             </Link>
           </nav>
         </div>
+        {/* Layar kecil: tautan tampil langsung, tanpa menu tersembunyi */}
+        <nav className="flex gap-5 overflow-x-auto border-t border-slate-100 px-4 py-2 text-sm whitespace-nowrap sm:hidden">
+          <Link href="/welcome" className="text-slate-600 hover:text-indigo-700">
+            Beranda
+          </Link>
+          <Link href="/peneliti" className="text-slate-600 hover:text-indigo-700">
+            {t.common.researchers}
+          </Link>
+          <Link href="/statistik" className="text-slate-600 hover:text-indigo-700">
+            Statistik
+          </Link>
+        </nav>
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8">
