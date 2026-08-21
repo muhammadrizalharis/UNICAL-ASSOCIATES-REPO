@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { dict, type Lang } from '@/lib/i18n';
 
 /**
@@ -18,7 +17,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
       <div className="bg-dots absolute inset-0 opacity-30" aria-hidden />
 
       <div className="relative mx-auto max-w-7xl px-4 pt-12 pb-6">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr]">
           {/* Merek + deskripsi */}
           <div>
             <div className="flex items-center gap-3">
@@ -40,43 +39,6 @@ export function SiteFooter({ lang }: { lang: Lang }) {
               {t.landing.featureOpen} · Open Access
             </p>
           </div>
-
-          {/* Navigasi repositori */}
-          <nav aria-label={t.landing.footerRepo}>
-            <p className="text-xs font-bold tracking-widest text-slate-900 uppercase">
-              {t.landing.footerRepo}
-            </p>
-            <ul className="mt-4 space-y-2.5 text-sm">
-              <FooterLink href="/publikasi">{t.common.publications}</FooterLink>
-              <FooterLink href="/peneliti">{t.common.researchers}</FooterLink>
-              <FooterLink href="/statistik">{t.landing.footerStats}</FooterLink>
-            </ul>
-          </nav>
-
-          {/* Layanan + ketentuan */}
-          <nav aria-label={t.landing.footerServices}>
-            <p className="text-xs font-bold tracking-widest text-slate-900 uppercase">
-              {t.landing.footerServices}
-            </p>
-            <ul className="mt-4 space-y-2.5 text-sm">
-              <FooterLink href="/masuk">{t.landing.ctaLogin}</FooterLink>
-              <FooterLink href="/daftar">{t.landing.ctaRegister}</FooterLink>
-              <li>
-                <a href="/api/docs" className="transition hover:text-indigo-700">
-                  {t.landing.footerApi}
-                </a>
-              </li>
-              <FooterLink href="/kebijakan">{t.landing.footerPolicy}</FooterLink>
-              <li>
-                <a
-                  href="/.well-known/security.txt"
-                  className="transition hover:text-indigo-700"
-                >
-                  security.txt
-                </a>
-              </li>
-            </ul>
-          </nav>
 
           {/* Alamat + kontak resmi */}
           <div className="text-sm">
@@ -148,19 +110,18 @@ export function SiteFooter({ lang }: { lang: Lang }) {
             © {new Date().getFullYear()} UNICAL ASSOCIATES ·{' '}
             {t.landing.footerManaged}
           </p>
-          <p>{t.landing.footerRights}</p>
+          <p className="flex items-center gap-3">
+            <a
+              href="/.well-known/security.txt"
+              className="transition hover:text-indigo-700"
+            >
+              security.txt
+            </a>
+            <span aria-hidden>·</span>
+            {t.landing.footerRights}
+          </p>
         </div>
       </div>
     </footer>
-  );
-}
-
-function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <li>
-      <Link href={href} className="transition hover:text-indigo-700">
-        {children}
-      </Link>
-    </li>
   );
 }
