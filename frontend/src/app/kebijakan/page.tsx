@@ -1,5 +1,7 @@
 import Link from 'next/link';
+import { getLang } from '@/lib/i18n';
 import { ReportForm } from '@/components/report-form';
+import { SiteFooter } from '@/components/site-footer';
 
 export const metadata = {
   title: 'Kebijakan & Pelaporan · UNICAL ASSOCIATES REPO',
@@ -7,7 +9,8 @@ export const metadata = {
     'Kebijakan hak cipta, prosedur takedown, dan pelaporan penyalahgunaan.',
 };
 
-export default function KebijakanPage() {
+export default async function KebijakanPage() {
+  const lang = await getLang();
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
@@ -72,6 +75,8 @@ export default function KebijakanPage() {
           </p>
         </section>
       </main>
+
+      <SiteFooter lang={lang} />
     </div>
   );
 }

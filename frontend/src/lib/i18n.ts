@@ -131,6 +131,16 @@ const id = {
     footerPolicy: 'Kebijakan & Pelaporan',
     footerStats: 'Statistik Institusi',
     footerApi: 'Dokumentasi API',
+    footerDesc:
+      'Repositori publikasi ilmiah resmi Universitas Muhammadiyah Makassar — menghimpun, memverifikasi, dan memetakan rekam jejak riset sivitas akademika.',
+    footerRepo: 'Repositori',
+    footerServices: 'Layanan',
+    footerLegal: 'Ketentuan',
+    footerAddress: 'Alamat',
+    footerContact: 'Kontak',
+    footerSources: 'Sumber Data Terbuka',
+    footerManaged: 'Dikelola Program Studi Informatika · Fakultas Teknik',
+    footerRights: 'Hak cipta setiap publikasi tetap milik penulis dan penerbitnya.',
   },
 };
 
@@ -256,6 +266,16 @@ const en: typeof id = {
     footerPolicy: 'Policy & Reporting',
     footerStats: 'Institution Statistics',
     footerApi: 'API Documentation',
+    footerDesc:
+      'The official scientific publication repository of Universitas Muhammadiyah Makassar — collecting, verifying, and mapping the research track record of our academic community.',
+    footerRepo: 'Repository',
+    footerServices: 'Services',
+    footerLegal: 'Terms',
+    footerAddress: 'Address',
+    footerContact: 'Contact',
+    footerSources: 'Open Data Sources',
+    footerManaged: 'Managed by Informatics Study Program · Faculty of Engineering',
+    footerRights: 'Copyright of each publication remains with its authors and publishers.',
   },
 };
 

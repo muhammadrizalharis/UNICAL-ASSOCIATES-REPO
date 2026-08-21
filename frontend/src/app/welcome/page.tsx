@@ -5,6 +5,7 @@ import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { MobileMenu } from '@/components/mobile-menu';
 import { CountUp } from '@/components/count-up';
+import { SiteFooter } from '@/components/site-footer';
 import { Reveal } from '@/components/reveal';
 
 export const dynamic = 'force-dynamic';
@@ -332,47 +333,7 @@ export default async function WelcomePage() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:grid-cols-3">
-          <div>
-            <p className="font-extrabold tracking-tight text-slate-900">
-              UNICAL <span className="text-indigo-600">ASSOCIATES</span> REPO
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-500">
-              {t.landing.tagline} — Universitas Muhammadiyah Makassar.
-            </p>
-            <p className="mt-3 inline-flex items-start gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs leading-relaxed text-emerald-700">
-              <span aria-hidden>🔓</span>
-              <span>
-                <span className="font-semibold">{t.landing.featureOpen}.</span>{' '}
-                {t.landing.featureOpenBody}
-              </span>
-            </p>
-          </div>
-          <nav className="text-sm">
-            <p className="mb-2 font-semibold text-slate-900">Navigasi</p>
-            <ul className="space-y-1.5 text-slate-500">
-              <li><Link href="/publikasi" className="hover:text-indigo-700">{t.common.publications}</Link></li>
-              <li><Link href="/peneliti" className="hover:text-indigo-700">{t.common.researchers}</Link></li>
-              <li><Link href="/statistik" className="hover:text-indigo-700">{t.landing.footerStats}</Link></li>
-              <li><Link href="/kebijakan" className="hover:text-indigo-700">{t.landing.footerPolicy}</Link></li>
-            </ul>
-          </nav>
-          <div className="text-sm">
-            <p className="mb-2 font-semibold text-slate-900">Sumber Daya</p>
-            <ul className="space-y-1.5 text-slate-500">
-              <li><a href="/api/docs" className="hover:text-indigo-700">{t.landing.footerApi}</a></li>
-              <li><a href="/.well-known/security.txt" className="hover:text-indigo-700">security.txt</a></li>
-              <li className="pt-1 text-xs text-slate-400">
-                Data: CrossRef · DataCite · OpenAlex · ORCID
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-slate-100 py-4 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} UNICAL ASSOCIATES · Universitas Muhammadiyah Makassar
-        </div>
-      </footer>
+      <SiteFooter lang={lang} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { TrendChart } from '@/components/trend-chart';
+import { SiteFooter } from '@/components/site-footer';
 
 // Dinamis karena cookie bahasa; data berat sudah di-cache Redis di API (10 mnt).
 export const dynamic = 'force-dynamic';
@@ -216,6 +217,8 @@ export default async function StatistikPage() {
           </ol>
         </section>
       </main>
+
+      <SiteFooter lang={lang} />
     </div>
   );
 }

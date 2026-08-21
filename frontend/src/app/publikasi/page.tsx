@@ -4,6 +4,7 @@ import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { MobileMenu } from '@/components/mobile-menu';
+import { SiteFooter } from '@/components/site-footer';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Jelajahi Publikasi · UNICAL ASSOCIATES REPO' };
@@ -314,6 +315,8 @@ export default async function PublikasiPage({
           </div>
         )}
       </main>
+
+      <SiteFooter lang={lang} />
     </div>
   );
 }
