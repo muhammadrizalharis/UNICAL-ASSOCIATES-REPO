@@ -4,6 +4,7 @@ import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CountUp } from '@/components/count-up';
+import { Reveal } from '@/components/reveal';
 
 export const dynamic = 'force-dynamic';
 
@@ -192,13 +193,15 @@ export default async function WelcomePage() {
         {/* Cara kerja 3 langkah */}
         <section className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-5xl px-4 py-14">
-            <h2 className="text-center text-2xl font-bold text-slate-900">
-              {t.landing.howTitle}
-            </h2>
+            <Reveal>
+              <h2 className="text-center text-2xl font-bold text-slate-900">
+                {t.landing.howTitle}
+              </h2>
+            </Reveal>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <Step no="1" title={t.landing.how1} body={t.landing.how1Body} />
-              <Step no="2" title={t.landing.how2} body={t.landing.how2Body} />
-              <Step no="3" title={t.landing.how3} body={t.landing.how3Body} />
+              <Reveal><Step no="1" title={t.landing.how1} body={t.landing.how1Body} /></Reveal>
+              <Reveal delay={120}><Step no="2" title={t.landing.how2} body={t.landing.how2Body} /></Reveal>
+              <Reveal delay={240}><Step no="3" title={t.landing.how3} body={t.landing.how3Body} /></Reveal>
             </div>
           </div>
         </section>
@@ -206,37 +209,40 @@ export default async function WelcomePage() {
         {/* Karya tersitasi teratas */}
         {stats && stats.topCited.length > 0 && (
           <section className="mx-auto max-w-5xl px-4 py-12">
-            <div className="mb-4 flex items-baseline justify-between">
-              <h2 className="text-2xl font-bold text-slate-900">
-                {t.landing.topCited}
-              </h2>
-              <Link
-                href="/publikasi?sort=citations"
-                className="text-sm font-medium text-indigo-600 hover:underline"
-              >
-                {t.landing.seeAll}
-              </Link>
-            </div>
+            <Reveal>
+              <div className="mb-4 flex items-baseline justify-between">
+                <h2 className="text-2xl font-bold text-slate-900">
+                  {t.landing.topCited}
+                </h2>
+                <Link
+                  href="/publikasi?sort=citations"
+                  className="text-sm font-medium text-indigo-600 hover:underline"
+                >
+                  {t.landing.seeAll}
+                </Link>
+              </div>
+            </Reveal>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {stats.topCited.slice(0, 3).map((pub, i) => (
-                <Link
-                  key={pub.id}
-                  href={`/publikasi/${pub.id}`}
-                  className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100"
-                >
-                  <span className="absolute -top-3 -right-1 text-7xl font-extrabold text-slate-100 transition group-hover:text-indigo-100">
-                    {i + 1}
-                  </span>
-                  <p className="relative line-clamp-3 font-semibold text-slate-900">
-                    {pub.title}
-                  </p>
-                  <p className="relative mt-2 text-xs text-slate-500">
-                    {[pub.journal, pub.year].filter(Boolean).join(' · ')}
-                  </p>
-                  <p className="relative mt-3 inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-sm font-bold text-indigo-700">
-                    📈 {pub.citationCount} {t.common.citations}
-                  </p>
-                </Link>
+                <Reveal key={pub.id} delay={i * 120} className="h-full">
+                  <Link
+                    href={`/publikasi/${pub.id}`}
+                    className="group relative block h-full overflow-hidden rounded-xl border border-slate-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100"
+                  >
+                    <span className="absolute -top-3 -right-1 text-7xl font-extrabold text-slate-100 transition group-hover:text-indigo-100">
+                      {i + 1}
+                    </span>
+                    <p className="relative line-clamp-3 font-semibold text-slate-900">
+                      {pub.title}
+                    </p>
+                    <p className="relative mt-2 text-xs text-slate-500">
+                      {[pub.journal, pub.year].filter(Boolean).join(' · ')}
+                    </p>
+                    <p className="relative mt-3 inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-sm font-bold text-indigo-700">
+                      📈 {pub.citationCount} {t.common.citations}
+                    </p>
+                  </Link>
+                </Reveal>
               ))}
             </div>
           </section>
@@ -246,58 +252,48 @@ export default async function WelcomePage() {
         {topResearchers.length > 0 && (
           <section className="border-y border-slate-200 bg-white">
             <div className="mx-auto max-w-5xl px-4 py-12">
-              <div className="mb-4 flex items-baseline justify-between">
-                <h2 className="text-2xl font-bold text-slate-900">
-                  {t.landing.topResearchers}
-                </h2>
-                <Link
-                  href="/peneliti"
-                  className="text-sm font-medium text-indigo-600 hover:underline"
-                >
-                  {t.landing.seeAll}
-                </Link>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {topResearchers.map((r) => (
+              <Reveal>
+                <div className="mb-4 flex items-baseline justify-between">
+                  <h2 className="text-2xl font-bold text-slate-900">
+                    {t.landing.topResearchers}
+                  </h2>
                   <Link
-                    key={r.unicalId}
-                    href={`/profil/${r.unicalId}`}
-                    className="group rounded-xl border border-slate-200 p-5 text-center transition duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100"
+                    href="/peneliti"
+                    className="text-sm font-medium text-indigo-600 hover:underline"
                   >
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xl font-bold text-[#f8fafc] shadow-lg shadow-indigo-200 transition group-hover:scale-110">
-                      {r.fullName.charAt(0).toUpperCase()}
-                    </div>
-                    <p className="mt-3 line-clamp-1 font-semibold text-slate-900">
-                      {r.fullName}
-                    </p>
-                    <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
-                      {r.department?.name ?? r.unicalId}
-                    </p>
-                    <p className="mt-2 text-sm font-bold text-indigo-700">
-                      {r._count.authorships} {t.common.publications.toLowerCase()}
-                    </p>
-                    <p className="mt-0.5 text-xs font-medium text-slate-500">
-                      h-index {r.hIndex} · {r.totalCitations} {t.common.citations}
-                    </p>
+                    {t.landing.seeAll}
                   </Link>
+                </div>
+              </Reveal>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {topResearchers.map((r, i) => (
+                  <Reveal key={r.unicalId} delay={i * 100} className="h-full">
+                    <Link
+                      href={`/profil/${r.unicalId}`}
+                      className="group block h-full rounded-xl border border-slate-200 p-5 text-center transition duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100"
+                    >
+                      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-xl font-bold text-[#f8fafc] shadow-lg shadow-indigo-200 transition group-hover:scale-110">
+                        {r.fullName.charAt(0).toUpperCase()}
+                      </div>
+                      <p className="mt-3 line-clamp-1 font-semibold text-slate-900">
+                        {r.fullName}
+                      </p>
+                      <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
+                        {r.department?.name ?? r.unicalId}
+                      </p>
+                      <p className="mt-2 text-sm font-bold text-indigo-700">
+                        {r._count.authorships} {t.common.publications.toLowerCase()}
+                      </p>
+                      <p className="mt-0.5 text-xs font-medium text-slate-500">
+                        h-index {r.hIndex} · {r.totalCitations} {t.common.citations}
+                      </p>
+                    </Link>
+                  </Reveal>
                 ))}
               </div>
             </div>
           </section>
         )}
-
-        {/* Fitur unggulan */}
-        <section className="mx-auto max-w-5xl px-4 py-14">
-          <h2 className="text-center text-2xl font-bold text-slate-900">
-            {t.landing.featureTitle}
-          </h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Feature icon="⚡" title={t.landing.featureDoi} body={t.landing.featureDoiBody} />
-            <Feature icon="🆔" title={t.landing.featureId} body={t.landing.featureIdBody} />
-            <Feature icon="📚" title={t.landing.featureExport} body={t.landing.featureExportBody} />
-            <Feature icon="🔓" title={t.landing.featureOpen} body={t.landing.featureOpenBody} />
-          </div>
-        </section>
 
         {/* Ajakan daftar — gradien merek literal agar identik di kedua mode */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#4f46e5] via-[#4338ca] to-[#6d28d9]">
@@ -306,7 +302,7 @@ export default async function WelcomePage() {
             className="absolute -top-24 left-1/2 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-[#f8fafc]/10 blur-3xl"
             aria-hidden
           />
-          <div className="relative mx-auto max-w-3xl px-4 py-16 text-center">
+          <Reveal className="relative mx-auto max-w-3xl px-4 py-16 text-center">
             <h2 className="text-3xl font-bold text-[#f8fafc]">{t.landing.ctaTitle}</h2>
             <p className="mx-auto mt-3 max-w-xl text-[#c7d2fe]">{t.landing.ctaBody}</p>
             <div className="mt-8 flex justify-center gap-3">
@@ -323,7 +319,7 @@ export default async function WelcomePage() {
                 {t.landing.ctaLogin}
               </Link>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
 
@@ -335,6 +331,13 @@ export default async function WelcomePage() {
             </p>
             <p className="mt-2 text-sm leading-relaxed text-slate-500">
               {t.landing.tagline} — Universitas Muhammadiyah Makassar.
+            </p>
+            <p className="mt-3 inline-flex items-start gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs leading-relaxed text-emerald-700">
+              <span aria-hidden>🔓</span>
+              <span>
+                <span className="font-semibold">{t.landing.featureOpen}.</span>{' '}
+                {t.landing.featureOpenBody}
+              </span>
             </p>
           </div>
           <nav className="text-sm">
@@ -383,16 +386,6 @@ function Step({ no, title, body }: { no: string; title: string; body: string }) 
         {no}
       </span>
       <p className="mt-3 font-semibold text-slate-900">{title}</p>
-      <p className="mt-1 text-sm leading-relaxed text-slate-600">{body}</p>
-    </div>
-  );
-}
-
-function Feature({ icon, title, body }: { icon: string; title: string; body: string }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg">
-      <p className="text-2xl">{icon}</p>
-      <p className="mt-2 font-semibold text-slate-900">{title}</p>
       <p className="mt-1 text-sm leading-relaxed text-slate-600">{body}</p>
     </div>
   );

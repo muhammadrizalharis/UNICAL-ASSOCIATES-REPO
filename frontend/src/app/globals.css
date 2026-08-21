@@ -149,6 +149,26 @@ html {
   animation: gradient-x 8s ease infinite;
 }
 
+/* Muncul lembut saat di-scroll (dipicu komponen Reveal) */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* Pola titik halus — adaptif dua mode */
 .bg-dots {
   background-image: radial-gradient(rgba(79, 70, 229, 0.14) 1px, transparent 1px);
