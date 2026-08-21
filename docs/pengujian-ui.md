@@ -5,7 +5,7 @@ Docker yang berjalan di server kampus (nginx `127.0.0.1:48080`).
 
 - **Kerangka**: [Playwright](https://playwright.dev) 1.55.0 (Chromium)
 - **Lokasi suite**: `frontend/e2e/`
-- **Hasil terakhir**: **18/18 lulus** — 20 Agustus 2026
+- **Hasil terakhir**: **19/19 lulus** — 20 Agustus 2026
 - **Tangkapan layar**: `frontend/e2e/dokumentasi/`
 
 ## Cara Menjalankan

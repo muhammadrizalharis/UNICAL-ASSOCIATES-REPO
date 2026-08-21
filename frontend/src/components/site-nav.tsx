@@ -13,7 +13,7 @@ export interface NavChild {
 
 export interface NavGroup {
   label: string;
-  icon: 'home' | 'book' | 'layers';
+  icon: 'home' | 'book' | 'layers' | 'shield' | 'info';
   /** Tanpa items = tautan langsung (Beranda). */
   href?: string;
   items?: NavChild[];
@@ -26,6 +26,12 @@ const ICONS: Record<NavGroup['icon'], React.ReactNode> = {
   ),
   layers: (
     <path d="m12 2 9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5" />
+  ),
+  shield: (
+    <path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10zM9 12l2 2 4-4" />
+  ),
+  info: (
+    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 16v-5M12 8h.01" />
   ),
 };
 

@@ -121,6 +121,21 @@ test.describe('Halaman publik', () => {
     await expect(page.locator('html')).not.toHaveClass(/dark/);
   });
 
+  test('halaman tentang & nav Kebijakan/Tentang level atas', async ({ page }) => {
+    await page.goto('/tentang');
+    await expect(
+      page.getByRole('heading', { name: 'Tentang UNICAL ASSOCIATES REPO' }),
+    ).toBeVisible();
+    await expect(page.getByText('Apa itu UNICAL?')).toBeVisible();
+    await expect(page.getByText('Pengelola', { exact: true })).toBeVisible();
+
+    // Kebijakan & Tentang tampil langsung di nav (bukan submenu).
+    const nav = page.getByRole('navigation', { name: 'Navigasi utama' });
+    await expect(nav.getByRole('link', { name: /Kebijakan & Pelaporan/ })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Tentang' })).toBeVisible();
+    await page.screenshot({ path: `${SHOT.dir}/15-tentang.png`, fullPage: true });
+  });
+
   test('sakelar bahasa ID → EN menerjemahkan antarmuka', async ({ page }) => {
     await page.goto('/publikasi');
     await expect(page.getByRole('heading', { name: 'Jelajahi Publikasi' })).toBeVisible();

@@ -53,8 +53,17 @@ export function SiteHeader({ lang }: { lang: Lang }) {
               { href: '/masuk', label: t.landing.ctaLogin },
               { href: '/daftar', label: t.landing.ctaRegister },
               { href: '/api/docs', label: t.landing.footerApi, external: true },
-              { href: '/kebijakan', label: t.landing.footerPolicy },
             ],
+          },
+          {
+            href: '/kebijakan',
+            label: t.landing.footerPolicy,
+            icon: 'shield',
+          },
+          {
+            href: '/tentang',
+            label: t.tentang.navLabel,
+            icon: 'info',
           },
         ]}
       />

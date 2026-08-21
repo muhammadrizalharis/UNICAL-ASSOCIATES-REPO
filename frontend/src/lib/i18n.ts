@@ -87,6 +87,28 @@ const id = {
     searchPlaceholder: 'Cari nama peneliti…',
     empty: 'Belum ada peneliti yang cocok.',
   },
+  tentang: {
+    navLabel: 'Tentang',
+    title: 'Tentang UNICAL ASSOCIATES REPO',
+    subtitle:
+      'Repositori publikasi ilmiah resmi Universitas Muhammadiyah Makassar.',
+    aboutTitle: 'Apa itu UNICAL?',
+    aboutBody:
+      'UNICAL (UNIsmuh Catalog of Academic Literature) menghimpun, memverifikasi, dan memetakan karya ilmiah sivitas akademika — artikel jurnal, prosiding, dan buku — dalam satu katalog terbuka. Metadata diambil otomatis dari DOI sehingga akurat dan konsisten, lalu ditinjau moderator sebelum tayang.',
+    idTitle: 'UNICAL ID',
+    idBody:
+      'Setiap peneliti terverifikasi menerima UNICAL ID — identitas permanen (format UNICAL-YYNNNNNN) yang menautkan seluruh karya, metrik sitasi, h-index, dan profil publiknya. ID tidak pernah didaur ulang dan dapat disandingkan dengan ORCID.',
+    dataTitle: 'Sumber Data & Metrik',
+    dataBody:
+      'Metadata publikasi bersumber dari CrossRef dan DataCite; abstrak dan jumlah sitasi diperkaya dari OpenAlex dan diperbarui otomatis setiap malam. Profil dapat disinkronkan dengan ORCID, dan setiap halaman publikasi memuat meta tag Google Scholar.',
+    openTitle: 'Akses Terbuka',
+    openBody:
+      'Seluruh katalog dapat dijelajahi tanpa akun, tersedia dwibahasa (ID/EN), dilengkapi API publik terdokumentasi, ekspor sitasi BibTeX/RIS/APA/IEEE, serta PDF akses terbuka bila haknya tersedia.',
+    teamTitle: 'Pengelola',
+    teamBody:
+      'Dikembangkan dan dikelola oleh Program Studi Informatika, Fakultas Teknik, Universitas Muhammadiyah Makassar.',
+    contactTitle: 'Kontak',
+  },
   landing: {
     tagline: 'UNIsmuh Catalog of Academic Literature',
     badge: 'Repositori Institusi Resmi · Akses Terbuka',
@@ -226,6 +248,28 @@ const en: typeof id = {
     title: 'Researcher Directory',
     searchPlaceholder: 'Search researcher name…',
     empty: 'No matching researchers yet.',
+  },
+  tentang: {
+    navLabel: 'About',
+    title: 'About UNICAL ASSOCIATES REPO',
+    subtitle:
+      'The official scientific publication repository of Universitas Muhammadiyah Makassar.',
+    aboutTitle: 'What is UNICAL?',
+    aboutBody:
+      'UNICAL (UNIsmuh Catalog of Academic Literature) collects, verifies, and maps the scholarly output of our academic community — journal articles, proceedings, and books — in one open catalogue. Metadata is fetched automatically from DOIs for accuracy and consistency, then reviewed by moderators before going live.',
+    idTitle: 'UNICAL ID',
+    idBody:
+      'Every verified researcher receives a UNICAL ID — a permanent identity (format UNICAL-YYNNNNNN) linking all of their works, citation metrics, h-index, and public profile. IDs are never recycled and can be paired with ORCID.',
+    dataTitle: 'Data Sources & Metrics',
+    dataBody:
+      'Publication metadata comes from CrossRef and DataCite; abstracts and citation counts are enriched from OpenAlex and refreshed automatically every night. Profiles can be synchronised with ORCID, and every publication page carries Google Scholar meta tags.',
+    openTitle: 'Open Access',
+    openBody:
+      'The entire catalogue is browsable without an account, available in two languages (ID/EN), with a documented public API, BibTeX/RIS/APA/IEEE citation export, and open-access PDFs where rights allow.',
+    teamTitle: 'Maintainers',
+    teamBody:
+      'Developed and maintained by the Informatics Study Program, Faculty of Engineering, Universitas Muhammadiyah Makassar.',
+    contactTitle: 'Contact',
   },
   landing: {
     tagline: 'UNIsmuh Catalog of Academic Literature',
