@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -87,6 +88,18 @@ export class OrcidService {
    * dipakai saat login pertama admin agar sekali klik tuntas tersinkron.
    */
   async linkAndSync(userId: string, orcid: string) {
+    // Satu ORCID = satu akun; cegah akun ganda untuk peneliti yang sama.
+    const taken = await this.prisma.researcherProfile.findFirst({
+      where: { orcid, user: { isNot: { id: userId } } },
+      select: { fullName: true, unicalId: true },
+    });
+    if (taken) {
+      throw new ConflictException({
+        code: 'ORCID_ALREADY_LINKED',
+        message: `ORCID ini sudah tertaut ke akun ${taken.fullName}${taken.unicalId ? ` (${taken.unicalId})` : ''}. Satu ORCID hanya boleh untuk satu akun — hubungi admin bila ini akun Anda.`,
+      });
+    }
+
     const profile = await this.prisma.researcherProfile.update({
       where: { userId },
       data: { orcid, orcidSyncedAt: new Date() },

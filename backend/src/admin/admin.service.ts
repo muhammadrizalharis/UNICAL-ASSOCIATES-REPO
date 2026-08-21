@@ -161,6 +161,123 @@ export class AdminService {
     return this.searchIndex.reindexAll();
   }
 
+  /** Daftar semua akun untuk manajemen pengguna super admin. */
+  async listUsers() {
+    const users = await this.prisma.user.findMany({
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        lastLoginAt: true,
+        createdAt: true,
+        profile: {
+          select: {
+            fullName: true,
+            unicalId: true,
+            orcid: true,
+            _count: { select: { authorships: true } },
+          },
+        },
+        _count: { select: { submittedPublications: true } },
+      },
+    });
+
+    return users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      role: u.role,
+      fullName: u.profile?.fullName ?? '-',
+      unicalId: u.profile?.unicalId ?? null,
+      orcid: u.profile?.orcid ?? null,
+      authorships: u.profile?._count.authorships ?? 0,
+      submitted: u._count.submittedPublications,
+      lastLoginAt: u.lastLoginAt,
+      createdAt: u.createdAt,
+    }));
+  }
+
+  /**
+   * Hapus akun (khusus super admin). Publikasi yang diunggahnya dialihkan
+   * ke super admin agar katalog tetap utuh; slot penulis duplikat hasil
+   * impor ORCID akun itu ikut dibersihkan bila slot aslinya sudah tertaut
+   * ke akun lain pada publikasi yang sama.
+   */
+  async deleteUser(adminId: string, targetUserId: string) {
+    if (adminId === targetUserId) {
+      throw new BadRequestException({
+        code: 'CANNOT_DELETE_SELF',
+        message: 'Anda tidak dapat menghapus akun sendiri.',
+      });
+    }
+
+    const target = await this.prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        profile: {
+          select: { id: true, fullName: true, unicalId: true, orcid: true },
+        },
+      },
+    });
+    if (!target) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: 'Akun tidak ditemukan.',
+      });
+    }
+    if (target.role === 'SUPER_ADMIN') {
+      throw new BadRequestException({
+        code: 'CANNOT_DELETE_SUPER_ADMIN',
+        message: 'Akun super admin tidak dapat dihapus.',
+      });
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      if (target.profile) {
+        // Slot yang publikasinya sudah punya slot lain milik peneliti lain
+        // dengan nama serupa = duplikat tambahan impor ORCID → hapus.
+        await tx.$executeRaw`
+          DELETE FROM publication_authors pa
+          USING publication_authors asli
+          WHERE pa.researcher_id = ${target.profile.id}::uuid
+            AND asli.publication_id = pa.publication_id
+            AND asli.id <> pa.id
+            AND asli.researcher_id IS NOT NULL
+            AND asli.researcher_id <> pa.researcher_id
+            AND lower(asli.raw_author_name) = lower(pa.raw_author_name)`;
+      }
+
+      // Unggahan dialihkan agar katalog publik tidak kehilangan publikasi.
+      await tx.publication.updateMany({
+        where: { submittedById: target.id },
+        data: { submittedById: adminId },
+      });
+
+      await tx.user.delete({ where: { id: target.id } });
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminId,
+          action: 'user.delete',
+          targetType: 'user',
+          targetId: target.id,
+          oldValues: {
+            email: target.email,
+            role: target.role,
+            fullName: target.profile?.fullName ?? null,
+            unicalId: target.profile?.unicalId ?? null,
+            orcid: target.profile?.orcid ?? null,
+          },
+        },
+      });
+    });
+
+    return { deleted: true, email: target.email };
+  }
+
   /**
    * Super admin menerbitkan tautan reset kata sandi untuk sebuah akun.
    * Token acak berumur 1 jam; hanya hash-nya yang disimpan. Bila SMTP

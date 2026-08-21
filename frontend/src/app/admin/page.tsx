@@ -39,6 +39,18 @@ interface OpenReport {
   createdAt: string;
 }
 
+interface ManagedUser {
+  id: string;
+  email: string;
+  role: string;
+  fullName: string;
+  unicalId: string | null;
+  orcid: string | null;
+  authorships: number;
+  submitted: number;
+  lastLoginAt: string | null;
+}
+
 export default function AdminPage() {
   return (
     <RequireAuth staffOnly>
@@ -51,6 +63,7 @@ export default function AdminPage() {
             <ClaimQueue />
             <ReportQueue />
             {user.role !== 'MODERATOR' && <ResearcherQueue />}
+            {user.role === 'SUPER_ADMIN' && <UserManagement selfId={user.id} />}
           </main>
         </div>
       )}
@@ -333,6 +346,79 @@ function ResearcherQueue() {
             >
               Terbitkan UNICAL ID
             </button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function UserManagement({ selfId }: { selfId: string }) {
+  const [rows, setRows] = useState<ManagedUser[]>([]);
+  const [note, setNote] = useState<string | null>(null);
+
+  const load = () =>
+    apiFetch<{ data: ManagedUser[] }>('/admin/users', { headers: authHeader() })
+      .then((body) => setRows(body.data))
+      .catch(() => setNote('Gagal memuat daftar pengguna.'));
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  async function remove(user: ManagedUser) {
+    const ok = window.confirm(
+      `Hapus akun ${user.fullName} (${user.email})?\n` +
+        `Unggahannya akan dialihkan ke akun Anda dan tindakan ini tidak dapat dibatalkan.`,
+    );
+    if (!ok) return;
+    try {
+      await apiFetch(`/admin/users/${user.id}`, {
+        method: 'DELETE',
+        headers: authHeader(),
+      });
+      setNote(`Akun ${user.email} dihapus.`);
+      void load();
+    } catch {
+      setNote('Gagal menghapus akun.');
+    }
+  }
+
+  return (
+    <section>
+      <h2 className="mb-3 font-medium text-slate-900">
+        Manajemen Pengguna ({rows.length})
+      </h2>
+      {note && <p className="mb-3 text-sm text-emerald-700">{note}</p>}
+
+      <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+        {rows.length === 0 && (
+          <p className="px-4 py-4 text-sm text-slate-500">Belum ada pengguna.</p>
+        )}
+        {rows.map((row) => (
+          <div key={row.id} className="flex items-center gap-4 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-slate-900">
+                {row.fullName}
+                <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-normal text-slate-600">
+                  {row.role}
+                </span>
+              </p>
+              <p className="truncate text-xs text-slate-500">
+                {row.email}
+                {row.unicalId && ` · ${row.unicalId}`}
+                {row.orcid && ` · ORCID ${row.orcid}`}
+                {` · ${row.authorships} karya · ${row.submitted} unggahan`}
+              </p>
+            </div>
+            {row.id !== selfId && row.role !== 'SUPER_ADMIN' && (
+              <button
+                onClick={() => remove(row)}
+                className="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
+              >
+                Hapus
+              </button>
+            )}
           </div>
         ))}
       </div>

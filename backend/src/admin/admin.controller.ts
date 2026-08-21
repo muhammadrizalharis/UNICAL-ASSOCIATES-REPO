@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -112,6 +113,21 @@ export class AdminController {
       success: true,
       data: await this.admin.issuePasswordReset(adminId, id),
     };
+  }
+
+  @Get('users')
+  @Roles('SUPER_ADMIN')
+  async listUsers() {
+    return { success: true, data: await this.admin.listUsers() };
+  }
+
+  @Delete('users/:id')
+  @Roles('SUPER_ADMIN')
+  async deleteUser(
+    @CurrentUserId() adminId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return { success: true, data: await this.admin.deleteUser(adminId, id) };
   }
 
   @Post('citations/refresh')

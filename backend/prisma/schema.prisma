@@ -148,7 +148,7 @@ model ResearcherProfile {
   bio       String?
   expertise Json    @default("[]")
 
-  orcid     String?
+  orcid     String? @unique
   scopusId  String? @map("scopus_id")
   sintaId   String? @map("sinta_id")
   scholarId String? @map("scholar_id")
@@ -474,6 +474,15 @@ model Comment {
 
   @@index([publicationId, createdAt])
   @@map("comments")
+}
+
+/// Penjaga nomor urut UNICAL ID per tahun; ID akun terhapus tidak pernah
+/// didaur ulang karena penghitung tidak ikut berkurang.
+model UnicalIdCounter {
+  year    String @id @db.VarChar(2)
+  lastSeq Int    @map("last_seq")
+
+  @@map("unical_id_counters")
 }
 
 enum ReportType {
