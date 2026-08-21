@@ -133,11 +133,12 @@ const HELP = `🤖 Bot Ops UNICAL ASSOCIATES REPO
 /aktivitas — 10 aksi audit terakhir
 /disk — pemakaian disk & ukuran backup
 /backupinfo — riwayat & berkas backup
-/log <api|web|worker|nginx> — 15 baris log terakhir
+/log — log ringkas SEMUA layanan (atau /log api)
 
 ⚙️ AKSI (wajib secret di akhir perintah)
 /backup {SECRET}
-/restart <api|web|worker|nginx|semua> {SECRET}
+/restart {SECRET} — restart SEMUA layanan
+/restart api {SECRET} — (opsional) satu layanan saja
 /sitasi {SECRET} — perbarui sitasi semua publikasi
 /reindex {SECRET} — bangun ulang indeks pencarian
 /metrik {SECRET} — hitung ulang metrik peneliti
@@ -213,13 +214,14 @@ async function cmdBackupInfo() {
 }
 
 async function cmdRestart(arg) {
-  if (arg === 'semua') {
+  // Tanpa argumen = restart seluruh stack.
+  if (!arg || arg === 'semua') {
     await send('⏳ Restart seluruh stack…');
     await compose(['restart'], 300_000);
     return cmdStatus();
   }
   if (!SERVICES.includes(arg)) {
-    return `Layanan tidak dikenal. Pilihan: ${SERVICES.join(', ')}, semua`;
+    return `Layanan tidak dikenal. Pilihan: ${SERVICES.join(', ')} (kosongkan untuk semua)`;
   }
   await send(`⏳ Restart ${arg}…`);
   await compose(['restart', arg], 180_000);
@@ -229,8 +231,17 @@ async function cmdRestart(arg) {
 
 async function cmdLog(arg) {
   const allowed = ['api', 'web', 'worker', 'nginx'];
-  if (!allowed.includes(arg)) return `Pilihan: ${allowed.join(', ')}`;
-  return run('docker', ['logs', '--tail', '15', `unical-${arg}`]);
+  if (arg) {
+    if (!allowed.includes(arg)) return `Pilihan: ${allowed.join(', ')} (kosongkan untuk semua)`;
+    return run('docker', ['logs', '--tail', '15', `unical-${arg}`]);
+  }
+  // Tanpa argumen = ringkasan semua layanan.
+  const parts = [];
+  for (const svc of allowed) {
+    const out = await run('docker', ['logs', '--tail', '6', `unical-${svc}`]);
+    parts.push(`── ${svc.toUpperCase()} ──\n${out}`);
+  }
+  return parts.join('\n\n');
 }
 
 // ── Loop utama ──
@@ -281,9 +292,9 @@ async function handle(text) {
       case '/backupinfo':
         return await cmdBackupInfo();
       case '/restart':
-        return arg ? await cmdRestart(arg) : 'Pakai: /restart <api|web|worker|nginx|semua> {SECRET}';
+        return await cmdRestart(arg);
       case '/log':
-        return arg ? await cmdLog(arg) : 'Pakai: /log <api|web|worker|nginx>';
+        return await cmdLog(arg);
       case '/sitasi': {
         await send('⏳ Memperbarui sitasi via OpenAlex…');
         const d = await adminPost('/admin/citations/refresh');
@@ -354,8 +365,8 @@ fetch(`${TG}/setMyCommands`, {
       { command: 'disk', description: 'Pemakaian disk & backup' },
       { command: 'backup', description: 'Jalankan backup sekarang' },
       { command: 'backupinfo', description: 'Riwayat backup' },
-      { command: 'restart', description: 'Restart layanan' },
-      { command: 'log', description: 'Log container' },
+      { command: 'restart', description: 'Restart semua (+secret); opsional nama layanan' },
+      { command: 'log', description: 'Log semua layanan; opsional /log api' },
       { command: 'sitasi', description: 'Perbarui sitasi OpenAlex' },
       { command: 'reindex', description: 'Bangun ulang indeks pencarian' },
       { command: 'metrik', description: 'Hitung ulang metrik peneliti' },
