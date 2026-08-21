@@ -63,7 +63,7 @@ export default async function StatistikPage() {
 
   if (!stats) {
     return (
-      <main className="mx-auto max-w-4xl px-4 py-16 text-center text-slate-500">
+      <main className="mx-auto max-w-6xl px-4 py-16 text-center text-slate-500">
         {t.statistik.unavailable}
       </main>
     );
@@ -75,7 +75,7 @@ export default async function StatistikPage() {
     <div className="min-h-screen bg-slate-50">
       <SiteHeader lang={lang} />
 
-      <main className="mx-auto max-w-4xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8">
         <h1 className="text-2xl font-semibold text-slate-900">
           {t.statistik.title}
         </h1>

@@ -46,7 +46,7 @@ export default async function LaporanFakultasPage({
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b border-slate-200 print:hidden">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <Link href="/statistik" className="text-sm text-indigo-600 hover:underline">
             ← Statistik Institusi
           </Link>
@@ -54,7 +54,7 @@ export default async function LaporanFakultasPage({
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8">
         <div className="text-center">
           <p className="text-xs tracking-widest text-slate-500 uppercase">
             Laporan Kinerja Riset

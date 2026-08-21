@@ -143,7 +143,7 @@ export default async function WelcomePage() {
 
           {/* Statistik hidup menempel di dasar hero */}
           {stats && (
-            <div className="relative mx-auto max-w-5xl px-4 pb-14">
+            <div className="relative mx-auto max-w-7xl px-4 pb-14">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <Stat value={stats.totals.publications} label={t.landing.statPublications} />
                 <Stat value={stats.totals.citations} label={t.landing.statCitations} />
@@ -156,7 +156,7 @@ export default async function WelcomePage() {
 
         {/* Cara kerja 3 langkah */}
         <section className="border-b border-slate-200 bg-white">
-          <div className="mx-auto max-w-5xl px-4 py-14">
+          <div className="mx-auto max-w-7xl px-4 py-14">
             <Reveal>
               <h2 className="text-center text-2xl font-bold text-slate-900">
                 {t.landing.howTitle}
@@ -172,7 +172,7 @@ export default async function WelcomePage() {
 
         {/* Karya tersitasi teratas */}
         {stats && stats.topCited.length > 0 && (
-          <section className="mx-auto max-w-5xl px-4 py-12">
+          <section className="mx-auto max-w-7xl px-4 py-12">
             <Reveal>
               <div className="mb-4 flex items-baseline justify-between">
                 <h2 className="text-2xl font-bold text-slate-900">
@@ -215,7 +215,7 @@ export default async function WelcomePage() {
         {/* Peneliti teratas */}
         {topResearchers.length > 0 && (
           <section className="border-y border-slate-200 bg-white">
-            <div className="mx-auto max-w-5xl px-4 py-12">
+            <div className="mx-auto max-w-7xl px-4 py-12">
               <Reveal>
                 <div className="mb-4 flex items-baseline justify-between">
                   <h2 className="text-2xl font-bold text-slate-900">
@@ -266,7 +266,7 @@ export default async function WelcomePage() {
             className="absolute -top-24 left-1/2 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-[#f8fafc]/10 blur-3xl"
             aria-hidden
           />
-          <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-4 py-16 md:grid-cols-2">
+          <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 md:grid-cols-2">
             <Reveal>
               <div className="text-center md:text-left">
                 <h2 className="text-3xl font-bold text-[#f8fafc]">

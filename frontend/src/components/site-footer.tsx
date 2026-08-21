@@ -17,7 +17,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
       />
       <div className="bg-dots absolute inset-0 opacity-30" aria-hidden />
 
-      <div className="relative mx-auto max-w-5xl px-4 pt-12 pb-6">
+      <div className="relative mx-auto max-w-7xl px-4 pt-12 pb-6">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           {/* Merek + deskripsi */}
           <div>

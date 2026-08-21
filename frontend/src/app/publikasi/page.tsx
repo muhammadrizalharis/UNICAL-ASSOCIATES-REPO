@@ -108,7 +108,7 @@ export default async function PublikasiPage({
     <div className="min-h-screen bg-slate-50">
       <SiteHeader lang={lang} />
 
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <main className="mx-auto max-w-7xl px-4 py-8">
         <h1 className="text-2xl font-semibold text-slate-900">{t.publikasi.title}</h1>
 
         <form className="mt-4 flex flex-wrap gap-2">

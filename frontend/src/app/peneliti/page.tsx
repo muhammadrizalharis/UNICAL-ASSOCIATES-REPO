@@ -47,7 +47,7 @@ export default async function PenelitiPage({
     <div className="min-h-screen bg-slate-50">
       <SiteHeader lang={lang} />
 
-      <main className="mx-auto max-w-4xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8">
         <h1 className="text-2xl font-semibold text-slate-900">{t.peneliti.title}</h1>
         <p className="mt-1 text-sm text-slate-600">
           {lang === 'id'

@@ -93,7 +93,7 @@ export default async function ProfilPage({
     <div className="min-h-screen bg-slate-50">
       <SiteHeader lang={lang} />
 
-      <main className="mx-auto max-w-3xl px-4 py-8">
+      <main className="mx-auto max-w-4xl px-4 py-8">
         <p className="mb-4">
           <Link href="/peneliti" className="text-sm text-indigo-600 hover:underline">
             {t.common.backToResearchers}

@@ -17,7 +17,7 @@ export default async function KebijakanPage() {
     <div className="min-h-screen bg-slate-50">
       <SiteHeader lang={lang} />
 
-      <main className="mx-auto max-w-3xl px-4 py-8">
+      <main className="mx-auto max-w-4xl px-4 py-8">
         <h1 className="text-2xl font-semibold text-slate-900">
           Kebijakan & Pelaporan
         </h1>

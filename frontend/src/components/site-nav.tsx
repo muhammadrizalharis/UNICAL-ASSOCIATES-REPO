@@ -42,7 +42,7 @@ export function SiteNav({ items }: { items: NavItem[] }) {
     <div className="border-t border-slate-100">
       <nav
         aria-label="Navigasi utama"
-        className="mx-auto flex max-w-5xl items-center gap-1 overflow-x-auto px-3 py-2 whitespace-nowrap"
+        className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-2 whitespace-nowrap"
       >
         {items.map((item) => {
           const active = isActive(item);
