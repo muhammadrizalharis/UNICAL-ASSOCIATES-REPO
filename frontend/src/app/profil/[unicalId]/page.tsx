@@ -2,10 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
-import { LanguageToggle } from '@/components/language-toggle';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { TrendChart } from '@/components/trend-chart';
 import { FollowButton } from '@/components/follow-button';
+import { SiteHeader } from '@/components/site-header';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,17 +91,14 @@ export default async function ProfilPage({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
+      <SiteHeader lang={lang} />
+
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <p className="mb-4">
           <Link href="/peneliti" className="text-sm text-indigo-600 hover:underline">
             {t.common.backToResearchers}
           </Link>
-          <ThemeToggle />
-          <LanguageToggle lang={lang} />
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl px-4 py-8">
+        </p>
         <section className="rounded-lg border border-slate-200 bg-white p-6">
           <div className="flex gap-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-bold text-white shadow-lg shadow-indigo-200">

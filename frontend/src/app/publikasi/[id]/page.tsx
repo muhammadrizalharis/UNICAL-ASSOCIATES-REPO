@@ -3,11 +3,10 @@ import { notFound } from 'next/navigation';
 import { cache } from 'react';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
-import { LanguageToggle } from '@/components/language-toggle';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { PublicationActions } from '@/components/publication-actions';
 import { SaveToCollection } from '@/components/save-to-collection';
 import { CommentsSection } from '@/components/comments-section';
+import { SiteHeader } from '@/components/site-header';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,17 +118,14 @@ export default async function PublicationDetailPage({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
+      <SiteHeader lang={lang} />
+
+      <main className="mx-auto max-w-3xl px-4 py-8">
+        <p className="mb-4">
           <Link href="/publikasi" className="text-sm text-indigo-600 hover:underline">
             {t.common.backToPublications}
           </Link>
-          <ThemeToggle />
-          <LanguageToggle lang={lang} />
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-3xl px-4 py-8">
+        </p>
         <div className="mb-2 flex flex-wrap gap-1">
           {pub.badges.map((b) => (
             <span

@@ -1,13 +1,11 @@
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
-import { LanguageToggle } from '@/components/language-toggle';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { CountUp } from '@/components/count-up';
 import { SiteFooter } from '@/components/site-footer';
-import { SiteNav } from '@/components/site-nav';
 import { LoginForm } from '@/components/login-form';
 import { Reveal } from '@/components/reveal';
+import { SiteHeader } from '@/components/site-header';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,35 +70,7 @@ export default async function WelcomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div>
-            <p className="font-extrabold tracking-tight text-slate-900">
-              UNICAL <span className="text-indigo-600 dark:text-indigo-400">ASSOCIATES</span> REPO
-            </p>
-            <p className="text-[11px] tracking-wide text-slate-400">{t.landing.tagline}</p>
-          </div>
-          <nav className="flex items-center gap-3 text-sm">
-            <ThemeToggle />
-            <LanguageToggle lang={lang} />
-            <Link
-              href="/masuk"
-              className="rounded-md bg-indigo-600 px-3 py-1.5 font-medium text-[#f8fafc] shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-500"
-            >
-              {t.landing.ctaLogin}
-            </Link>
-          </nav>
-        </div>
-        <SiteNav
-          items={[
-            { href: '/welcome', label: lang === 'id' ? 'Beranda' : 'Home', icon: 'home' },
-            { href: '/publikasi', label: t.common.publications, icon: 'book' },
-            { href: '/peneliti', label: t.common.researchers, icon: 'users', also: ['/profil'] },
-            { href: '/statistik', label: 'Statistik', icon: 'chart' },
-            { href: '/kebijakan', label: t.landing.footerPolicy, icon: 'shield' },
-          ]}
-        />
-      </header>
+      <SiteHeader lang={lang} />
 
       <main>
         {/* Hero adaptif: terang bergradasi indigo, gelap bernuansa navy */}

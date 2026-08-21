@@ -1,10 +1,8 @@
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
-import { LanguageToggle } from '@/components/language-toggle';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { SiteFooter } from '@/components/site-footer';
-import { SiteNav } from '@/components/site-nav';
+import { SiteHeader } from '@/components/site-header';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Direktori Peneliti · UNICAL ASSOCIATES REPO' };
@@ -47,29 +45,7 @@ export default async function PenelitiPage({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-          <Link href="/" className="font-bold text-indigo-700">
-            UNICAL ASSOCIATES REPO
-          </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <ThemeToggle />
-            <LanguageToggle lang={lang} />
-            <Link href="/masuk" className="text-slate-600 hover:text-indigo-700">
-              {t.common.login}
-            </Link>
-          </nav>
-        </div>
-        <SiteNav
-          items={[
-            { href: '/welcome', label: lang === 'id' ? 'Beranda' : 'Home', icon: 'home' },
-            { href: '/publikasi', label: t.common.publications, icon: 'book' },
-            { href: '/peneliti', label: t.common.researchers, icon: 'users', also: ['/profil'] },
-            { href: '/statistik', label: 'Statistik', icon: 'chart' },
-            { href: '/kebijakan', label: t.landing.footerPolicy, icon: 'shield' },
-          ]}
-        />
-      </header>
+      <SiteHeader lang={lang} />
 
       <main className="mx-auto max-w-4xl px-4 py-8">
         <h1 className="text-2xl font-semibold text-slate-900">{t.peneliti.title}</h1>
