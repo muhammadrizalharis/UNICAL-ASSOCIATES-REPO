@@ -5,6 +5,7 @@ import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CountUp } from '@/components/count-up';
 import { SiteFooter } from '@/components/site-footer';
+import { LoginForm } from '@/components/login-form';
 import { Reveal } from '@/components/reveal';
 
 export const dynamic = 'force-dynamic';
@@ -311,31 +312,59 @@ export default async function WelcomePage() {
           </section>
         )}
 
-        {/* Ajakan daftar — gradien merek literal agar identik di kedua mode */}
+        {/* Ajakan daftar + login langsung dari beranda */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#4f46e5] via-[#4338ca] to-[#6d28d9]">
           <div className="bg-dots-dark absolute inset-0" aria-hidden />
           <div
             className="absolute -top-24 left-1/2 h-64 w-[36rem] -translate-x-1/2 rounded-full bg-[#f8fafc]/10 blur-3xl"
             aria-hidden
           />
-          <Reveal className="relative mx-auto max-w-3xl px-4 py-16 text-center">
-            <h2 className="text-3xl font-bold text-[#f8fafc]">{t.landing.ctaTitle}</h2>
-            <p className="mx-auto mt-3 max-w-xl text-[#c7d2fe]">{t.landing.ctaBody}</p>
-            <div className="mt-8 flex justify-center gap-3">
-              <Link
-                href="/daftar"
-                className="rounded-xl bg-[#f8fafc] px-7 py-3.5 font-semibold text-[#4338ca] shadow-xl shadow-indigo-900/30 transition hover:-translate-y-0.5 hover:bg-[#e0e7ff]"
-              >
-                {t.landing.ctaRegister}
-              </Link>
-              <Link
-                href="/masuk"
-                className="rounded-xl border border-[#f8fafc]/30 bg-[#f8fafc]/10 px-7 py-3.5 font-semibold text-[#f8fafc] backdrop-blur transition hover:-translate-y-0.5 hover:bg-[#f8fafc]/20"
-              >
-                {t.landing.ctaLogin}
-              </Link>
-            </div>
-          </Reveal>
+          <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-4 py-16 md:grid-cols-2">
+            <Reveal>
+              <div className="text-center md:text-left">
+                <h2 className="text-3xl font-bold text-[#f8fafc]">
+                  {t.landing.ctaTitle}
+                </h2>
+                <p className="mx-auto mt-3 max-w-xl text-[#c7d2fe] md:mx-0">
+                  {t.landing.ctaBody}
+                </p>
+                <ul className="mx-auto mt-6 max-w-md space-y-2.5 text-left text-sm text-[#e0e7ff] md:mx-0">
+                  {[t.landing.ctaPoint1, t.landing.ctaPoint2, t.landing.ctaPoint3].map(
+                    (point) => (
+                      <li key={point} className="flex items-start gap-2.5">
+                        <span
+                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f8fafc]/15 text-[11px] font-bold text-[#a7f3d0]"
+                          aria-hidden
+                        >
+                          ✓
+                        </span>
+                        {point}
+                      </li>
+                    ),
+                  )}
+                </ul>
+                <Link
+                  href="/daftar"
+                  className="mt-8 inline-block rounded-xl bg-[#f8fafc] px-7 py-3.5 font-semibold text-[#4338ca] shadow-xl shadow-indigo-900/30 transition hover:-translate-y-0.5 hover:bg-[#e0e7ff]"
+                >
+                  {t.landing.ctaRegister}
+                </Link>
+              </div>
+            </Reveal>
+
+            {/* Kartu login langsung — tanpa pindah halaman */}
+            <Reveal delay={150}>
+              <div className="rounded-2xl border border-[#f8fafc]/25 bg-white p-6 shadow-2xl shadow-[#1e1b4b]/50 sm:p-7">
+                <p className="text-lg font-bold text-slate-900">
+                  {t.landing.loginCardTitle}
+                </p>
+                <p className="mt-0.5 mb-5 text-xs text-slate-500">
+                  {t.landing.loginCardHint}
+                </p>
+                <LoginForm />
+              </div>
+            </Reveal>
+          </div>
         </section>
       </main>
 
