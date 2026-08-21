@@ -2,48 +2,48 @@ import Link from 'next/link';
 import { dict, type Lang } from '@/lib/i18n';
 
 /**
- * Footer institusional — desain orisinal UNICAL: band navy formal dengan
- * garis aksen gradien; warna literal agar identik di mode terang & gelap.
+ * Footer institusional — terang dan formal; kelas semantik membuatnya
+ * otomatis menyesuaikan saat pengguna memilih mode gelap.
  */
 export function SiteFooter({ lang }: { lang: Lang }) {
   const t = dict(lang);
 
   return (
-    <footer className="relative overflow-hidden bg-[#020617] text-[#94a3b8]">
+    <footer className="relative overflow-hidden border-t border-slate-200 bg-white text-slate-600">
       {/* Garis aksen khas merek */}
       <div
         className="h-1 w-full bg-gradient-to-r from-[#4f46e5] via-[#8b5cf6] to-[#4f46e5]"
         aria-hidden
       />
-      <div className="bg-dots-dark absolute inset-0 opacity-40" aria-hidden />
+      <div className="bg-dots absolute inset-0 opacity-30" aria-hidden />
 
       <div className="relative mx-auto max-w-5xl px-4 pt-12 pb-6">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           {/* Merek + deskripsi */}
           <div>
             <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-xl font-extrabold text-[#f8fafc] shadow-lg shadow-[#4f46e5]/30">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-xl font-extrabold text-[#f8fafc] shadow-lg shadow-indigo-200">
                 U
               </span>
               <div>
-                <p className="font-extrabold tracking-tight text-[#f8fafc]">
-                  UNICAL <span className="text-[#a5b4fc]">ASSOCIATES</span> REPO
+                <p className="font-extrabold tracking-tight text-slate-900">
+                  UNICAL <span className="text-indigo-600">ASSOCIATES</span> REPO
                 </p>
-                <p className="text-[11px] tracking-widest text-[#64748b] uppercase">
+                <p className="text-[11px] tracking-widest text-slate-400 uppercase">
                   {t.landing.tagline}
                 </p>
               </div>
             </div>
             <p className="mt-4 text-sm leading-relaxed">{t.landing.footerDesc}</p>
-            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-[#10b981]/30 bg-[#10b981]/10 px-3 py-1 text-xs font-medium text-[#6ee7b7]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#10b981]" aria-hidden />
+            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
               {t.landing.featureOpen} · Open Access
             </p>
           </div>
 
           {/* Navigasi repositori */}
           <nav aria-label={t.landing.footerRepo}>
-            <p className="text-xs font-bold tracking-widest text-[#e2e8f0] uppercase">
+            <p className="text-xs font-bold tracking-widest text-slate-900 uppercase">
               {t.landing.footerRepo}
             </p>
             <ul className="mt-4 space-y-2.5 text-sm">
@@ -55,14 +55,14 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 
           {/* Layanan + ketentuan */}
           <nav aria-label={t.landing.footerServices}>
-            <p className="text-xs font-bold tracking-widest text-[#e2e8f0] uppercase">
+            <p className="text-xs font-bold tracking-widest text-slate-900 uppercase">
               {t.landing.footerServices}
             </p>
             <ul className="mt-4 space-y-2.5 text-sm">
               <FooterLink href="/masuk">{t.landing.ctaLogin}</FooterLink>
               <FooterLink href="/daftar">{t.landing.ctaRegister}</FooterLink>
               <li>
-                <a href="/api/docs" className="transition hover:text-[#a5b4fc]">
+                <a href="/api/docs" className="transition hover:text-indigo-700">
                   {t.landing.footerApi}
                 </a>
               </li>
@@ -70,7 +70,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
               <li>
                 <a
                   href="/.well-known/security.txt"
-                  className="transition hover:text-[#a5b4fc]"
+                  className="transition hover:text-indigo-700"
                 >
                   security.txt
                 </a>
@@ -80,7 +80,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 
           {/* Alamat + kontak resmi */}
           <div className="text-sm">
-            <p className="text-xs font-bold tracking-widest text-[#e2e8f0] uppercase">
+            <p className="text-xs font-bold tracking-widest text-slate-900 uppercase">
               {t.landing.footerAddress}
             </p>
             <address className="mt-4 leading-relaxed not-italic">
@@ -90,14 +90,14 @@ export function SiteFooter({ lang }: { lang: Lang }) {
               <br />
               Makassar 90221, Sulawesi Selatan
             </address>
-            <p className="mt-5 text-xs font-bold tracking-widest text-[#e2e8f0] uppercase">
+            <p className="mt-5 text-xs font-bold tracking-widest text-slate-900 uppercase">
               {t.landing.footerContact}
             </p>
             <ul className="mt-3 space-y-1.5">
               <li>
                 <a
                   href="mailto:unical.assoc.repo@gmail.com"
-                  className="transition hover:text-[#a5b4fc]"
+                  className="transition hover:text-indigo-700"
                 >
                   ✉ unical.assoc.repo@gmail.com
                 </a>
@@ -107,7 +107,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
                   href="https://unismuh.ac.id"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition hover:text-[#a5b4fc]"
+                  className="transition hover:text-indigo-700"
                 >
                   🌐 unismuh.ac.id
                 </a>
@@ -117,8 +117,8 @@ export function SiteFooter({ lang }: { lang: Lang }) {
         </div>
 
         {/* Strip sumber data */}
-        <div className="mt-10 border-t border-[#1e293b] pt-6">
-          <p className="text-center text-[11px] font-bold tracking-widest text-[#64748b] uppercase">
+        <div className="mt-10 border-t border-slate-200 pt-6">
+          <p className="text-center text-[11px] font-bold tracking-widest text-slate-400 uppercase">
             {t.landing.footerSources}
           </p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
@@ -134,7 +134,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg border border-[#1e293b] bg-[#0f172a] px-3.5 py-1.5 text-xs font-semibold text-[#cbd5e1] transition hover:-translate-y-0.5 hover:border-[#6366f1] hover:text-[#f8fafc]"
+                className="rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:-translate-y-0.5 hover:border-indigo-400 hover:text-indigo-700 hover:shadow-sm"
               >
                 {name}
               </a>
@@ -143,7 +143,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
         </div>
 
         {/* Bar bawah */}
-        <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-[#1e293b] pt-5 text-center text-xs text-[#64748b] sm:flex-row sm:text-left">
+        <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-slate-200 pt-5 text-center text-xs text-slate-400 sm:flex-row sm:text-left">
           <p>
             © {new Date().getFullYear()} UNICAL ASSOCIATES ·{' '}
             {t.landing.footerManaged}
@@ -158,7 +158,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <li>
-      <Link href={href} className="transition hover:text-[#a5b4fc]">
+      <Link href={href} className="transition hover:text-indigo-700">
         {children}
       </Link>
     </li>
