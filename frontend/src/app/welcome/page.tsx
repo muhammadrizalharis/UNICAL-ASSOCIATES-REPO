@@ -5,6 +5,7 @@ import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { CountUp } from '@/components/count-up';
 import { SiteFooter } from '@/components/site-footer';
+import { SiteNav } from '@/components/site-nav';
 import { LoginForm } from '@/components/login-form';
 import { Reveal } from '@/components/reveal';
 
@@ -80,24 +81,6 @@ export default async function WelcomePage() {
             <p className="text-[11px] tracking-wide text-slate-400">{t.landing.tagline}</p>
           </div>
           <nav className="flex items-center gap-3 text-sm">
-            <Link
-              href="/publikasi"
-              className="hidden text-slate-600 hover:text-indigo-700 sm:block"
-            >
-              {t.common.publications}
-            </Link>
-            <Link
-              href="/peneliti"
-              className="hidden text-slate-600 hover:text-indigo-700 sm:block"
-            >
-              {t.common.researchers}
-            </Link>
-            <Link
-              href="/statistik"
-              className="hidden text-slate-600 hover:text-indigo-700 sm:block"
-            >
-              Statistik
-            </Link>
             <ThemeToggle />
             <LanguageToggle lang={lang} />
             <Link
@@ -108,21 +91,15 @@ export default async function WelcomePage() {
             </Link>
           </nav>
         </div>
-        {/* Layar kecil: tautan tampil langsung, tanpa menu tersembunyi */}
-        <nav className="flex gap-5 overflow-x-auto border-t border-slate-100 px-4 py-2 text-sm whitespace-nowrap sm:hidden">
-          <Link href="/publikasi" className="text-slate-600 hover:text-indigo-700">
-            {t.common.publications}
-          </Link>
-          <Link href="/peneliti" className="text-slate-600 hover:text-indigo-700">
-            {t.common.researchers}
-          </Link>
-          <Link href="/statistik" className="text-slate-600 hover:text-indigo-700">
-            Statistik
-          </Link>
-          <Link href="/kebijakan" className="text-slate-600 hover:text-indigo-700">
-            {t.landing.footerPolicy}
-          </Link>
-        </nav>
+        <SiteNav
+          items={[
+            { href: '/welcome', label: lang === 'id' ? 'Beranda' : 'Home', icon: 'home' },
+            { href: '/publikasi', label: t.common.publications, icon: 'book' },
+            { href: '/peneliti', label: t.common.researchers, icon: 'users', also: ['/profil'] },
+            { href: '/statistik', label: 'Statistik', icon: 'chart' },
+            { href: '/kebijakan', label: t.landing.footerPolicy, icon: 'shield' },
+          ]}
+        />
       </header>
 
       <main>

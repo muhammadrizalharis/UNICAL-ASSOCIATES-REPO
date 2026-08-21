@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { getLang } from '@/lib/i18n';
+import { dict, getLang } from '@/lib/i18n';
 import { ReportForm } from '@/components/report-form';
 import { SiteFooter } from '@/components/site-footer';
+import { SiteNav } from '@/components/site-nav';
 
 export const metadata = {
   title: 'Kebijakan & Pelaporan · UNICAL ASSOCIATES REPO',
@@ -11,6 +12,7 @@ export const metadata = {
 
 export default async function KebijakanPage() {
   const lang = await getLang();
+  const t = dict(lang);
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
@@ -19,6 +21,15 @@ export default async function KebijakanPage() {
             ← Beranda
           </Link>
         </div>
+        <SiteNav
+          items={[
+            { href: '/welcome', label: lang === 'id' ? 'Beranda' : 'Home', icon: 'home' },
+            { href: '/publikasi', label: t.common.publications, icon: 'book' },
+            { href: '/peneliti', label: t.common.researchers, icon: 'users', also: ['/profil'] },
+            { href: '/statistik', label: 'Statistik', icon: 'chart' },
+            { href: '/kebijakan', label: t.landing.footerPolicy, icon: 'shield' },
+          ]}
+        />
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-8">

@@ -5,6 +5,7 @@ import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { TrendChart } from '@/components/trend-chart';
 import { SiteFooter } from '@/components/site-footer';
+import { SiteNav } from '@/components/site-nav';
 
 // Dinamis karena cookie bahasa; data berat sudah di-cache Redis di API (10 mnt).
 export const dynamic = 'force-dynamic';
@@ -82,6 +83,15 @@ export default async function StatistikPage() {
           <ThemeToggle />
           <LanguageToggle lang={lang} />
         </div>
+        <SiteNav
+          items={[
+            { href: '/welcome', label: lang === 'id' ? 'Beranda' : 'Home', icon: 'home' },
+            { href: '/publikasi', label: t.common.publications, icon: 'book' },
+            { href: '/peneliti', label: t.common.researchers, icon: 'users', also: ['/profil'] },
+            { href: '/statistik', label: 'Statistik', icon: 'chart' },
+            { href: '/kebijakan', label: t.landing.footerPolicy, icon: 'shield' },
+          ]}
+        />
       </header>
 
       <main className="mx-auto max-w-4xl px-4 py-8">
