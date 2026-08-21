@@ -2,75 +2,160 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
-export interface NavItem {
+export interface NavChild {
   href: string;
   label: string;
-  icon: 'home' | 'book' | 'users' | 'chart' | 'shield';
-  /** Awalan path lain yang membuat item ini dianggap aktif. */
-  also?: string[];
+  /** Tautan non-Next (mis. /api/docs) dirender sebagai <a>. */
+  external?: boolean;
 }
 
-const ICONS: Record<NavItem['icon'], React.ReactNode> = {
-  home: (
-    <path d="M3 10.5 12 3l9 7.5M5 9.5V21h5v-6h4v6h5V9.5" />
-  ),
+export interface NavGroup {
+  label: string;
+  icon: 'home' | 'book' | 'layers';
+  /** Tanpa items = tautan langsung (Beranda). */
+  href?: string;
+  items?: NavChild[];
+}
+
+const ICONS: Record<NavGroup['icon'], React.ReactNode> = {
+  home: <path d="M3 10.5 12 3l9 7.5M5 9.5V21h5v-6h4v6h5V9.5" />,
   book: (
     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15zM8 7h8M8 11h5" />
   ),
-  users: (
-    <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM21 21v-2a4 4 0 0 0-3-3.87M15.5 3.13a4 4 0 0 1 0 7.75" />
-  ),
-  chart: (
-    <path d="M3 3v18h18M8 17V9m5 8V5m5 12v-6" />
-  ),
-  shield: (
-    <path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10zM9 12l2 2 4-4" />
+  layers: (
+    <path d="m12 2 9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5" />
   ),
 };
 
-/** Bar navigasi utama: pil aktif bergradien, ikon garis, sticky-friendly. */
-export function SiteNav({ items }: { items: NavItem[] }) {
-  const pathname = usePathname();
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+      aria-hidden
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
 
-  const isActive = (item: NavItem) =>
-    pathname === item.href ||
-    pathname.startsWith(item.href + '/') ||
-    (item.also ?? []).some((p) => pathname === p || pathname.startsWith(p + '/'));
+/** Bar navigasi utama: Beranda langsung, sisanya dropdown ber-submenu. */
+export function SiteNav({ groups }: { groups: NavGroup[] }) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState<string | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Tutup saat klik di luar atau pindah halaman.
+  useEffect(() => {
+    function onOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(null);
+    }
+    document.addEventListener('mousedown', onOutside);
+    return () => document.removeEventListener('mousedown', onOutside);
+  }, []);
+  useEffect(() => setOpen(null), [pathname]);
+
+  const childActive = (child: NavChild) =>
+    pathname === child.href || pathname.startsWith(child.href + '/');
+
+  const groupActive = (group: NavGroup) => {
+    if (group.href) {
+      return pathname === group.href || pathname.startsWith(group.href + '/');
+    }
+    return (group.items ?? []).some(
+      (c) =>
+        childActive(c) ||
+        // /profil dihitung bagian Peneliti di grup Repositori.
+        (c.href === '/peneliti' && pathname.startsWith('/profil')),
+    );
+  };
+
+  const pill = (active: boolean) =>
+    active
+      ? 'flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-1.5 text-sm font-semibold text-[#f8fafc] shadow-lg shadow-indigo-500/25'
+      : 'flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-slate-600 transition-colors duration-200 hover:bg-indigo-50 hover:text-indigo-700';
 
   return (
-    <div className="border-t border-slate-100">
+    <div ref={ref} className="border-t border-slate-100">
       <nav
         aria-label="Navigasi utama"
-        className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-3 py-2 whitespace-nowrap"
+        className="mx-auto flex max-w-7xl items-center gap-1 px-3 py-2 whitespace-nowrap"
       >
-        {items.map((item) => {
-          const active = isActive(item);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active ? 'page' : undefined}
-              className={
-                active
-                  ? 'flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-1.5 text-sm font-semibold text-[#f8fafc] shadow-lg shadow-indigo-500/25'
-                  : 'flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-slate-600 transition-colors duration-200 hover:bg-indigo-50 hover:text-indigo-700'
-              }
+        {groups.map((group) => {
+          const active = groupActive(group);
+          const icon = (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4 shrink-0"
+              aria-hidden
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-4 w-4 shrink-0"
-                aria-hidden
+              {ICONS[group.icon]}
+            </svg>
+          );
+
+          if (group.href) {
+            return (
+              <Link
+                key={group.label}
+                href={group.href}
+                aria-current={active ? 'page' : undefined}
+                className={pill(active)}
               >
-                {ICONS[item.icon]}
-              </svg>
-              {item.label}
-            </Link>
+                {icon}
+                {group.label}
+              </Link>
+            );
+          }
+
+          const isOpen = open === group.label;
+          return (
+            <div key={group.label} className="relative">
+              <button
+                onClick={() => setOpen(isOpen ? null : group.label)}
+                aria-expanded={isOpen}
+                aria-haspopup="menu"
+                className={pill(active)}
+              >
+                {icon}
+                {group.label}
+                <Chevron open={isOpen} />
+              </button>
+
+              {isOpen && (
+                <div
+                  role="menu"
+                  className="animate-fade-up absolute left-0 z-30 mt-2 w-60 overflow-hidden rounded-xl border border-slate-200 bg-white py-1.5 shadow-xl shadow-indigo-950/10 [animation-duration:200ms]"
+                >
+                  {(group.items ?? []).map((child) => {
+                    const activeChild = childActive(child);
+                    const cls = activeChild
+                      ? 'flex items-center gap-2 border-l-2 border-indigo-600 bg-indigo-50 px-4 py-2.5 text-sm font-semibold text-indigo-700'
+                      : 'flex items-center gap-2 border-l-2 border-transparent px-4 py-2.5 text-sm text-slate-700 transition hover:border-indigo-300 hover:bg-slate-50 hover:text-indigo-700';
+                    return child.external ? (
+                      <a key={child.href} href={child.href} className={cls} role="menuitem">
+                        {child.label}
+                      </a>
+                    ) : (
+                      <Link key={child.href} href={child.href} className={cls} role="menuitem">
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>

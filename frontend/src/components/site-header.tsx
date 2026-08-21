@@ -31,12 +31,31 @@ export function SiteHeader({ lang }: { lang: Lang }) {
         </nav>
       </div>
       <SiteNav
-        items={[
-          { href: '/welcome', label: lang === 'id' ? 'Beranda' : 'Home', icon: 'home' },
-          { href: '/publikasi', label: t.common.publications, icon: 'book' },
-          { href: '/peneliti', label: t.common.researchers, icon: 'users', also: ['/profil'] },
-          { href: '/statistik', label: 'Statistik', icon: 'chart' },
-          { href: '/kebijakan', label: t.landing.footerPolicy, icon: 'shield' },
+        groups={[
+          {
+            href: '/welcome',
+            label: lang === 'id' ? 'Beranda' : 'Home',
+            icon: 'home',
+          },
+          {
+            label: t.landing.footerRepo,
+            icon: 'book',
+            items: [
+              { href: '/publikasi', label: t.common.publications },
+              { href: '/peneliti', label: t.common.researchers },
+              { href: '/statistik', label: t.landing.footerStats },
+            ],
+          },
+          {
+            label: t.landing.footerServices,
+            icon: 'layers',
+            items: [
+              { href: '/masuk', label: t.landing.ctaLogin },
+              { href: '/daftar', label: t.landing.ctaRegister },
+              { href: '/api/docs', label: t.landing.footerApi, external: true },
+              { href: '/kebijakan', label: t.landing.footerPolicy },
+            ],
+          },
         ]}
       />
     </header>
