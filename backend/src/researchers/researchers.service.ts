@@ -4,6 +4,7 @@ import { CacheService } from '../common/cache/cache.module';
 import { NotificationsService } from '../notifications/notifications.module';
 
 const PROFILE_CACHE_TTL_S = 120;
+const DIRECTORY_CACHE_TTL_S = 60;
 
 @Injectable()
 export class ResearchersService {
@@ -17,6 +18,10 @@ export class ResearchersService {
   async directory(params: { q?: string; facultyId?: string; page?: number }) {
     const page = Math.max(1, params.page ?? 1);
     const limit = 20;
+
+    const cacheKey = `directory:${params.q ?? ''}:${params.facultyId ?? ''}:${page}`;
+    const cached = await this.cache.get<object>(cacheKey);
+    if (cached) return cached;
 
     const where = {
       unicalId: { not: null },
@@ -51,10 +56,12 @@ export class ResearchersService {
       }),
     ]);
 
-    return {
+    const result = {
       data: rows,
       meta: { page, perPage: limit, total, lastPage: Math.ceil(total / limit) || 1 },
     };
+    await this.cache.set(cacheKey, result, DIRECTORY_CACHE_TTL_S);
+    return result;
   }
 
   async publicProfile(unicalId: string) {

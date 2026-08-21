@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { cache } from 'react';
 import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
@@ -40,14 +41,19 @@ interface PublicationDetail {
   viewCount: number;
 }
 
-async function loadPublication(id: string): Promise<PublicationDetail | null> {
-  try {
-    const body = await apiFetch<{ data: PublicationDetail }>(`/publications/${id}`);
-    return body.data;
-  } catch {
-    return null;
-  }
-}
+// cache() mendedup panggilan ganda generateMetadata + halaman dalam satu request.
+const loadPublication = cache(
+  async (id: string): Promise<PublicationDetail | null> => {
+    try {
+      const body = await apiFetch<{ data: PublicationDetail }>(
+        `/publications/${id}`,
+      );
+      return body.data;
+    } catch {
+      return null;
+    }
+  },
+);
 
 interface RelatedHit {
   id: string;
@@ -101,11 +107,14 @@ export default async function PublicationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const pub = await loadPublication(id);
+  // Ketiganya independen; jalankan serentak agar TTFB lebih cepat.
+  const [pub, related, lang] = await Promise.all([
+    loadPublication(id),
+    loadRelated(id),
+    getLang(),
+  ]);
   if (!pub) notFound();
 
-  const related = await loadRelated(id);
-  const lang = await getLang();
   const t = dict(lang);
 
   return (

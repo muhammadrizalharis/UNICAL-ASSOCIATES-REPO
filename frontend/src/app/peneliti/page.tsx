@@ -3,6 +3,7 @@ import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { MobileMenu } from '@/components/mobile-menu';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Direktori Peneliti · UNICAL ASSOCIATES REPO' };
@@ -51,11 +52,18 @@ export default async function PenelitiPage({
             UNICAL ASSOCIATES REPO
           </Link>
           <nav className="flex items-center gap-4 text-sm">
-            <Link href="/publikasi" className="text-slate-600 hover:text-indigo-700">
+            <Link href="/publikasi" className="hidden text-slate-600 hover:text-indigo-700 sm:block">
               {t.common.publications}
             </Link>
             <ThemeToggle />
             <LanguageToggle lang={lang} />
+            <MobileMenu
+              items={[
+                { href: '/welcome', label: 'Beranda' },
+                { href: '/publikasi', label: t.common.publications },
+                { href: '/statistik', label: 'Statistik' },
+              ]}
+            />
             <Link href="/masuk" className="text-slate-600 hover:text-indigo-700">
               {t.common.login}
             </Link>

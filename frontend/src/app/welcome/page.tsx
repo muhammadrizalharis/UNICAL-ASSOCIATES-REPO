@@ -3,6 +3,7 @@ import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { MobileMenu } from '@/components/mobile-menu';
 import { CountUp } from '@/components/count-up';
 import { Reveal } from '@/components/reveal';
 
@@ -98,6 +99,14 @@ export default async function WelcomePage() {
             </Link>
             <ThemeToggle />
             <LanguageToggle lang={lang} />
+            <MobileMenu
+              items={[
+                { href: '/publikasi', label: t.common.publications },
+                { href: '/peneliti', label: t.common.researchers },
+                { href: '/statistik', label: 'Statistik' },
+                { href: '/kebijakan', label: t.landing.footerPolicy },
+              ]}
+            />
             <Link
               href="/masuk"
               className="rounded-md bg-indigo-600 px-3 py-1.5 font-medium text-[#f8fafc] shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-500"

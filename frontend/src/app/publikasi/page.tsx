@@ -3,6 +3,7 @@ import { apiFetch } from '@/lib/api';
 import { dict, getLang } from '@/lib/i18n';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { MobileMenu } from '@/components/mobile-menu';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Jelajahi Publikasi · UNICAL ASSOCIATES REPO' };
@@ -112,14 +113,21 @@ export default async function PublikasiPage({
             UNICAL ASSOCIATES REPO
           </Link>
           <nav className="flex items-center gap-4 text-sm">
-            <Link href="/peneliti" className="text-slate-600 hover:text-indigo-700">
+            <Link href="/peneliti" className="hidden text-slate-600 hover:text-indigo-700 sm:block">
               {t.common.researchers}
             </Link>
-            <Link href="/statistik" className="text-slate-600 hover:text-indigo-700">
+            <Link href="/statistik" className="hidden text-slate-600 hover:text-indigo-700 sm:block">
               Statistik
             </Link>
             <ThemeToggle />
             <LanguageToggle lang={lang} />
+            <MobileMenu
+              items={[
+                { href: '/welcome', label: 'Beranda' },
+                { href: '/peneliti', label: t.common.researchers },
+                { href: '/statistik', label: 'Statistik' },
+              ]}
+            />
             <Link
               href="/masuk"
               className="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50"
