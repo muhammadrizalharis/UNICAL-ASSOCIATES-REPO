@@ -41,3 +41,4 @@ unical-associates-repo.md
 # Artefak runtime Playwright (screenshot dokumentasi TETAP di-commit)
 frontend/e2e/output/
 frontend/e2e/report/
+*.tmp.mjs

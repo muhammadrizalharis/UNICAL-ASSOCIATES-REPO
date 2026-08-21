@@ -10,7 +10,9 @@ test.describe('Halaman publik', () => {
     ).toBeVisible();
     await expect(page.getByText('Publikasi Terverifikasi')).toBeVisible();
     await expect(page.getByText('Paling Banyak Disitasi')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Daftar Sekarang' })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Daftar Sekarang' }).first(),
+    ).toBeVisible();
     await page.screenshot({ path: `${SHOT.dir}/00-landing.png`, fullPage: true });
 
     // Pencarian hero mengarah ke halaman jelajah.
@@ -88,7 +90,9 @@ test.describe('Halaman publik', () => {
   test('statistik institusi + laporan fakultas siap cetak', async ({ page }) => {
     await page.goto('/statistik');
     await expect(page.getByRole('heading', { name: 'Statistik Institusi' })).toBeVisible();
-    await expect(page.getByText('Fakultas Teknik')).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Fakultas Teknik' }),
+    ).toBeVisible();
     await page.screenshot({ path: `${SHOT.dir}/04-statistik.png`, fullPage: true });
 
     // Klik nama fakultas membuka laporan kinerja.
