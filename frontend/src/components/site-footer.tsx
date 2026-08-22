@@ -21,9 +21,12 @@ export function SiteFooter({ lang }: { lang: Lang }) {
           {/* Merek + deskripsi */}
           <div>
             <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-xl font-extrabold text-[#f8fafc] shadow-lg shadow-indigo-200">
-                U
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-unical.png"
+                alt="Logo UNICAL ASSOCIATES REPO"
+                className="h-11 w-11 shrink-0 object-contain"
+              />
               <div>
                 <p className="font-extrabold tracking-tight text-slate-900">
                   UNICAL <span className="text-indigo-600">ASSOCIATES</span> REPO

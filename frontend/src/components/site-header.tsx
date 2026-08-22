@@ -11,13 +11,21 @@ export function SiteHeader({ lang }: { lang: Lang }) {
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        <Link href="/welcome" className="group">
-          <p className="font-extrabold tracking-tight text-slate-900 transition group-hover:text-indigo-700">
-            UNICAL <span className="text-indigo-600 dark:text-indigo-400">ASSOCIATES</span> REPO
-          </p>
-          <p className="text-[11px] tracking-wide text-slate-400">
-            {t.landing.tagline}
-          </p>
+        <Link href="/welcome" className="group flex items-center gap-2.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-unical.png"
+            alt="Logo UNICAL ASSOCIATES REPO"
+            className="h-10 w-10 shrink-0 object-contain drop-shadow-sm"
+          />
+          <span>
+            <p className="font-extrabold tracking-tight text-slate-900 transition group-hover:text-indigo-700">
+              UNICAL <span className="text-indigo-600 dark:text-indigo-400">ASSOCIATES</span> REPO
+            </p>
+            <p className="text-[11px] tracking-wide text-slate-400">
+              {t.landing.tagline}
+            </p>
+          </span>
         </Link>
         <nav className="flex items-center gap-3 text-sm">
           <ThemeToggle />
