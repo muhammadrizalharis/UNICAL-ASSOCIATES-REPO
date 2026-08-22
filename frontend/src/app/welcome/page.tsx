@@ -154,22 +154,6 @@ export default async function WelcomePage() {
           )}
         </section>
 
-        {/* Cara kerja 3 langkah */}
-        <section className="border-b border-slate-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-14">
-            <Reveal>
-              <h2 className="text-center text-2xl font-bold text-slate-900">
-                {t.landing.howTitle}
-              </h2>
-            </Reveal>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <Reveal><Step no="1" title={t.landing.how1} body={t.landing.how1Body} /></Reveal>
-              <Reveal delay={120}><Step no="2" title={t.landing.how2} body={t.landing.how2Body} /></Reveal>
-              <Reveal delay={240}><Step no="3" title={t.landing.how3} body={t.landing.how3Body} /></Reveal>
-            </div>
-          </div>
-        </section>
-
         {/* Karya tersitasi teratas */}
         {stats && stats.topCited.length > 0 && (
           <section className="mx-auto max-w-7xl px-4 py-12">
@@ -258,6 +242,22 @@ export default async function WelcomePage() {
             </div>
           </section>
         )}
+
+        {/* Cara publikasi 3 langkah — mengantar ke ajakan daftar */}
+        <section className="bg-slate-50">
+          <div className="mx-auto max-w-7xl px-4 py-12">
+            <Reveal>
+              <h2 className="text-center text-2xl font-bold text-slate-900">
+                {t.landing.howTitle}
+              </h2>
+            </Reveal>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <Reveal><Step no="1" title={t.landing.how1} body={t.landing.how1Body} /></Reveal>
+              <Reveal delay={120}><Step no="2" title={t.landing.how2} body={t.landing.how2Body} /></Reveal>
+              <Reveal delay={240}><Step no="3" title={t.landing.how3} body={t.landing.how3Body} /></Reveal>
+            </div>
+          </div>
+        </section>
 
         {/* Ajakan daftar + login langsung dari beranda */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#4f46e5] via-[#4338ca] to-[#6d28d9]">
