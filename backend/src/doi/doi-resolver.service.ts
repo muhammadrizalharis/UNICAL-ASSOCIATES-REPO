@@ -49,6 +49,26 @@ export class DoiNotFoundError extends Error {
   }
 }
 
+interface DataCiteCreator {
+  name?: string;
+  givenName?: string;
+  familyName?: string;
+  affiliation?: { name?: string }[];
+  nameIdentifiers?: { nameIdentifierScheme?: string; nameIdentifier?: string }[];
+}
+
+interface DataCiteAttributes {
+  creators?: DataCiteCreator[];
+  publicationYear?: number;
+  titles?: { title?: string }[];
+  descriptions?: { descriptionType?: string; description?: string }[];
+  publisher?: { name?: string } | string;
+  subjects?: { subject?: string }[];
+  url?: string;
+  citationCount?: number;
+  rightsList?: unknown[];
+}
+
 @Injectable()
 export class DoiResolverService {
   private readonly logger = new Logger(DoiResolverService.name);
@@ -194,14 +214,19 @@ export class DoiResolverService {
 
   private async resolveFromDataCite(doi: string): Promise<ResolvedPublication> {
     const body = await this.fetchJson<{
-      data?: { attributes?: Record<string, any> };
+      data?: { attributes?: DataCiteAttributes };
     }>(`https://api.datacite.org/dois/${encodeURIComponent(doi)}`);
 
     const attr = body?.data?.attributes;
     if (!attr) throw new DoiNotFoundError(doi);
 
+    const publisherName =
+      typeof attr.publisher === 'string'
+        ? attr.publisher
+        : (attr.publisher?.name ?? null);
+
     const authors: ResolvedAuthor[] = (attr.creators ?? []).map(
-      (creator: Record<string, any>, index: number) => ({
+      (creator, index) => ({
         name:
           creator.name ??
           [creator.givenName, creator.familyName].filter(Boolean).join(' '),
@@ -210,27 +235,24 @@ export class DoiResolverService {
         affiliation: creator.affiliation?.[0]?.name ?? null,
         orcid:
           creator.nameIdentifiers
-            ?.find(
-              (n: Record<string, any>) => n.nameIdentifierScheme === 'ORCID',
-            )
+            ?.find((n) => n.nameIdentifierScheme === 'ORCID')
             ?.nameIdentifier?.replace(/^https?:\/\/orcid\.org\//i, '') ?? null,
       }),
     );
 
-    const publishedYear: number | undefined = attr.publicationYear;
+    const publishedYear = attr.publicationYear;
 
     return {
       doi,
       title: attr.titles?.[0]?.title ?? '(tanpa judul)',
       abstract: cleanAbstract(
-        attr.descriptions?.find(
-          (d: Record<string, any>) => d.descriptionType === 'Abstract',
-        )?.description,
+        attr.descriptions?.find((d) => d.descriptionType === 'Abstract')
+          ?.description,
       ),
       type: 'PREPRINT' as ResolvedType,
       journal: {
-        name: attr.publisher?.name ?? attr.publisher ?? null,
-        publisher: attr.publisher?.name ?? attr.publisher ?? null,
+        name: publisherName,
+        publisher: publisherName,
         issn: null,
         eissn: null,
       },
@@ -240,13 +262,13 @@ export class DoiResolverService {
       pages: null,
       publishedDate: publishedYear ? `${publishedYear}-01-01` : null,
       keywords: (attr.subjects ?? [])
-        .map((s: Record<string, any>) => s.subject)
-        .filter(Boolean),
+        .map((s) => s.subject)
+        .filter((s): s is string => Boolean(s)),
       url: attr.url ?? null,
       citationCount: attr.citationCount ?? 0,
       isOpenAccess: Boolean(attr.rightsList?.length),
       sources: { metadata: 'datacite', abstract: null },
-      raw: attr,
+      raw: attr as Record<string, unknown>,
     };
   }
 

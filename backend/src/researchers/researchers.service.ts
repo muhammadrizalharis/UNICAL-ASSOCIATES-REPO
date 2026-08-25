@@ -1,8 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { CacheService } from '../common/cache/cache.module';
 import { NotificationsService } from '../notifications/notifications.module';
 import { StorageService } from '../common/storage/storage.module';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 const PROFILE_CACHE_TTL_S = 120;
 const DIRECTORY_CACHE_TTL_S = 60;
@@ -91,6 +96,106 @@ export class ResearchersService {
       });
     }
     return object;
+  }
+
+  /** Hapus foto profil (objek MinIO + tautannya). */
+  async removeAvatar(userId: string) {
+    const profile = await this.prisma.researcherProfile.findUnique({
+      where: { userId },
+      select: { id: true, unicalId: true, photoUrl: true },
+    });
+    if (!profile) {
+      throw new NotFoundException({
+        code: 'PROFILE_NOT_FOUND',
+        message: 'Profil tidak ditemukan.',
+      });
+    }
+    if (profile.photoUrl) {
+      await this.storage.remove(`avatar/${profile.id}`);
+      await this.prisma.researcherProfile.update({
+        where: { id: profile.id },
+        data: { photoUrl: null },
+      });
+      if (profile.unicalId) await this.cache.del(`profile:${profile.unicalId}`);
+    }
+    return { photoUrl: null };
+  }
+
+  /** Pembaruan profil mandiri: nama, bio, keahlian, dan afiliasi. */
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    const current = await this.prisma.researcherProfile.findUnique({
+      where: { userId },
+      select: { id: true, unicalId: true, firstName: true, lastName: true },
+    });
+    if (!current) {
+      throw new NotFoundException({
+        code: 'PROFILE_NOT_FOUND',
+        message: 'Profil tidak ditemukan.',
+      });
+    }
+
+    // Program studi menentukan fakultasnya; tolak pasangan yang tidak konsisten.
+    let facultyId = dto.facultyId;
+    if (dto.departmentId) {
+      const department = await this.prisma.department.findUnique({
+        where: { id: dto.departmentId },
+        select: { facultyId: true },
+      });
+      if (!department) {
+        throw new BadRequestException({
+          code: 'DEPARTMENT_NOT_FOUND',
+          message: 'Program studi tidak ditemukan.',
+        });
+      }
+      if (dto.facultyId && department.facultyId !== dto.facultyId) {
+        throw new BadRequestException({
+          code: 'DEPARTMENT_FACULTY_MISMATCH',
+          message: 'Program studi tidak berada di bawah fakultas yang dipilih.',
+        });
+      }
+      facultyId = department.facultyId;
+    }
+
+    const firstName = dto.firstName?.trim() || current.firstName;
+    const lastName =
+      dto.lastName === undefined
+        ? current.lastName
+        : dto.lastName.trim() || null;
+    const fullName = [firstName, lastName].filter(Boolean).join(' ');
+
+    const profile = await this.prisma.researcherProfile.update({
+      where: { id: current.id },
+      data: {
+        firstName,
+        lastName,
+        fullName,
+        bio: dto.bio === undefined ? undefined : dto.bio.trim() || null,
+        expertise:
+          dto.expertise === undefined
+            ? undefined
+            : dto.expertise.map((e) => e.trim()).filter(Boolean),
+        institution:
+          dto.institution === undefined
+            ? undefined
+            : dto.institution.trim() || null,
+        ...(dto.departmentId !== undefined || dto.facultyId !== undefined
+          ? {
+              facultyId: facultyId ?? null,
+              departmentId: dto.departmentId ?? null,
+            }
+          : {}),
+        ...(dto.facultyOther !== undefined
+          ? { facultyOther: dto.facultyOther.trim() || null }
+          : {}),
+        ...(dto.departmentOther !== undefined
+          ? { departmentOther: dto.departmentOther.trim() || null }
+          : {}),
+      },
+      include: { faculty: true, department: true },
+    });
+
+    if (current.unicalId) await this.cache.del(`profile:${current.unicalId}`);
+    return { profile };
   }
 
   /** Direktori hanya memuat peneliti yang UNICAL ID-nya sudah terbit. */

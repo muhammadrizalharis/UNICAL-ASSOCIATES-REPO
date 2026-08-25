@@ -151,6 +151,12 @@ export class SearchIndexService implements OnModuleInit {
           'exactness',
           'citationCount:desc',
         ],
+        // DOI adalah identitas pasti; jangan toleransi salah ketik padanya.
+        typoTolerance: {
+          enabled: true,
+          minWordSizeForTypos: { oneTypo: 4, twoTypos: 8 },
+          disableOnAttributes: ['doi'],
+        },
       });
     } catch (error) {
       this.logger.warn(

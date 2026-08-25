@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import {
   FastifyAdapter,
@@ -8,6 +8,7 @@ import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/observability/all-exceptions.filter';
 
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
@@ -34,6 +35,24 @@ async function bootstrap(): Promise<void> {
     }),
   );
   app.enableShutdownHooks();
+
+  // Observability: catat galat 5xx (dengan stack) tanpa mengubah bentuk respons.
+  app.useGlobalFilters(
+    new AllExceptionsFilter(app.get(HttpAdapterHost).httpAdapter),
+  );
+
+  // Catat permintaan lambat (>1s) atau bergalat server untuk pemantauan latensi.
+  const fastify = app.getHttpAdapter().getInstance();
+  fastify.addHook('onResponse', (request, reply, done) => {
+    const ms = reply.elapsedTime;
+    if (reply.statusCode >= 500 || ms > 1000) {
+      Logger.warn(
+        `${request.method} ${request.url} ${reply.statusCode} ${Math.round(ms)}ms`,
+        'HTTP',
+      );
+    }
+    done();
+  });
 
   // Dokumentasi API publik: /api/docs (UI) dan /api/docs-json (spec).
   const openapi = new DocumentBuilder()

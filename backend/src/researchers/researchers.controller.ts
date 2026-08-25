@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
@@ -7,6 +8,7 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
   Req,
@@ -18,12 +20,26 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUserId } from '../auth/current-user.decorator';
 import { ResearchersService } from './researchers.service';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 const MAX_AVATAR_BYTES = 3 * 1024 * 1024;
 
 @Controller({ path: 'researchers', version: '1' })
 export class ResearchersController {
   constructor(private readonly researchers: ResearchersService) {}
+
+  @Patch('me')
+  @UseGuards(AuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
+  async updateMe(
+    @CurrentUserId() userId: string,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    return {
+      success: true,
+      data: await this.researchers.updateProfile(userId, dto),
+    };
+  }
 
   @Post('me/avatar')
   @UseGuards(AuthGuard)
@@ -57,6 +73,15 @@ export class ResearchersController {
       .header('Content-Length', object.size)
       .header('Cache-Control', 'public, max-age=86400')
       .send(object.stream);
+  }
+
+  @Delete('me/avatar')
+  @UseGuards(AuthGuard)
+  async removeAvatar(@CurrentUserId() userId: string) {
+    return {
+      success: true,
+      data: await this.researchers.removeAvatar(userId),
+    };
   }
 
   @Get()
