@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { authHeader } from '@/lib/session';
 import { RequireAuth, TopBar } from '@/components/require-auth';
@@ -49,6 +50,7 @@ export default function NotifikasiPage() {
 function NotificationList() {
   const [rows, setRows] = useState<NotificationRow[]>([]);
   const [unread, setUnread] = useState(0);
+  const router = useRouter();
 
   async function load() {
     try {
@@ -82,7 +84,7 @@ function NotificationList() {
         headers: authHeader(),
       }).catch(() => undefined);
     }
-    if (n.link) window.location.href = n.link;
+    if (n.link) router.push(n.link);
     else await load();
   }
 

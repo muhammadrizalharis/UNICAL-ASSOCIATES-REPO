@@ -82,7 +82,10 @@ export class AuthController {
     @CurrentUserId() userId: string,
     @Body() dto: AffiliationDto,
   ) {
-    return { success: true, data: await this.auth.saveAffiliation(userId, dto) };
+    return {
+      success: true,
+      data: await this.auth.saveAffiliation(userId, dto),
+    };
   }
 
   @Post('affiliation/skip')

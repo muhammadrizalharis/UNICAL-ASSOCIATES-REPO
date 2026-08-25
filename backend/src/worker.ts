@@ -52,8 +52,8 @@ async function bootstrap(): Promise<void> {
     await app.close();
     process.exit(0);
   };
-  process.on('SIGTERM', shutdown);
-  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', () => void shutdown());
+  process.on('SIGINT', () => void shutdown());
 
   logger.log('unical-worker siap mengonsumsi antrean.');
 }

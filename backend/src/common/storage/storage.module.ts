@@ -26,7 +26,9 @@ export class StorageService {
     });
   }
 
-  async stream(key: string): Promise<{ stream: Readable; size: number } | null> {
+  async stream(
+    key: string,
+  ): Promise<{ stream: Readable; size: number } | null> {
     try {
       const stat = await this.client.statObject(this.bucket, key);
       const stream = await this.client.getObject(this.bucket, key);

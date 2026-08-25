@@ -1,4 +1,10 @@
-import { Controller, Get, NotFoundException, Param, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { StatsService } from './stats.service';
 
 @Controller({ path: 'stats', version: '1' })

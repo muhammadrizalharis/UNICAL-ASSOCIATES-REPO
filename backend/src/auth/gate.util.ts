@@ -25,7 +25,9 @@ export interface GateConfig {
   superAdmin: string;
 }
 
-export function readGateConfig(env: NodeJS.ProcessEnv = process.env): GateConfig {
+export function readGateConfig(
+  env: NodeJS.ProcessEnv = process.env,
+): GateConfig {
   return {
     admin: env.ADMIN_GATE ?? 'assoc=-01',
     superAdmin: env.SUPER_ADMIN_GATE ?? 'assoc=-000',
@@ -45,7 +47,8 @@ export function isGateValid(
   const tier = tierOfRole(role);
 
   if (tier === 'member') return gate === '';
-  if (tier === 'admin') return gate !== '' && timingSafeEquals(gate, config.admin);
+  if (tier === 'admin')
+    return gate !== '' && timingSafeEquals(gate, config.admin);
   return gate !== '' && timingSafeEquals(gate, config.superAdmin);
 }
 

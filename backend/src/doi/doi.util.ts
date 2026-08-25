@@ -66,9 +66,7 @@ export function mapCrossrefType(type: string | undefined): ResolvedType {
 }
 
 /** CrossRef memberi tanggal sebagai [[tahun, bulan, hari]] dengan bulan/hari opsional. */
-export function dateFromParts(
-  parts: number[][] | undefined,
-): string | null {
+export function dateFromParts(parts: number[][] | undefined): string | null {
   const part = parts?.[0];
   if (!part || part.length === 0) return null;
 

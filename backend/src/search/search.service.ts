@@ -98,7 +98,9 @@ export class SearchService {
         ? {
             OR: [
               { title: { contains: params.q, mode: 'insensitive' as const } },
-              { abstract: { contains: params.q, mode: 'insensitive' as const } },
+              {
+                abstract: { contains: params.q, mode: 'insensitive' as const },
+              },
             ],
           }
         : {}),

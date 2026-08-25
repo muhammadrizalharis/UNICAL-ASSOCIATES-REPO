@@ -29,7 +29,9 @@ export class StatsService {
       trend,
     ] = await this.prisma.$transaction([
       this.prisma.publication.count({ where: { status: 'APPROVED' } }),
-      this.prisma.researcherProfile.count({ where: { unicalId: { not: null } } }),
+      this.prisma.researcherProfile.count({
+        where: { unicalId: { not: null } },
+      }),
       this.prisma.publication.aggregate({
         where: { status: 'APPROVED' },
         _sum: { citationCount: true },
@@ -41,7 +43,13 @@ export class StatsService {
         WHERE status = 'APPROVED' AND published_date IS NOT NULL
         GROUP BY 1 ORDER BY 1`,
       this.prisma.$queryRaw<
-        { id: string; faculty: string; researchers: bigint; publications: bigint; citations: bigint }[]
+        {
+          id: string;
+          faculty: string;
+          researchers: bigint;
+          publications: bigint;
+          citations: bigint;
+        }[]
       >`
         SELECT f.id AS id, f.name AS faculty,
                (SELECT count(*) FROM researcher_profiles rp
@@ -99,7 +107,10 @@ export class StatsService {
         citations: citationAgg._sum.citationCount ?? 0,
         journals: totalJournals,
       },
-      publicationsByYear: byYear.map((r) => ({ year: r.year, total: Number(r.total) })),
+      publicationsByYear: byYear.map((r) => ({
+        year: r.year,
+        total: Number(r.total),
+      })),
       byFaculty: byFaculty.map((r) => ({
         id: r.id,
         faculty: r.faculty,
@@ -108,7 +119,10 @@ export class StatsService {
         citations: Number(r.citations),
       })),
       byType: byType.map((r) => ({ type: r.type, total: r._count })),
-      byQuartile: byQuartile.map((r) => ({ quartile: r.quartile, total: Number(r.total) })),
+      byQuartile: byQuartile.map((r) => ({
+        quartile: r.quartile,
+        total: Number(r.total),
+      })),
       topCited: topCited.map((p) => ({
         id: p.id,
         title: p.title,

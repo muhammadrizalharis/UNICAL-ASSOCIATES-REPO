@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { dict, getLang } from '@/lib/i18n';
+import { getLang } from '@/lib/i18n';
 import { ReportForm } from '@/components/report-form';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -12,7 +11,6 @@ export const metadata = {
 
 export default async function KebijakanPage() {
   const lang = await getLang();
-  const t = dict(lang);
   return (
     <div className="min-h-screen bg-slate-50">
       <SiteHeader lang={lang} />

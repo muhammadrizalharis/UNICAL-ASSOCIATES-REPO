@@ -15,11 +15,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AffiliationDto } from './dto/affiliation.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import {
-  homePathForRole,
-  isGateValid,
-  readGateConfig,
-} from './gate.util';
+import { homePathForRole, isGateValid, readGateConfig } from './gate.util';
 
 // Parameter Argon2id sesuai kebijakan keamanan: memori 64 MB.
 const ARGON_OPTIONS = {

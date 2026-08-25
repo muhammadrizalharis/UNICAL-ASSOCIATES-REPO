@@ -3,7 +3,11 @@ import {
   extractDoiFromText,
   normalizeIsbn,
 } from './identifier.util';
-import { parseBibtex, parseRis, parseBibliography } from './bibliography.parser';
+import {
+  parseBibtex,
+  parseRis,
+  parseBibliography,
+} from './bibliography.parser';
 
 describe('detectIdentifier', () => {
   it.each([
@@ -120,7 +124,9 @@ ER  -
 
 describe('parseBibliography', () => {
   it('memilih parser berdasarkan isi berkas', () => {
-    expect(parseBibliography('TY  - JOUR\nTI  - Judul\nER  - ')).toHaveLength(1);
+    expect(parseBibliography('TY  - JOUR\nTI  - Judul\nER  - ')).toHaveLength(
+      1,
+    );
     expect(
       parseBibliography('@article{a, title={Judul}, doi={10.1/x}}'),
     ).toHaveLength(1);

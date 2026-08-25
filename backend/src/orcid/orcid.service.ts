@@ -161,7 +161,12 @@ export class OrcidService {
   }
 
   private async importOne(
-    profile: { id: string; orcid: string | null; fullName: string; userId: string },
+    profile: {
+      id: string;
+      orcid: string | null;
+      fullName: string;
+      userId: string;
+    },
     doi: string,
     fallbackTitle: string,
   ): Promise<OrcidImportItem> {
@@ -250,7 +255,12 @@ export class OrcidService {
   ): Promise<boolean> {
     const slots = await this.prisma.publicationAuthor.findMany({
       where: { publicationId },
-      select: { id: true, rawAuthorName: true, researcherId: true, authorOrder: true },
+      select: {
+        id: true,
+        rawAuthorName: true,
+        researcherId: true,
+        authorOrder: true,
+      },
       orderBy: { authorOrder: 'asc' },
     });
 

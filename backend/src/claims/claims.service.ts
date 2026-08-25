@@ -160,7 +160,8 @@ export class ClaimsService {
     if (approve && claim.publicationAuthor.researcherId) {
       throw new ConflictException({
         code: 'SLOT_ALREADY_CLAIMED',
-        message: 'Slot sudah tertaut ke peneliti lain; klaim tidak bisa disetujui.',
+        message:
+          'Slot sudah tertaut ke peneliti lain; klaim tidak bisa disetujui.',
       });
     }
 

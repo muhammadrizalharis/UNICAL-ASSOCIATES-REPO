@@ -1,4 +1,10 @@
-import { IsBoolean, IsEmail, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class LoginDto {
   @IsEmail({}, { message: 'Format email tidak valid' })

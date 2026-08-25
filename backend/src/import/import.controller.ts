@@ -74,7 +74,7 @@ export class ImportController {
   }
 
   @Post('manual')
-  async manual(@Body() dto: ManualReferenceDto) {
+  manual(@Body() dto: ManualReferenceDto) {
     return { success: true, data: this.importer.buildManual(dto) };
   }
 

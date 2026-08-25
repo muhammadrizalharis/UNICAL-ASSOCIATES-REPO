@@ -114,12 +114,15 @@ export class PublicationsService {
     const limit = Math.min(100, Math.max(1, params.limit ?? 20));
 
     const where = {
-      status: (params.status as 'PENDING' | 'APPROVED' | 'REJECTED') ?? 'APPROVED',
+      status:
+        (params.status as 'PENDING' | 'APPROVED' | 'REJECTED') ?? 'APPROVED',
       ...(params.q
         ? {
             OR: [
               { title: { contains: params.q, mode: 'insensitive' as const } },
-              { abstract: { contains: params.q, mode: 'insensitive' as const } },
+              {
+                abstract: { contains: params.q, mode: 'insensitive' as const },
+              },
             ],
           }
         : {}),
@@ -229,12 +232,17 @@ export class PublicationsService {
       if (!user || !allowed.includes(user.role)) {
         throw new ForbiddenException({
           code: 'PDF_FORBIDDEN',
-          message: 'Hanya pengunggah publikasi atau pengelola yang boleh melampirkan PDF.',
+          message:
+            'Hanya pengunggah publikasi atau pengelola yang boleh melampirkan PDF.',
         });
       }
     }
 
-    await this.storage.put(`pdf/${publicationId}.pdf`, buffer, 'application/pdf');
+    await this.storage.put(
+      `pdf/${publicationId}.pdf`,
+      buffer,
+      'application/pdf',
+    );
     await this.prisma.publication.update({
       where: { id: publicationId },
       data: { pdfUrl: `/api/v1/publications/${publicationId}/pdf` },
@@ -263,7 +271,10 @@ export class PublicationsService {
       });
     }
 
-    return { ...object, filename: `${publication.doi.replace(/[^\w.-]+/g, '_')}.pdf` };
+    return {
+      ...object,
+      filename: `${publication.doi.replace(/[^\w.-]+/g, '_')}.pdf`,
+    };
   }
 
   private detailInclude() {

@@ -11,8 +11,11 @@ export interface CitationData {
 
 function bibtexKey(data: CitationData): string {
   const surname =
-    data.authors[0]?.split(/\s+/).at(-1)?.toLowerCase().replace(/[^a-z]/g, '') ??
-    'unical';
+    data.authors[0]
+      ?.split(/\s+/)
+      .at(-1)
+      ?.toLowerCase()
+      .replace(/[^a-z]/g, '') ?? 'unical';
   return `${surname}${data.year ?? ''}`;
 }
 
@@ -68,10 +71,7 @@ export function toApa(data: CitationData): string {
         ? `${names[0]} & ${names[1]}`
         : `${names.slice(0, -1).join(', ')}, & ${names.at(-1)}`;
 
-  const pieces = [
-    `${authorText} (${data.year ?? 't.t.'}).`,
-    `${data.title}.`,
-  ];
+  const pieces = [`${authorText} (${data.year ?? 't.t.'}).`, `${data.title}.`];
   if (data.journal) {
     let source = data.journal;
     if (data.volume) {

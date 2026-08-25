@@ -40,7 +40,13 @@ export class SessionsService {
     const tokenHash = this.hashToken(token);
     const session = await this.prisma.userSession.findUnique({
       where: { tokenHash },
-      select: { id: true, userId: true, revokedAt: true, expiresAt: true, lastSeenAt: true },
+      select: {
+        id: true,
+        userId: true,
+        revokedAt: true,
+        expiresAt: true,
+        lastSeenAt: true,
+      },
     });
 
     if (!session || session.revokedAt || session.expiresAt < new Date()) {

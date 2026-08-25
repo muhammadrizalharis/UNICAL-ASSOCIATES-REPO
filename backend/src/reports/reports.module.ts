@@ -200,7 +200,10 @@ export class ReportsController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('MODERATOR', 'FACULTY_ADMIN', 'SUPER_ADMIN')
   async list(@Query('status') status?: string, @Query('page') page?: string) {
-    const result = await this.reports.list(status, Math.max(1, Number(page) || 1));
+    const result = await this.reports.list(
+      status,
+      Math.max(1, Number(page) || 1),
+    );
     return { success: true, ...result };
   }
 
@@ -212,7 +215,10 @@ export class ReportsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: ResolveReportDto,
   ) {
-    return { success: true, data: await this.reports.resolve(adminId, id, dto) };
+    return {
+      success: true,
+      data: await this.reports.resolve(adminId, id, dto),
+    };
   }
 }
 

@@ -1,9 +1,5 @@
 export type ResolvedType =
-  | 'JOURNAL_ARTICLE'
-  | 'PROCEEDING'
-  | 'BOOK_CHAPTER'
-  | 'BOOK'
-  | 'PREPRINT';
+  'JOURNAL_ARTICLE' | 'PROCEEDING' | 'BOOK_CHAPTER' | 'BOOK' | 'PREPRINT';
 
 export interface ResolvedAuthor {
   name: string;

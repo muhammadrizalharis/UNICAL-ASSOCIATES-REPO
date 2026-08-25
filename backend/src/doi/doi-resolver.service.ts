@@ -1,10 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CacheService } from '../common/cache/cache.module';
-import {
-  ResolvedAuthor,
-  ResolvedPublication,
-  ResolvedType,
-} from './doi.types';
+import { ResolvedAuthor, ResolvedPublication, ResolvedType } from './doi.types';
 import {
   abstractFromInvertedIndex,
   cleanAbstract,
@@ -196,9 +192,7 @@ export class DoiResolverService {
     });
   }
 
-  private async resolveFromDataCite(
-    doi: string,
-  ): Promise<ResolvedPublication> {
+  private async resolveFromDataCite(doi: string): Promise<ResolvedPublication> {
     const body = await this.fetchJson<{
       data?: { attributes?: Record<string, any> };
     }>(`https://api.datacite.org/dois/${encodeURIComponent(doi)}`);
@@ -215,9 +209,11 @@ export class DoiResolverService {
         isCorresponding: index === 0,
         affiliation: creator.affiliation?.[0]?.name ?? null,
         orcid:
-          creator.nameIdentifiers?.find(
-            (n: Record<string, any>) => n.nameIdentifierScheme === 'ORCID',
-          )?.nameIdentifier?.replace(/^https?:\/\/orcid\.org\//i, '') ?? null,
+          creator.nameIdentifiers
+            ?.find(
+              (n: Record<string, any>) => n.nameIdentifierScheme === 'ORCID',
+            )
+            ?.nameIdentifier?.replace(/^https?:\/\/orcid\.org\//i, '') ?? null,
       }),
     );
 

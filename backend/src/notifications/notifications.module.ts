@@ -99,7 +99,10 @@ export class NotificationsController {
 
   @Patch('read-all')
   async readAll(@CurrentUserId() userId: string) {
-    return { success: true, data: await this.notifications.markAllRead(userId) };
+    return {
+      success: true,
+      data: await this.notifications.markAllRead(userId),
+    };
   }
 
   @Patch(':id/read')
@@ -107,7 +110,10 @@ export class NotificationsController {
     @CurrentUserId() userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    return { success: true, data: await this.notifications.markRead(userId, id) };
+    return {
+      success: true,
+      data: await this.notifications.markRead(userId, id),
+    };
   }
 }
 

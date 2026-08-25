@@ -58,7 +58,12 @@ export class ResearchersService {
 
     const result = {
       data: rows,
-      meta: { page, perPage: limit, total, lastPage: Math.ceil(total / limit) || 1 },
+      meta: {
+        page,
+        perPage: limit,
+        total,
+        lastPage: Math.ceil(total / limit) || 1,
+      },
     };
     await this.cache.set(cacheKey, result, DIRECTORY_CACHE_TTL_S);
     return result;
@@ -125,7 +130,12 @@ export class ResearchersService {
             indexations: {
               select: {
                 indexation: {
-                  select: { code: true, name: true, level: true, badgeColor: true },
+                  select: {
+                    code: true,
+                    name: true,
+                    level: true,
+                    badgeColor: true,
+                  },
                 },
               },
             },
@@ -185,7 +195,12 @@ export class ResearchersService {
         const key = c.unicalId ?? c.name.toLowerCase();
         const entry = collabCount.get(key);
         if (entry) entry.count++;
-        else collabCount.set(key, { name: c.name, unicalId: c.unicalId, count: 1 });
+        else
+          collabCount.set(key, {
+            name: c.name,
+            unicalId: c.unicalId,
+            count: 1,
+          });
       }
     }
     const topCollaborators = [...collabCount.values()]

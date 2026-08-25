@@ -174,7 +174,8 @@ export function parseRis(content: string): ParsedReference[] {
     }
 
     if (tag === 'ER') {
-      if (startPage) current.pages = endPage ? `${startPage}-${endPage}` : startPage;
+      if (startPage)
+        current.pages = endPage ? `${startPage}-${endPage}` : startPage;
       if (current.doi || current.title) references.push(current);
       current = emptyReference();
       started = false;
@@ -183,9 +184,18 @@ export function parseRis(content: string): ParsedReference[] {
       continue;
     }
 
-    if (tag === 'SP') { startPage = value; continue; }
-    if (tag === 'EP') { endPage = value; continue; }
-    if (tag === 'KW') { if (value) current.keywords.push(value); continue; }
+    if (tag === 'SP') {
+      startPage = value;
+      continue;
+    }
+    if (tag === 'EP') {
+      endPage = value;
+      continue;
+    }
+    if (tag === 'KW') {
+      if (value) current.keywords.push(value);
+      continue;
+    }
 
     const field = RIS_MAP[tag];
     if (!field) continue;

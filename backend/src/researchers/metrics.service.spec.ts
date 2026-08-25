@@ -19,7 +19,7 @@ describe('MetricsService.hIndex', () => {
     [[3, 3, 3], 3],
     [[10, 8, 5, 4, 3], 4],
   ])('h-index dari %j adalah %i', (citations, expected) => {
-    expect(MetricsService.hIndex(citations as number[])).toBe(expected);
+    expect(MetricsService.hIndex(citations)).toBe(expected);
   });
 
   it('tidak melebihi jumlah publikasi', () => {

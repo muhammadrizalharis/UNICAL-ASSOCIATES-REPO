@@ -16,7 +16,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { IsBoolean, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUserId } from '../auth/current-user.decorator';
@@ -215,7 +222,10 @@ export class CollectionsController {
   @Post()
   @UseGuards(AuthGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
-  async create(@CurrentUserId() userId: string, @Body() dto: CreateCollectionDto) {
+  async create(
+    @CurrentUserId() userId: string,
+    @Body() dto: CreateCollectionDto,
+  ) {
     return { success: true, data: await this.collections.create(userId, dto) };
   }
 

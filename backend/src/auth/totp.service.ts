@@ -24,7 +24,8 @@ export class TotpService {
     if (user.totpEnabledAt) {
       throw new BadRequestException({
         code: 'TOTP_ALREADY_ENABLED',
-        message: '2FA sudah aktif. Nonaktifkan dulu untuk membuat rahasia baru.',
+        message:
+          '2FA sudah aktif. Nonaktifkan dulu untuk membuat rahasia baru.',
       });
     }
 

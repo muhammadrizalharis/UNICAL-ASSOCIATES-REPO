@@ -37,7 +37,8 @@ describe('normalizeDoi', () => {
 
 describe('cleanAbstract', () => {
   it('membuang tag JATS dan merapikan spasi', () => {
-    const raw = '<jats:p>Studi ini   mengusulkan</jats:p>\n<jats:p>metode baru</jats:p>';
+    const raw =
+      '<jats:p>Studi ini   mengusulkan</jats:p>\n<jats:p>metode baru</jats:p>';
     expect(cleanAbstract(raw)).toBe('Studi ini mengusulkan metode baru');
   });
 

@@ -15,7 +15,9 @@ describe('toBibtex', () => {
   it('menyusun entri lengkap dengan kunci nama-tahun', () => {
     const out = toBibtex(data);
     expect(out).toContain('@article{faisal2026,');
-    expect(out).toContain('author  = {Muhammad Faisal and Muhammad Rizal Haris}');
+    expect(out).toContain(
+      'author  = {Muhammad Faisal and Muhammad Rizal Haris}',
+    );
     expect(out).toContain('doi     = {10.18280/ijsdp.210613}');
     expect(out.trim().endsWith('}')).toBe(true);
   });
@@ -54,7 +56,9 @@ describe('toIeee', () => {
   it('memakai inisial di depan dan volume/no/pp gaya IEEE', () => {
     const out = toIeee(data);
     expect(out).toContain('M. Faisal and M. R. Haris');
-    expect(out).toContain('"Hybrid PCA-FCM Clustering for Provincial Rice Distribution,"');
+    expect(out).toContain(
+      '"Hybrid PCA-FCM Clustering for Provincial Rice Distribution,"',
+    );
     expect(out).toContain('vol. 21, no. 6, pp. 113-125');
     expect(out).toContain('doi: 10.18280/ijsdp.210613.');
   });

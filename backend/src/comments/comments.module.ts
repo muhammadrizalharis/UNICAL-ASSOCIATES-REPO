@@ -15,11 +15,20 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUserId } from '../auth/current-user.decorator';
-import { NotificationsService, NotificationsModule } from '../notifications/notifications.module';
+import {
+  NotificationsService,
+  NotificationsModule,
+} from '../notifications/notifications.module';
 
 class CreateCommentDto {
   @IsString()
@@ -53,12 +62,16 @@ export class CommentsService {
         skip: (page - 1) * limit,
         take: limit,
         include: {
-          user: { select: { profile: { select: { fullName: true, unicalId: true } } } },
+          user: {
+            select: { profile: { select: { fullName: true, unicalId: true } } },
+          },
           replies: {
             orderBy: { createdAt: 'asc' },
             include: {
               user: {
-                select: { profile: { select: { fullName: true, unicalId: true } } },
+                select: {
+                  profile: { select: { fullName: true, unicalId: true } },
+                },
               },
             },
           },
@@ -113,7 +126,8 @@ export class CommentsService {
       if (!parent) {
         throw new BadRequestException({
           code: 'PARENT_COMMENT_INVALID',
-          message: 'Balasan hanya bisa untuk komentar utama di publikasi yang sama.',
+          message:
+            'Balasan hanya bisa untuk komentar utama di publikasi yang sama.',
         });
       }
       parentAuthorId = parent.userId;
@@ -127,7 +141,9 @@ export class CommentsService {
         body: dto.body.trim(),
       },
       include: {
-        user: { select: { profile: { select: { fullName: true, unicalId: true } } } },
+        user: {
+          select: { profile: { select: { fullName: true, unicalId: true } } },
+        },
       },
     });
 

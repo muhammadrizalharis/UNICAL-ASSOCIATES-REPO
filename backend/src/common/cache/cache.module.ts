@@ -1,4 +1,10 @@
-import { Global, Injectable, Logger, Module, OnModuleDestroy } from '@nestjs/common';
+import {
+  Global,
+  Injectable,
+  Logger,
+  Module,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import Redis from 'ioredis';
 
 /** Cache ringan berbasis Redis; bila Redis mati, aplikasi tetap berjalan. */

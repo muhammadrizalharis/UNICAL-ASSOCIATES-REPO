@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiBase, apiFetch, ApiRequestError } from '@/lib/api';
 import { authHeader, readUser } from '@/lib/session';
 
@@ -115,13 +116,14 @@ function ClaimButton({
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const unclaimed = authors.filter((a) => !a.claimed);
   if (unclaimed.length === 0) return null;
 
   async function claim(order: number) {
     if (!readUser()) {
-      window.location.href = '/masuk';
+      router.push('/masuk');
       return;
     }
 

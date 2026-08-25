@@ -172,7 +172,10 @@ export class ImportService {
       keywords: ref.keywords,
       url: ref.url,
       citationCount: 0,
-      sources: { metadata: 'berkas-pustaka', abstract: ref.abstract ? 'berkas-pustaka' : null },
+      sources: {
+        metadata: 'berkas-pustaka',
+        abstract: ref.abstract ? 'berkas-pustaka' : null,
+      },
     };
   }
 }
