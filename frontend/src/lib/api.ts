@@ -41,14 +41,22 @@ export async function apiFetch<T>(
   const body = await response.json().catch(() => null);
 
   if (!response.ok) {
-    const detail = body?.message ?? body?.error ?? {};
+    // Backend memakai dua bentuk galat: kustom `{ code, message, details }`
+    // dan bawaan Nest `{ statusCode, message: string|string[], error }`.
+    const b: Record<string, unknown> = body ?? {};
+    const rawMessage = b.message;
+    const message =
+      typeof rawMessage === 'string'
+        ? rawMessage
+        : Array.isArray(rawMessage)
+          ? rawMessage.join(', ')
+          : typeof b.error === 'string'
+            ? b.error
+            : 'Permintaan gagal diproses.';
     throw new ApiRequestError(response.status, {
-      code: detail.code ?? 'REQUEST_FAILED',
-      message:
-        detail.message ??
-        (Array.isArray(detail) ? detail.join(', ') : null) ??
-        'Permintaan gagal diproses.',
-      details: detail.details,
+      code: typeof b.code === 'string' ? b.code : 'REQUEST_FAILED',
+      message,
+      details: b.details as Record<string, unknown> | undefined,
     });
   }
 
