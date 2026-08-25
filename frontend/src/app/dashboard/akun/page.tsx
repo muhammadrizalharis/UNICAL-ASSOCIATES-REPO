@@ -14,8 +14,8 @@ export default function AkunPage() {
           <TopBar user={user} />
 
           <main className="mx-auto max-w-md px-4 py-8">
-            <Link href="/dashboard" className="text-sm text-indigo-600 hover:underline">
-              ← Dashboard
+            <Link href="/dashboard/profil" className="text-sm text-indigo-600 hover:underline">
+              ← Profil
             </Link>
 
             <h1 className="mt-3 text-2xl font-semibold text-slate-900">

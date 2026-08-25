@@ -58,9 +58,9 @@ export default function DashboardPage() {
                 body="Lihat rekam jejak dan metrik riset sivitas akademika."
               />
               <Card
-                href="/dashboard/akun"
-                title="Pengaturan Akun"
-                body="Ubah kata sandi Anda secara mandiri."
+                href="/dashboard/profil"
+                title="Profil Saya"
+                body="Identitas, UNICAL ID, ORCID, dan pengaturan kata sandi akun."
               />
               <Card
                 href="/dashboard/keamanan"
@@ -97,9 +97,9 @@ function Card({ href, title, body }: { href: string; title: string; body: string
   return (
     <Link
       href={href}
-      className="rounded-lg border border-slate-200 bg-white p-5 transition hover:border-indigo-300 hover:shadow-sm"
+      className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
     >
-      <p className="font-medium text-slate-900">{title}</p>
+      <p className="font-semibold text-slate-900">{title}</p>
       <p className="mt-1 text-sm text-slate-600">{body}</p>
     </Link>
   );

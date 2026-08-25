@@ -282,10 +282,14 @@ function AdminBar({ user }: { user: SessionUser }) {
             )}
           </Link>
           <Link
-            href="/dashboard/akun"
-            className="hidden rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50 sm:inline-flex"
+            href="/dashboard/profil"
+            title="Profil saya"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-300 py-1 pr-3 pl-1 text-sm font-medium text-slate-600 transition hover:border-indigo-300 hover:bg-indigo-50/60"
           >
-            Akun
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-xs font-bold text-[#f8fafc]">
+              {(user.profile?.firstName ?? user.email).charAt(0).toUpperCase()}
+            </span>
+            <span className="hidden sm:inline">Profil</span>
           </Link>
           <button
             onClick={() => {
