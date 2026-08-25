@@ -19,6 +19,7 @@ export interface SessionUser {
     orcid: string | null;
     isVerified: boolean;
     affiliationCompleted: boolean;
+    photoUrl: string | null;
   } | null;
 }
 

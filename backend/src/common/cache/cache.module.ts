@@ -44,6 +44,14 @@ export class CacheService implements OnModuleDestroy {
     }
   }
 
+  async del(key: string): Promise<void> {
+    try {
+      await this.redis.del(key);
+    } catch {
+      // Cache bersifat opsional.
+    }
+  }
+
   async onModuleDestroy(): Promise<void> {
     await this.redis.quit().catch(() => undefined);
   }

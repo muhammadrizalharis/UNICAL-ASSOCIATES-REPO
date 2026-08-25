@@ -1,10 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { CacheService } from '../common/cache/cache.module';
 import { NotificationsService } from '../notifications/notifications.module';
+import { StorageService } from '../common/storage/storage.module';
 
 const PROFILE_CACHE_TTL_S = 120;
 const DIRECTORY_CACHE_TTL_S = 60;
+const MAX_AVATAR_BYTES = 3 * 1024 * 1024;
+
+/** Deteksi tipe gambar dari magic bytes; menolak berkas selain JPG/PNG/WebP. */
+function detectImageType(buffer: Buffer): string | null {
+  if (
+    buffer.length >= 3 &&
+    buffer[0] === 0xff &&
+    buffer[1] === 0xd8 &&
+    buffer[2] === 0xff
+  )
+    return 'image/jpeg';
+  if (
+    buffer.length >= 8 &&
+    buffer
+      .subarray(0, 8)
+      .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+  )
+    return 'image/png';
+  if (
+    buffer.length >= 12 &&
+    buffer.subarray(0, 4).toString('latin1') === 'RIFF' &&
+    buffer.subarray(8, 12).toString('latin1') === 'WEBP'
+  )
+    return 'image/webp';
+  return null;
+}
 
 @Injectable()
 export class ResearchersService {
@@ -12,7 +39,59 @@ export class ResearchersService {
     private readonly prisma: PrismaService,
     private readonly cache: CacheService,
     private readonly notifications: NotificationsService,
+    private readonly storage: StorageService,
   ) {}
+
+  /** Simpan foto profil (JPG/PNG/WebP, maks 3 MB) untuk akun mana pun. */
+  async setAvatar(userId: string, buffer: Buffer) {
+    const contentType = detectImageType(buffer);
+    if (!contentType) {
+      throw new BadRequestException({
+        code: 'NOT_AN_IMAGE',
+        message: 'Berkas harus berupa gambar JPG, PNG, atau WebP.',
+      });
+    }
+    if (buffer.length > MAX_AVATAR_BYTES) {
+      throw new BadRequestException({
+        code: 'IMAGE_TOO_LARGE',
+        message: 'Ukuran gambar maksimal 3 MB.',
+      });
+    }
+
+    const profile = await this.prisma.researcherProfile.findUnique({
+      where: { userId },
+      select: { id: true, unicalId: true },
+    });
+    if (!profile) {
+      throw new NotFoundException({
+        code: 'PROFILE_NOT_FOUND',
+        message: 'Profil tidak ditemukan.',
+      });
+    }
+
+    await this.storage.put(`avatar/${profile.id}`, buffer, contentType);
+    // Query versi memaksa peramban memuat ulang gambar setelah diganti.
+    const photoUrl = `/api/v1/researchers/avatar/${profile.id}?v=${Date.now()}`;
+    await this.prisma.researcherProfile.update({
+      where: { id: profile.id },
+      data: { photoUrl },
+    });
+    if (profile.unicalId) await this.cache.del(`profile:${profile.unicalId}`);
+
+    return { photoUrl };
+  }
+
+  /** Ambil objek foto profil dari MinIO untuk di-stream ke peramban. */
+  async getAvatar(profileId: string) {
+    const object = await this.storage.stream(`avatar/${profileId}`);
+    if (!object) {
+      throw new NotFoundException({
+        code: 'AVATAR_NOT_FOUND',
+        message: 'Foto profil tidak ditemukan.',
+      });
+    }
+    return object;
+  }
 
   /** Direktori hanya memuat peneliti yang UNICAL ID-nya sudah terbit. */
   async directory(params: { q?: string; facultyId?: string; page?: number }) {

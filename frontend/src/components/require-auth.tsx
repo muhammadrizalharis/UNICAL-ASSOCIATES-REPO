@@ -104,8 +104,17 @@ export function TopBar({ user }: { user: SessionUser }) {
             title="Profil saya"
             className="inline-flex items-center gap-2 rounded-full border border-slate-300 py-1 pr-3 pl-1 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50/60"
           >
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-xs font-bold text-[#f8fafc]">
-              {initial}
+            <span className="inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-xs font-bold text-[#f8fafc]">
+              {user.profile?.photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.profile.photoUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                initial
+              )}
             </span>
             <span className="hidden sm:inline">Profil</span>
           </Link>

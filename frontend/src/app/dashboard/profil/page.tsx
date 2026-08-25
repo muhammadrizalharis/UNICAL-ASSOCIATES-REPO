@@ -1,6 +1,14 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import Link from 'next/link';
+import { apiBase, apiFetch } from '@/lib/api';
+import {
+  authHeader,
+  readToken,
+  saveSession,
+  type SessionUser,
+} from '@/lib/session';
 import { RequireAuth, TopBar } from '@/components/require-auth';
 import { Icon } from '@/components/icons';
 
@@ -44,9 +52,7 @@ export default function ProfilPage() {
                 />
                 <div className="px-6 pb-6">
                   <div className="-mt-12 flex flex-wrap items-end gap-4">
-                    <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border-4 border-white bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-4xl font-bold text-[#f8fafc] shadow-lg">
-                      {initial}
-                    </span>
+                    <AvatarUploader initial={initial} initialUrl={p?.photoUrl ?? null} />
                     <div className="min-w-0 flex-1 pb-1">
                       <h1 className="truncate text-2xl font-bold text-slate-900">
                         {p?.fullName ?? user.email}
@@ -143,6 +149,97 @@ export default function ProfilPage() {
         );
       }}
     </RequireAuth>
+  );
+}
+
+function AvatarUploader({
+  initial,
+  initialUrl,
+}: {
+  initial: string;
+  initialUrl: string | null;
+}) {
+  const [photoUrl, setPhotoUrl] = useState(initialUrl);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function onPick(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!/^image\/(jpe?g|png|webp)$/.test(file.type)) {
+      setError('Format harus JPG, PNG, atau WebP.');
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      setError('Ukuran maksimal 3 MB.');
+      return;
+    }
+
+    setBusy(true);
+    setError(null);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch(`${apiBase()}/researchers/me/avatar`, {
+        method: 'POST',
+        headers: authHeader(),
+        body: form,
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.message ?? 'Gagal mengunggah foto.');
+
+      setPhotoUrl(json.data.photoUrl as string);
+      // Segarkan sesi agar foto baru ikut tampil di header.
+      const me = await apiFetch<{ data: SessionUser }>('/auth/me', {
+        headers: authHeader(),
+      });
+      const token = readToken();
+      if (token) saveSession(token, me.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal mengunggah foto.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="relative shrink-0">
+      <span className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-4xl font-bold text-[#f8fafc] shadow-lg">
+        {photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={photoUrl} alt="Foto profil" className="h-full w-full object-cover" />
+        ) : (
+          initial
+        )}
+      </span>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={busy}
+        title="Ubah foto profil"
+        className="absolute -right-1.5 -bottom-1.5 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#4f46e5] text-[#f8fafc] shadow-md transition hover:bg-[#4338ca] disabled:opacity-60"
+      >
+        {busy ? (
+          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+        ) : (
+          <Icon name="camera" className="h-4 w-4" />
+        )}
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        className="hidden"
+        onChange={onPick}
+      />
+      {error && (
+        <p className="absolute top-full left-1/2 mt-1 w-36 -translate-x-1/2 text-center text-[11px] text-rose-600">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 

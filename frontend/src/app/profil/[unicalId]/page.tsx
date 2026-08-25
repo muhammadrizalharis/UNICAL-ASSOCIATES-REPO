@@ -101,8 +101,17 @@ export default async function ProfilPage({
         </p>
         <section className="rounded-lg border border-slate-200 bg-white p-6">
           <div className="flex gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-bold text-white shadow-lg shadow-indigo-200">
-              {profile.fullName.charAt(0).toUpperCase()}
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-bold text-[#f8fafc] shadow-lg shadow-indigo-200">
+              {profile.photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profile.photoUrl}
+                  alt={profile.fullName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                profile.fullName.charAt(0).toUpperCase()
+              )}
             </div>
             <div className="min-w-0">
               <h1 className="text-2xl font-semibold text-slate-900">

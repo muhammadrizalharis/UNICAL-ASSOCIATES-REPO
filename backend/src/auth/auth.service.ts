@@ -381,6 +381,7 @@ export class AuthService {
             orcid: user.profile.orcid ?? null,
             isVerified: user.profile.isVerified,
             affiliationCompleted: Boolean(user.profile.affiliationCompletedAt),
+            photoUrl: user.profile.photoUrl ?? null,
           }
         : null,
     };

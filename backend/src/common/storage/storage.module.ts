@@ -28,11 +28,17 @@ export class StorageService {
 
   async stream(
     key: string,
-  ): Promise<{ stream: Readable; size: number } | null> {
+  ): Promise<{ stream: Readable; size: number; contentType: string } | null> {
     try {
       const stat = await this.client.statObject(this.bucket, key);
       const stream = await this.client.getObject(this.bucket, key);
-      return { stream, size: stat.size };
+      return {
+        stream,
+        size: stat.size,
+        contentType:
+          (stat.metaData?.['content-type'] as string) ??
+          'application/octet-stream',
+      };
     } catch {
       return null;
     }
