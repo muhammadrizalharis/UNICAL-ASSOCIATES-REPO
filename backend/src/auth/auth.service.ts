@@ -376,8 +376,14 @@ export class AuthService {
             country: user.profile.country,
             institution: user.profile.institution,
             faculty: user.profile.faculty?.name ?? user.profile.facultyOther,
+            facultyId: user.profile.facultyId ?? null,
             department:
               user.profile.department?.name ?? user.profile.departmentOther,
+            departmentId: user.profile.departmentId ?? null,
+            bio: user.profile.bio ?? null,
+            expertise: Array.isArray(user.profile.expertise)
+              ? (user.profile.expertise as string[])
+              : [],
             orcid: user.profile.orcid ?? null,
             isVerified: user.profile.isVerified,
             affiliationCompleted: Boolean(user.profile.affiliationCompletedAt),

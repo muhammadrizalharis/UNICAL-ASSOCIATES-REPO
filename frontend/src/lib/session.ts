@@ -15,7 +15,11 @@ export interface SessionUser {
     fullName: string;
     institution: string | null;
     faculty: string | null;
+    facultyId: string | null;
     department: string | null;
+    departmentId: string | null;
+    bio: string | null;
+    expertise: string[];
     orcid: string | null;
     isVerified: boolean;
     affiliationCompleted: boolean;

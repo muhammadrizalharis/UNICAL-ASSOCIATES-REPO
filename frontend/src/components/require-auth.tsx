@@ -90,6 +90,7 @@ export function TopBar({ user }: { user: SessionUser }) {
           <Link
             href="/dashboard/notifikasi"
             title="Notifikasi"
+            aria-label="Notifikasi"
             className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 text-slate-600 transition hover:border-indigo-300 hover:text-indigo-700"
           >
             <Icon name="bell" className="h-5 w-5" />
@@ -102,6 +103,7 @@ export function TopBar({ user }: { user: SessionUser }) {
           <Link
             href="/dashboard/profil"
             title="Profil saya"
+            aria-label="Profil saya"
             className="inline-flex items-center gap-2 rounded-full border border-slate-300 py-1 pr-3 pl-1 text-sm font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50/60"
           >
             <span className="inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-xs font-bold text-[#f8fafc]">
@@ -124,6 +126,7 @@ export function TopBar({ user }: { user: SessionUser }) {
               router.replace('/masuk');
             }}
             title="Keluar"
+            aria-label="Keluar"
             className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-300 px-2.5 text-sm font-medium text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
           >
             <Icon name="logout" className="h-4 w-4" />
