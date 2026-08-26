@@ -3,9 +3,9 @@
 Dokumentasi hasil uji antarmuka UNICAL ASSOCIATES REPO terhadap stack
 Docker yang berjalan di server kampus (nginx `127.0.0.1:48080`).
 
-- **Kerangka**: [Playwright](https://playwright.dev) 1.55.0 (Chromium)
+- **Kerangka**: [Playwright](https://playwright.dev) 1.55.1 (Chromium)
 - **Lokasi suite**: `frontend/e2e/`
-- **Hasil terakhir**: **19/19 lulus** — 20 Agustus 2026
+- **Hasil terakhir**: **19/19 lulus** — 26 Agustus 2026
 - **Tangkapan layar**: `frontend/e2e/dokumentasi/`
 
 ## Cara Menjalankan
@@ -21,7 +21,7 @@ docker run --rm --network host \
   -e E2E_QA_EMAIL=usrqauser@unical.assoc.id \
   -e E2E_QA_PASSWORD="$SEED_PWD_QA_USER" \
   -v "$PWD/frontend":/app -w /app \
-  mcr.microsoft.com/playwright:v1.55.0-noble \
+  mcr.microsoft.com/playwright:v1.55.1-noble \
   npx playwright test
 ```
 
@@ -69,6 +69,6 @@ sehingga suite tetap bisa dijalankan siapa pun terhadap halaman publik.
   memiliki data indeksasi (faset kosong disembunyikan UI) — aktifkan
   kembali asersinya setelah admin mengisi indeksasi jurnal.
 - Versi image Docker Playwright **harus sama persis** dengan versi
-  `@playwright/test` di `frontend/package.json` (`1.55.0`).
+  `@playwright/test` di `frontend/package.json` (`1.55.1`).
 - Uji yang bermutasi data (koleksi, tandai-dibaca) membersihkan
   jejaknya sendiri; komentar hanya diuji keterbukaannya, tidak dikirim.
