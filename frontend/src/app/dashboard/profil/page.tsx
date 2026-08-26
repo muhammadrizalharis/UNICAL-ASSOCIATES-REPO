@@ -68,11 +68,15 @@ function ProfileView({ user }: { user: SessionUser }) {
         </div>
 
         {/* Kartu identitas */}
-        <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="animate-fade-up mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div
-            className="h-24 bg-gradient-to-r from-[#4f46e5] via-[#6d28d9] to-[#7c3aed]"
+            className="relative h-28 overflow-hidden bg-gradient-to-br from-[#4f46e5] via-[#6d28d9] to-[#7c3aed]"
             aria-hidden
-          />
+          >
+            <div className="bg-dots-dark absolute inset-0 opacity-70" />
+            <div className="animate-float-slow absolute -top-12 -right-4 h-44 w-44 rounded-full bg-[#f8fafc]/15 blur-2xl" />
+            <div className="animate-float-slow absolute -bottom-20 left-10 h-44 w-44 rounded-full bg-[#c084fc]/30 blur-3xl [animation-delay:-4.5s]" />
+          </div>
           <div className="px-6 pb-6">
             <div className="-mt-12 flex flex-wrap items-start gap-4">
               <AvatarUploader initial={initial} initialUrl={p?.photoUrl ?? null} />
@@ -318,7 +322,7 @@ function AvatarUploader({
   return (
     <div className="flex shrink-0 flex-col items-center gap-2">
       <div className="relative h-24 w-24">
-        <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-4xl font-bold text-[#f8fafc] shadow-lg">
+        <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-4xl font-bold text-[#f8fafc] shadow-xl shadow-indigo-900/25">
           {shownUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={shownUrl} alt="Foto profil" className="h-full w-full object-cover" />
