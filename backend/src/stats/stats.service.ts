@@ -27,6 +27,7 @@ export class StatsService {
       byQuartile,
       topCited,
       trend,
+      topKeywords,
     ] = await this.prisma.$transaction([
       this.prisma.publication.count({ where: { status: 'APPROVED' } }),
       this.prisma.researcherProfile.count({
@@ -98,6 +99,19 @@ export class StatsService {
         FROM citation_snapshots cs
         JOIN publications p ON p.id = cs.publication_id AND p.status = 'APPROVED'
         GROUP BY 1 ORDER BY 1`,
+      this.prisma.$queryRaw<{ keyword: string; total: bigint }[]>`
+        SELECT lower(trim(kw)) AS keyword, count(*) AS total
+        FROM (
+          SELECT p.id, p.keywords::jsonb AS kws
+          FROM publications p
+          WHERE p.status = 'APPROVED'
+            AND jsonb_typeof(p.keywords::jsonb) = 'array'
+        ) q
+        CROSS JOIN LATERAL jsonb_array_elements_text(q.kws) AS kw
+        WHERE length(trim(kw)) > 1
+        GROUP BY 1
+        ORDER BY total DESC, keyword ASC
+        LIMIT 12`,
     ]);
 
     const result = {
@@ -134,6 +148,7 @@ export class StatsService {
         date: r.date.toISOString().slice(0, 10),
         citations: Number(r.citations),
       })),
+      topKeywords: topKeywords.map((r) => r.keyword),
       generatedAt: new Date().toISOString(),
     };
 

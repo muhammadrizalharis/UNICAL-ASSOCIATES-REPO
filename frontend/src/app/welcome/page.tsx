@@ -13,6 +13,27 @@ export const metadata = {
   title: 'UNICAL ASSOCIATES REPO — Repositori Publikasi Ilmiah Unismuh Makassar',
   description:
     'Repositori publikasi ilmiah Universitas Muhammadiyah Makassar: telusuri artikel jurnal, prosiding, dan buku dengan metrik sitasi otomatis.',
+  openGraph: {
+    title: 'UNICAL ASSOCIATES REPO — Repositori Publikasi Ilmiah Unismuh Makassar',
+    description:
+      'Telusuri artikel jurnal, prosiding, dan buku dosen Universitas Muhammadiyah Makassar dengan metrik sitasi otomatis.',
+    type: 'website',
+    images: [
+      {
+        url: '/icon-512.png',
+        width: 512,
+        height: 512,
+        alt: 'UNICAL ASSOCIATES REPO',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary' as const,
+    title: 'UNICAL ASSOCIATES REPO',
+    description:
+      'Repositori publikasi ilmiah Universitas Muhammadiyah Makassar.',
+    images: ['/icon-512.png'],
+  },
 };
 
 interface Stats {
@@ -29,6 +50,7 @@ interface Stats {
     year: number | null;
     journal: string | null;
   }[];
+  topKeywords?: string[];
 }
 
 interface TopResearcher {
@@ -58,7 +80,15 @@ async function loadTopResearchers(): Promise<TopResearcher[]> {
   }
 }
 
-const POPULAR_KEYWORDS = ['machine learning', 'clustering', 'deep learning', 'fuzzy'];
+// Cadangan lintas fakultas bila data kata kunci belum tersedia (bukan hanya Informatika).
+const POPULAR_KEYWORDS = [
+  'pendidikan',
+  'kesehatan',
+  'ekonomi',
+  'pertanian',
+  'teknik',
+  'hukum',
+];
 
 export default async function WelcomePage() {
   const lang = await getLang();
@@ -68,8 +98,38 @@ export default async function WelcomePage() {
     loadTopResearchers(),
   ]);
 
+  const popularKeywords = (
+    stats?.topKeywords?.length ? stats.topKeywords : POPULAR_KEYWORDS
+  ).slice(0, 6);
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? 'https://unical.unismuh.ac.id';
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'UNICAL ASSOCIATES REPO',
+    url: baseUrl,
+    inLanguage: lang,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Universitas Muhammadiyah Makassar',
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${baseUrl}/publikasi?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <SiteHeader lang={lang} />
 
       <main>
@@ -117,7 +177,11 @@ export default async function WelcomePage() {
               action="/publikasi"
               className="animate-fade-up delay-300 mx-auto mt-9 flex max-w-xl gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-indigo-200/60 backdrop-blur dark:shadow-indigo-950/50"
             >
+              <label htmlFor="hero-q" className="sr-only">
+                {lang === 'id' ? 'Cari publikasi' : 'Search publications'}
+              </label>
               <input
+                id="hero-q"
                 name="q"
                 placeholder={t.landing.searchPlaceholder}
                 className="min-w-0 flex-1 rounded-xl bg-transparent px-4 py-3 text-slate-900 placeholder-slate-400 outline-none"
@@ -129,7 +193,7 @@ export default async function WelcomePage() {
 
             <p className="animate-fade-up delay-300 mt-4 text-xs text-slate-500">
               {t.landing.popular}{' '}
-              {POPULAR_KEYWORDS.map((k) => (
+              {popularKeywords.map((k) => (
                 <Link
                   key={k}
                   href={`/publikasi?q=${encodeURIComponent(k)}`}
@@ -142,7 +206,7 @@ export default async function WelcomePage() {
           </div>
 
           {/* Statistik hidup menempel di dasar hero */}
-          {stats && (
+          {stats && stats.totals.publications > 0 ? (
             <div className="relative mx-auto max-w-7xl px-4 pb-14">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <Stat value={stats.totals.publications} label={t.landing.statPublications} />
@@ -150,6 +214,14 @@ export default async function WelcomePage() {
                 <Stat value={stats.totals.researchers} label={t.landing.statResearchers} />
                 <Stat value={stats.totals.journals} label={t.landing.statJournals} />
               </div>
+            </div>
+          ) : (
+            <div className="relative mx-auto max-w-3xl px-4 pb-14">
+              <p className="rounded-2xl border border-dashed border-indigo-200 bg-white/70 px-6 py-8 text-center text-sm text-slate-500 backdrop-blur">
+                {lang === 'id'
+                  ? 'Repositori sedang disiapkan. Publikasi dan statistik akan segera tampil di sini.'
+                  : 'The repository is being prepared. Publications and statistics will appear here soon.'}
+              </p>
             </div>
           )}
         </section>
@@ -186,8 +258,21 @@ export default async function WelcomePage() {
                     <p className="relative mt-2 text-xs text-slate-500">
                       {[pub.journal, pub.year].filter(Boolean).join(' · ')}
                     </p>
-                    <p className="relative mt-3 inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-sm font-bold text-indigo-700">
-                      📈 {pub.citationCount} {t.common.citations}
+                    <p className="relative mt-3 inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-2.5 py-1 text-sm font-bold text-indigo-700">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2.2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-4 w-4"
+                        aria-hidden
+                      >
+                        <path d="m3 17 6-6 4 4 8-8" />
+                        <path d="M17 7h4v4" />
+                      </svg>
+                      {pub.citationCount} {t.common.citations}
                     </p>
                   </Link>
                 </Reveal>
@@ -280,10 +365,20 @@ export default async function WelcomePage() {
                     (point) => (
                       <li key={point} className="flex items-start gap-2.5">
                         <span
-                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f8fafc]/15 text-[11px] font-bold text-[#a7f3d0]"
+                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f8fafc]/15 text-[#a7f3d0]"
                           aria-hidden
                         >
-                          ✓
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={3}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-3 w-3"
+                          >
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
                         </span>
                         {point}
                       </li>
