@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
-import { authHeader, clearSession, type SessionUser } from '@/lib/session';
+import { authHeader, type SessionUser } from '@/lib/session';
 import { RequireAuth } from '@/components/require-auth';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { UserMenu } from '@/components/user-menu';
 
 interface PendingPublication {
   id: string;
@@ -233,7 +233,6 @@ function Note({ text }: { text: string }) {
 }
 
 function AdminBar({ user }: { user: SessionUser }) {
-  const router = useRouter();
   const [unread, setUnread] = useState(0);
 
   useEffect(() => {
@@ -282,38 +281,7 @@ function AdminBar({ user }: { user: SessionUser }) {
               </span>
             )}
           </Link>
-          <Link
-            href="/dashboard/profil"
-            title="Profil saya"
-            aria-label="Profil saya"
-            className="inline-flex items-center gap-2 rounded-full border border-slate-300 py-1 pr-3 pl-1 text-sm font-medium text-slate-600 transition hover:border-indigo-300 hover:bg-indigo-50/60"
-          >
-            <span className="inline-flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-xs font-bold text-[#f8fafc]">
-              {user.profile?.photoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user.profile.photoUrl}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                (user.profile?.firstName ?? user.email).charAt(0).toUpperCase()
-              )}
-            </span>
-            <span className="hidden sm:inline">Profil</span>
-          </Link>
-          <button
-            onClick={() => {
-              clearSession();
-              router.replace('/masuk');
-            }}
-            title="Keluar"
-            aria-label="Keluar"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
-          >
-            <Icon name="logout" className="h-4 w-4" />
-            <span className="hidden sm:inline">Keluar</span>
-          </button>
+          <UserMenu user={user} />
         </div>
       </div>
     </header>
