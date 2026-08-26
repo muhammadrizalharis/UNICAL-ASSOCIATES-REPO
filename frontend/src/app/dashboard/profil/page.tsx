@@ -67,54 +67,53 @@ function ProfileView({ user }: { user: SessionUser }) {
           </Link>
         </div>
 
-        {/* Kartu identitas */}
-        <div className="animate-fade-up mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div
-            className="relative h-28 overflow-hidden bg-gradient-to-br from-[#4f46e5] via-[#6d28d9] to-[#7c3aed]"
-            aria-hidden
-          >
-            <div className="bg-dots-dark absolute inset-0 opacity-70" />
-            <div className="animate-float-slow absolute -top-12 -right-4 h-44 w-44 rounded-full bg-[#f8fafc]/15 blur-2xl" />
-            <div className="animate-float-slow absolute -bottom-20 left-10 h-44 w-44 rounded-full bg-[#c084fc]/30 blur-3xl [animation-delay:-4.5s]" />
-          </div>
-          <div className="px-6 pb-6">
-            <div className="-mt-12 flex flex-wrap items-start gap-4">
-              <AvatarUploader initial={initial} initialUrl={p?.photoUrl ?? null} />
-              <div className="flex h-24 min-w-0 flex-1 flex-col justify-end pb-1">
-                <h1 className="truncate text-2xl font-bold text-slate-900">
-                  {p?.fullName ?? user.email}
-                </h1>
-                <p className="truncate text-sm text-slate-500">{user.email}</p>
-              </div>
-            </div>
+        {/* Kartu identitas — glassmorphism di atas latar aurora */}
+        <div className="animate-fade-up relative mt-3 overflow-hidden rounded-3xl border border-slate-200/70 bg-slate-100 shadow-sm">
+          {/* Aurora: bola cahaya membaur di belakang kaca */}
+          <div className="animate-float-slow absolute -top-16 -left-12 h-60 w-60 rounded-full bg-indigo-400/40 blur-3xl" aria-hidden />
+          <div className="animate-float-slow absolute -right-10 -bottom-20 h-60 w-60 rounded-full bg-violet-400/40 blur-3xl [animation-delay:-3s]" aria-hidden />
+          <div className="animate-float-slow absolute top-4 right-1/3 h-44 w-44 rounded-full bg-sky-400/30 blur-3xl [animation-delay:-6s]" aria-hidden />
 
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold tracking-wide uppercase ${
-                  isSuper
-                    ? 'bg-gradient-to-r from-[#4f46e5] to-[#7c3aed] text-[#f8fafc]'
-                    : 'bg-indigo-50 text-indigo-700'
-                }`}
-              >
-                {isSuper && <Icon name="shield" className="h-3 w-3" />}
-                {roleLabel}
-              </span>
-              {p?.unicalId && (
-                <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
-                  {p.unicalId}
-                </span>
-              )}
-              {p && user.role === 'MEMBER' &&
-                (p.isVerified ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                    <Icon name="shield" className="h-3 w-3" />
-                    Terverifikasi
+          {/* Panel kaca buram */}
+          <div className="relative m-2.5 rounded-[1.4rem] border border-white/60 bg-white/55 p-6 shadow-[0_10px_40px_rgba(2,6,23,0.10)] backdrop-blur-2xl sm:p-8">
+            <div className="flex flex-wrap items-center gap-5">
+              <AvatarUploader initial={initial} initialUrl={p?.photoUrl ?? null} />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-2xl font-bold text-slate-900">
+                    {p?.fullName ?? user.email}
+                  </h1>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
+                      isSuper
+                        ? 'bg-gradient-to-r from-[#4f46e5] to-[#7c3aed] text-[#f8fafc]'
+                        : 'bg-indigo-500/15 text-indigo-700'
+                    }`}
+                  >
+                    {isSuper && <Icon name="shield" className="h-3 w-3" />}
+                    {roleLabel}
                   </span>
-                ) : (
-                  <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
-                    Menunggu verifikasi
-                  </span>
-                ))}
+                </div>
+                <p className="mt-0.5 truncate text-sm text-slate-500">{user.email}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {p?.unicalId && (
+                    <span className="inline-flex items-center rounded-full bg-white/60 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-white/60">
+                      {p.unicalId}
+                    </span>
+                  )}
+                  {p && user.role === 'MEMBER' &&
+                    (p.isVerified ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                        <Icon name="shield" className="h-3 w-3" />
+                        Terverifikasi
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-700">
+                        Menunggu verifikasi
+                      </span>
+                    ))}
+                </div>
+              </div>
             </div>
 
             {p?.bio && (
@@ -126,7 +125,7 @@ function ProfileView({ user }: { user: SessionUser }) {
                 {p.expertise.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700"
+                    className="inline-flex items-center rounded-full bg-indigo-500/15 px-2.5 py-1 text-xs font-medium text-indigo-700"
                   >
                     {tag}
                   </span>
@@ -134,7 +133,7 @@ function ProfileView({ user }: { user: SessionUser }) {
               </div>
             )}
 
-            <dl className="mt-6 grid gap-x-6 gap-y-4 sm:grid-cols-2">
+            <dl className="mt-6 grid gap-3 sm:grid-cols-2">
               <Detail label="ORCID" value={p?.orcid} />
               <Detail label="Institusi" value={p?.institution} />
               <Detail label="Fakultas" value={p?.faculty} />
@@ -396,9 +395,13 @@ function AvatarUploader({
 
 function Detail({ label, value }: { label: string; value?: string | null }) {
   return (
-    <div>
-      <dt className="text-xs font-medium tracking-wide text-slate-400 uppercase">{label}</dt>
-      <dd className="mt-0.5 text-sm text-slate-800">{value || '—'}</dd>
+    <div className="rounded-xl border border-white/60 bg-white/40 px-3.5 py-2.5">
+      <dt className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+        {label}
+      </dt>
+      <dd className="mt-0.5 truncate text-sm font-medium text-slate-800">
+        {value || '—'}
+      </dd>
     </div>
   );
 }
