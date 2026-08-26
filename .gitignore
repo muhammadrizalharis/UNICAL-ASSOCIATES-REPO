@@ -37,6 +37,7 @@ Thumbs.db
 
 # Dokumen rencana internal (khusus server, jangan dipublikasikan)
 unical-associates-repo.md
+fitur-dan-keamanan.md
 
 # Artefak runtime Playwright (screenshot dokumentasi TETAP di-commit)
 frontend/e2e/output/
