@@ -74,9 +74,9 @@ function ProfileView({ user }: { user: SessionUser }) {
             aria-hidden
           />
           <div className="px-6 pb-6">
-            <div className="-mt-12 flex flex-wrap items-end gap-4">
+            <div className="-mt-12 flex flex-wrap items-start gap-4">
               <AvatarUploader initial={initial} initialUrl={p?.photoUrl ?? null} />
-              <div className="min-w-0 flex-1 pb-1">
+              <div className="flex h-24 min-w-0 flex-1 flex-col justify-end pb-1">
                 <h1 className="truncate text-2xl font-bold text-slate-900">
                   {p?.fullName ?? user.email}
                 </h1>
@@ -316,43 +316,43 @@ function AvatarUploader({
   const shownUrl = preview?.url ?? photoUrl;
 
   return (
-    <div className="relative shrink-0">
-      <span className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-4xl font-bold text-[#f8fafc] shadow-lg">
-        {shownUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={shownUrl} alt="Foto profil" className="h-full w-full object-cover" />
-        ) : (
-          initial
-        )}
-      </span>
-
-      {!preview && (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={busy}
-          title="Ubah foto profil"
-          aria-label="Ubah foto profil"
-          className="absolute -right-1.5 -bottom-1.5 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#4f46e5] text-[#f8fafc] shadow-md transition hover:bg-[#4338ca] disabled:opacity-60"
-        >
-          {busy ? (
-            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+    <div className="flex shrink-0 flex-col items-center gap-2">
+      <div className="relative h-24 w-24">
+        <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] text-4xl font-bold text-[#f8fafc] shadow-lg">
+          {shownUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={shownUrl} alt="Foto profil" className="h-full w-full object-cover" />
           ) : (
-            <Icon name="camera" className="h-4 w-4" />
+            initial
           )}
-        </button>
-      )}
-
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        className="hidden"
-        onChange={onPick}
-      />
+        </span>
+        {!preview && (
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={busy}
+            title="Ubah foto profil"
+            aria-label="Ubah foto profil"
+            className="absolute -right-1.5 -bottom-1.5 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#4f46e5] text-[#f8fafc] shadow-md transition hover:bg-[#4338ca] disabled:opacity-60"
+          >
+            {busy ? (
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+            ) : (
+              <Icon name="camera" className="h-4 w-4" />
+            )}
+          </button>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          className="hidden"
+          onChange={onPick}
+        />
+      </div>
 
       {preview ? (
-        <div className="absolute top-full left-0 z-10 mt-2 flex w-max items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={save}
@@ -376,7 +376,7 @@ function AvatarUploader({
             type="button"
             onClick={remove}
             disabled={busy}
-            className="absolute top-full left-0 mt-2 text-[11px] font-medium text-rose-600 transition hover:underline disabled:opacity-60"
+            className="text-[11px] font-medium text-rose-600 transition hover:underline disabled:opacity-60"
           >
             Hapus foto
           </button>
@@ -384,9 +384,7 @@ function AvatarUploader({
       )}
 
       {error && (
-        <p className="absolute top-full left-0 mt-8 w-40 text-[11px] text-rose-600">
-          {error}
-        </p>
+        <p className="max-w-[8rem] text-center text-[11px] text-rose-600">{error}</p>
       )}
     </div>
   );
