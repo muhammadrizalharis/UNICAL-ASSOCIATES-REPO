@@ -7,7 +7,7 @@
  * Aksi    : /backup /backupinfo /restart <svc> /log <svc> /sitasi /reindex /metrik
  * Bantuan : /bantuan
  *
- * Jalankan: nohup node scripts/unical-ops-bot.mjs >> ~/.unical-ops-bot.log 2>&1 &
+ * Jalankan: nohup node scripts/unical-ops-bot.mjs >> ~/logs/unical-ops-bot.log 2>&1 &
  * (cron @reboot + watchdog pgrep sudah dipasang otomatis.)
  */
 import { execFile } from 'node:child_process';
@@ -220,12 +220,12 @@ async function cmdDisk() {
 async function cmdBackup() {
   await send('⏳ Menjalankan backup…');
   const out = await run('bash', [join(PROJECT, 'scripts', 'unical-backup.sh')], 600_000);
-  const log = await run('tail', ['-4', join(HOME, '.unical-backup.log')]);
+  const log = await run('tail', ['-4', join(HOME, 'logs', 'unical-backup.log')]);
   return `🗄 Backup selesai.\n${log}${out && out !== '(tanpa output)' ? `\n${out}` : ''}`;
 }
 
 async function cmdBackupInfo() {
-  const log = await run('tail', ['-8', join(HOME, '.unical-backup.log')]);
+  const log = await run('tail', ['-8', join(HOME, 'logs', 'unical-backup.log')]);
   const ls = await run('ls', ['-lht', join(HOME, 'unical-backups')]);
   return `📜 Log terakhir:\n${log}\n\n📁 Berkas:\n${ls.split('\n').slice(0, 10).join('\n')}`;
 }

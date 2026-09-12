@@ -9,7 +9,7 @@ set -u
 
 PROJECT_DIR="$HOME/UNICAL ASSOCIATES"
 DIR="$HOME/unical-backups"
-LOG="$HOME/.unical-backup.log"
+LOG="$HOME/logs/unical-backup.log"
 APP_ENV="$PROJECT_DIR/.env"
 KEEP=14
 
@@ -62,7 +62,7 @@ if docker exec unical-postgres pg_dump -U unical -d unical \
   log "OK: db $(du -h "$DB_FILE" | cut -f1) -> $(basename "$DB_FILE")"
 else
   log "GAGAL: pg_dump"
-  tg_notify "⚠️ Backup UNICAL GAGAL: pg_dump error. Cek ~/.unical-backup.log"
+  tg_notify "⚠️ Backup UNICAL GAGAL: pg_dump error. Cek ~/logs/unical-backup.log"
   rm -f "$DB_FILE"
   FAIL=1
 fi

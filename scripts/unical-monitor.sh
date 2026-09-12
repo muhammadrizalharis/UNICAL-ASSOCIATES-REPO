@@ -5,7 +5,7 @@
 set -u
 
 PROJECT_DIR="$HOME/UNICAL ASSOCIATES"
-LOG="$HOME/.unical-monitor.log"
+LOG="$HOME/logs/unical-monitor.log"
 APP_ENV="$PROJECT_DIR/.env"
 HEALTH_URL="http://127.0.0.1:48080/api/v1/health"
 STATE="$HOME/.unical-monitor.state"
