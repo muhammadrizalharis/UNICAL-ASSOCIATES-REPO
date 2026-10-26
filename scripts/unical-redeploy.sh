@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
-# Redeploy UNICAL ASSOCIATES di server self-hosted.
-# Jalankan DI SERVER tempat docker-compose berjalan, bukan di mesin dev.
+# Redeploy UNICAL ASSOCIATES (sepenuhnya Docker).
+# Jalankan di host tempat container berjalan.
 #
-#   ./scripts/unical-redeploy.sh
+#   cd "$HOME/UNICAL ASSOCIATES" && ./scripts/unical-redeploy.sh
 #
-# Script akan: ambil kode terbaru dari main, rebuild image Docker (menarik
-# base image Node terbaru untuk patch keamanan), lalu restart service.
+# CATATAN: path repo mengandung spasi. Jika memanggil dengan path lengkap,
+# WAJIB dikutip, mis.:
+#   "$HOME/UNICAL ASSOCIATES/scripts/unical-redeploy.sh"
+#
+# Hanya service aplikasi (api, web, worker) yang di-rebuild. Infra
+# (postgres/redis/meili/minio/nginx) dibiarkan berjalan agar tidak kena
+# rate-limit pull Docker Hub.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -15,14 +20,15 @@ git fetch origin
 git checkout main
 git pull --ff-only origin main
 
-echo "==> Rebuild & restart container (tanpa cache base image lama)"
-docker compose pull || true
-docker compose build --pull
-docker compose up -d
+echo "==> Rebuild image aplikasi (base Node terbaru via --pull)"
+docker compose build --pull api web
+
+echo "==> Recreate container aplikasi saja"
+docker compose up -d api web worker nginx
 
 echo "==> Status"
-docker compose ps
+docker compose ps api web worker nginx
 
-echo "==> Selesai. Verifikasi runtime di dalam container bila perlu:"
-echo "    docker compose exec frontend node --version"
-echo "    docker compose exec backend node --version"
+echo "==> Verifikasi versi di dalam container:"
+echo "    docker exec unical-web node -e \"console.log(require('next/package.json').version, process.version)\""
+echo "    docker exec unical-api node --version"
